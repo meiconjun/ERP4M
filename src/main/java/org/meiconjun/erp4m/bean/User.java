@@ -1,4 +1,4 @@
-package org.meiconjun.bean;
+package org.meiconjun.erp4m.bean;
 
 /**
  * 登录用户Bean

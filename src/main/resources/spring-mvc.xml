@@ -17,12 +17,18 @@
       http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
     <!-- 1.注解扫描位置-->
-    <context:component-scan base-package="org.meiconjun.controller" />
+    <context:component-scan base-package="org.meiconjun.erp4m.controller" />
 
     <!-- 2.配置映射处理和适配器-->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
 
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="org.meiconjun.erp4m.interceptor.UserSessionInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors>
     <!-- 3.视图的解析器-->
     <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/jsp/" />

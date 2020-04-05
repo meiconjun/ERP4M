@@ -1,6 +1,6 @@
-package org.meiconjun.interceptor;
+package org.meiconjun.erp4m.interceptor;
 
-import org.meiconjun.bean.User;
+import org.meiconjun.erp4m.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -25,13 +25,17 @@ public class UserSessionInterceptor implements HandlerInterceptor {
         //获取请求的URO：取出http:[ip]:[port]后剩下的
         String uri = request.getRequestURI();
 
-        // 判断访问地址是否是不需要拦截的
-        for (String s : except_url) {
-            if (uri.endsWith(s)) {
+            // 判断访问地址是否是不需要拦截的
+            if (uri.endsWith(".css") || uri.endsWith(".json") || uri.endsWith(".js") || uri.endsWith(".jpg")
+            || uri.endsWith(".png") || uri.endsWith(".ico") || uri.endsWith(".txt")) {
                 passFlag = true;
             }
-        }
-        if (passFlag == true) {
+            for (String s : except_url) {
+                if (uri.contains(s)) {
+                    passFlag = true;
+                }
+            }
+            if (passFlag == true) {
             logger.info("本地请求不需拦截,URI[" + uri + "]");
         } else {
             // 获取session
@@ -41,7 +45,7 @@ public class UserSessionInterceptor implements HandlerInterceptor {
                 passFlag = true;
 } else {
         // 未登录
-        logger.info("请求未登录，拦截");
+        logger.info("请求未登录，拦截,uri:[" + uri + "]");
         request.setAttribute("err_msg", "您未登录或登录已失效，请重新登录！");
         request.getRequestDispatcher("/WEB-INF/static/html/login.html").forward(request, response);
         }

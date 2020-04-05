@@ -44,7 +44,7 @@
         <!-- 注入数据库连接池 -->
         <property name="dataSource" ref="dataSource"/>
         <!-- 扫描bean包 使用别名 -->
-        <property name="typeAliasesPackage" value="com.zhongruan.bean"></property>
+        <property name="typeAliasesPackage" value="org.meiconjun.erp4m.bean"></property>
 
         <!--配置加载映射文件 UserMapper.xml-->
         <property name="mapperLocations" value="classpath:mapper/*.xml"/>
@@ -55,7 +55,7 @@
     <!-- 4.配置扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <!-- 给出需要扫描Dao接口包 -->
-        <property name="basePackage" value="org.meiconjun.dao"/>
+        <property name="basePackage" value="org.meiconjun.erp4m.dao"/>
         <!-- 注入sqlSessionFactory -->
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
@@ -63,7 +63,7 @@
 
 
     <!--自动扫描-->
-    <context:component-scan base-package="org.meiconjun"/>
+    <context:component-scan base-package="org.meiconjun.erp4m"/>
 
 
     <!-- 配置事务-->
