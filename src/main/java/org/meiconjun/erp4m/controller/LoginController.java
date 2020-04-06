@@ -1,5 +1,6 @@
 package org.meiconjun.erp4m.controller;
 
+import com.google.gson.reflect.TypeToken;
 import org.meiconjun.erp4m.base.BaseController;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
@@ -36,11 +37,12 @@ public class LoginController extends BaseController {
     @RequestMapping(value = "/login.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String excute(HttpServletRequest request, HttpServletResponse response) {
-        return super.excuteRequest(request, User.class);
+        return super.excuteRequest(request, new TypeToken<RequestBean<User>>(){}.getType());
     }
 
     @Override
-    protected void doAction(HttpServletRequest request, RequestBean requestBean, ResponseBean responseBean) {
+    protected ResponseBean doAction(HttpServletRequest request, RequestBean requestBean) {
+        ResponseBean responseBean = new ResponseBean();
         try {
             responseBean = loginService.excute(requestBean);
             if (SystemContants.HANDLE_SUCCESS.equals(responseBean.getRetCode())) {
@@ -52,6 +54,7 @@ public class LoginController extends BaseController {
             responseBean.setRetMsg("调用服务类异常");
             logger.error("调用服务类异常:" + e.getMessage(), e);
         }
+        return responseBean;
     }
 
 //    public

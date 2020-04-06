@@ -11,5 +11,5 @@ import org.meiconjun.erp4m.bean.ResponseBean;
  * @date 2020/4/5 20:16
  */
 public interface LoginService {
-    public ResponseBean excute(RequestBean requestBean) throws Exception;
+    ResponseBean excute(RequestBean requestBean) throws Exception;
 }

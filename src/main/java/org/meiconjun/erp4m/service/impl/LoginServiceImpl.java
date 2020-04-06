@@ -6,6 +6,8 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.LoginDao;
 import org.meiconjun.erp4m.service.LoginService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ import java.util.Map;
 @Service("loginService")
 @Transactional
 public class LoginServiceImpl implements LoginService {
+    private Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
     @Resource
     private LoginDao loginDao;
 
@@ -50,9 +53,11 @@ public class LoginServiceImpl implements LoginService {
 
             List<HashMap<String, Object>> userList = loginDao.selectUser(condMap);
             if (userList.isEmpty()) {
+                logger.info("用户号或密码错误！");
                 responseBean.setRetCode(SystemContants.HANDLE_FAIL);
                 responseBean.setRetMsg("用户号或密码错误！");
             } else {
+                logger.info("用户名密码正确！");
                 HashMap<String, Object> userMap = userList.get(0);
                 User user2 = new User();
                 user2.setUser_no((String) userMap.get("USER_NO"));

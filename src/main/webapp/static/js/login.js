@@ -37,7 +37,7 @@ function login() {
         'operType' : 'login',
         'paramMap' : {}
     };
-    let retData = commonAjax("login.do", $.toJSON(msg));
+    let retData = commonAjax("login.do", JSON.stringify(msg));
     if (retData.retCode == '0') {
         window.location.href = 'index.html';
     } else {

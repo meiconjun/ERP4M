@@ -26,12 +26,12 @@ public abstract class BaseController {
      * @param paramClass
      * @return
      */
-    protected String excuteRequest (HttpServletRequest request, Class paramClass) {
+    protected String excuteRequest (HttpServletRequest request, Type paramClass) {
         String retStr = "";
-        RequestBean requestBean = null;
-        ResponseBean responseBean = null;
-        beforeAction(request, paramClass, requestBean);
-        doAction(request, requestBean, responseBean);
+        RequestBean requestBean;
+        ResponseBean responseBean;
+        requestBean = beforeAction(request, paramClass);
+        responseBean = doAction(request, requestBean);
         retStr = afterAction(responseBean);
         return retStr;
     }
@@ -40,24 +40,23 @@ public abstract class BaseController {
      * 前置动作，打印报文等
      * @param request
      * @param paramClass
-     * @param requestBean
      */
-    protected void beforeAction (HttpServletRequest request, Class paramClass, RequestBean requestBean) {
+    protected  RequestBean beforeAction (HttpServletRequest request, Type paramClass) {
 
         String reqJson = request.getParameter("message");
         // 打印请求报文
-        logger.info("请求报文:" + CommonUtil.formatJson(reqJson));
+        logger.info("请求报文:\n" + CommonUtil.formatJson(reqJson));
         // 将json报文转为requestBean
-        requestBean = (RequestBean) CommonUtil.jsonToObj(reqJson, paramClass);
+//        return (RequestBean) CommonUtil.jsonToObj(reqJson, RequestBean.class);
+        return (RequestBean) CommonUtil.jsonToObj(reqJson, paramClass);
     }
 
     /**
      * 实际分发逻辑，子类实现
      * @param request
      * @param requestBean
-     * @param responseBean
      */
-    protected abstract void doAction (HttpServletRequest request, RequestBean requestBean, ResponseBean responseBean);
+    protected abstract ResponseBean doAction (HttpServletRequest request, RequestBean requestBean);
 
     /**
      * 后置操作，打印报文等
@@ -66,7 +65,7 @@ public abstract class BaseController {
      */
     protected String afterAction (ResponseBean responseBean) {
         String retStr = CommonUtil.objToJson(responseBean);
-        logger.info("返回报文:" + retStr);
+        logger.info("返回报文:\n" + retStr);
         return retStr;
     }
 }

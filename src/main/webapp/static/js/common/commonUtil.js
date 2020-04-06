@@ -61,6 +61,7 @@ function commonError(msg, f) {
  * @param is_async true-同步，false-异步，不传则默认false
  */
 function commonAjax(url, data, is_async) {
+    // console.log("发送请求......");
     let result = null;
     let async = false;
     if (!commonBlank(is_async)) {
