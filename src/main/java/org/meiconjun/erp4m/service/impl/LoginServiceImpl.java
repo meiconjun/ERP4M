@@ -60,15 +60,16 @@ public class LoginServiceImpl implements LoginService {
                 logger.info("用户名密码正确！");
                 HashMap<String, Object> userMap = userList.get(0);
                 User user2 = new User();
-                user2.setUser_no((String) userMap.get("USER_NO"));
-                user2.setUser_name((String) userMap.get("USER_NAME"));
-                user2.setAuth_user((String) userMap.get("AUTH_USER"));
-                user2.setEmail((String) userMap.get("EMAIL"));
-                user2.setPhone((String) userMap.get("PHONE"));
-                user2.setPass_word((String) userMap.get("PASS_WORD"));
-                user2.setPicture((String) userMap.get("PICTURE"));
-                user2.setStatus((String) userMap.get("STATUS"));
+                user2.setUser_no((String) userMap.get("user_no"));
+                user2.setUser_name((String) userMap.get("user_name"));
+                user2.setAuth_user((String) userMap.get("auth_user"));
+                user2.setEmail((String) userMap.get("email"));
+                user2.setPhone((String) userMap.get("phone"));
+//                user2.setPass_word((String) userMap.get("pass_word"));
+                user2.setPicture((String) userMap.get("picture"));
+                user2.setStatus((String) userMap.get("status"));
 
+                logger.info("USER_no:" + user2.getUser_no());
                 Map retMap = new HashMap();
                 retMap.put("user", user2);
                 responseBean.setRetMap(retMap);

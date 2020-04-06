@@ -39,7 +39,10 @@ function login() {
     };
     let retData = commonAjax("login.do", JSON.stringify(msg));
     if (retData.retCode == '0') {
+        sessionStorage.setItem("user_info", JSON.stringify(retData.retMap.user));//前台缓存中存储用户信息
         window.location.href = 'index.html';
+        commonOk("登录成功！");
+
     } else {
         commonError(retData.retMsg);
     }
