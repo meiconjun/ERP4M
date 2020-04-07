@@ -15,9 +15,19 @@ $(document).ready(function () {
 
         $("#user_name_min").text(user_info.user_name);
         $("#user_name_main").text(user_info.user_name + ' - 普通员工');
+        $("#user_name_sidebar").text(user_info.user_name);
+
+        initMenuLeft(user_info.user_no);
     } catch (e) {
         alert("加载主页异常：" + e.message);
         console.error(e.message);
     }
 
 });
+
+/**
+ * 初始化左侧菜单列表
+ */
+function initMenuLeft(user_no) {
+
+}

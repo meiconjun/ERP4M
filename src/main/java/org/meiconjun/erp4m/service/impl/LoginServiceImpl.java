@@ -69,14 +69,18 @@ public class LoginServiceImpl implements LoginService {
                 user2.setPicture((String) userMap.get("picture"));
                 user2.setStatus((String) userMap.get("status"));
 
-                logger.info("USER_no:" + user2.getUser_no());
                 Map retMap = new HashMap();
-                retMap.put("user", user2);
-                responseBean.setRetMap(retMap);
-                responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
-                responseBean.setRetMsg("登录成功！");
+                //判断用户是否被停用
+                if ("2".equals(user2.getStatus())) {
+                    responseBean.setRetCode(SystemContants.HANDLE_FAIL);
+                    responseBean.setRetMsg("该用户已被停用，请联系管理员！");
+                } else {
+                    retMap.put("user", user2);
+                    responseBean.setRetMap(retMap);
+                    responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+                    responseBean.setRetMsg("登录成功！");
+                }
             }
-
     }
 
 }
