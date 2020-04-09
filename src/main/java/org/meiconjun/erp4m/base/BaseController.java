@@ -18,7 +18,7 @@ import java.lang.reflect.Type;
  * @date 2020/4/518:05
         */
 public abstract class BaseController {
-    private Logger logger = LoggerFactory.getLogger(BaseController.class);
+    protected Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     /**
      *
