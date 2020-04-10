@@ -1,17 +1,17 @@
-var layer;
 $(document).ready(function () {
     try {
-        //layui相关模组初始化------此处似乎是异步的！！未加载完执行到下面会报错
-        layui.use(['layer'], function () {
-            layer = layui.layer;
-        });
+        /*============初始化操作 begin===============*/
+
+        /*============初始化操作 end===============*/
+
         //获取登录用户信息
         let user_info;
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
         } else {
-            commonError("您未登录或登录已失效！");
-            window.location.href = 'login.html';
+            commonError("您未登录或登录已失效！",function () {
+                window.location.href = 'login.html';
+            });
             return;
         }
 
@@ -39,7 +39,7 @@ function initMenuLeft(user_no) {
         }
     }
     let retData = commonAjax("menu.do", JSON.stringify(msg));
-    if (retData.retCode == '0') {
+    if (retData.retCode == HANDLE_SUCCESS) {
         // 菜单列表
         let menuList = [
             {
@@ -100,7 +100,7 @@ function initMenuLeft(user_no) {
                     menuli.setAttribute("class", "treeview");
                     $(menuli).append("<a href='#'></a>");
                     $(menuli.childNodes[0]).append("<i class='fa fa-" + menuList[i].menu_icon + "'></i>");//菜单小图标
-                    $(menuli.childNodes[0]).append("<span>" + menuList[i].menu_name + "</span>");//菜单名称
+                    $(menuli.childNodes[0]).append("<span title='" + menuList[i].menu_desc + "'>" + menuList[i].menu_name + "</span>");//菜单名称
                     $(menuli.childNodes[0]).append("<span class='pull-right-container'><i class='fa fa-angle-left pull-right'></i></span>");//右侧箭头
                     // 子菜单列表容器
                     $(menuli).append('<ul class="treeview-menu"></ul>');
@@ -109,7 +109,7 @@ function initMenuLeft(user_no) {
                 } else {
                     //非父级
                     $(menuli).append("<a href='" + menuList[i].menu_url + "'></a>");
-                    $(menuli.childNodes[0]).append("<i class='fa fa-" + menuList[i].menu_icon + "'></i><span>" + menuList[i].menu_name + "</span>");
+                    $(menuli.childNodes[0]).append("<i class='fa fa-" + menuList[i].menu_icon + "'></i><span title='" + menuList[i].menu_desc + "'>" + menuList[i].menu_name + "</span>");
                 }
                 contObj.append(menuli);
             }

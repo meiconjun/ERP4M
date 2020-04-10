@@ -7,6 +7,7 @@ import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.service.MenuService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  * @Description: 菜单操作控制器
  * @date 2020/4/9 21:02
  */
+@Controller
 public class MenuController extends BaseController {
 
     @Resource(name = "menuService")
