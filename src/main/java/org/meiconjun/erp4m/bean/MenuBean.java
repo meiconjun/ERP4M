@@ -40,6 +40,18 @@ public class MenuBean {
      * 最后修改时间
      */
     private String last_modi_time;
+    /**
+     * 菜单图标
+     */
+    private String menu_icon;
+
+    public String getMenu_icon() {
+        return menu_icon;
+    }
+
+    public void setMenu_icon(String menu_icon) {
+        this.menu_icon = menu_icon;
+    }
 
     public String getMenu_id() {
         return menu_id;

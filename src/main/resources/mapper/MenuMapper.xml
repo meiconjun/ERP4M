@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.MenuDao">
+    <select id="selectRoleAuthMenu" parameterType="java.util.HashMap" resultType="org.meiconjun.erp4m.bean.MenuBean">
+        select m.* from sys_user_tb u, sys_user_role_tb r, sys_role_right_tb rr, sys_menu_tb m
+        where u.user_no = #{user_no} and u.user_no = r.user_no and r.role_no = rr.role_no
+        and rr.field_no = m.menu_id
+    </select>
+
+    <select id="selectUserAuthMenu" parameterType="java.util.HashMap" resultType="org.meiconjun.erp4m.bean.MenuBean">
+        select m.* from sys_user_tb u, sys_user_right_tb rr, sys_menu_tb m
+        where u.user_no = #{user_no} and u.user_no = rr.user_no
+        and rr.field_no = m.menu_id
+    </select>
+</mapper>

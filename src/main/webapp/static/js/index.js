@@ -28,7 +28,7 @@ $(document).ready(function () {
 });
 
 /**
- * 初始化左侧菜单列表
+ * 初始化左侧菜单列表，并获取按钮权限
  */
 function initMenuLeft(user_no) {
     let msg = {

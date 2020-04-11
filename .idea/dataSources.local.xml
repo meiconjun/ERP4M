@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="tencent cloud" uuid="cebe9e06-0bcf-4178-8b5b-019953d8590f">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="MYSQL" exact-version="0" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>erp4m</user-name>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>
