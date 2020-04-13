@@ -37,58 +37,12 @@ function initMenuLeft(user_no) {
         "paramMap" : {
             "user_no" : user_no
         }
-    }
+    };
     let retData = commonAjax("menu.do", JSON.stringify(msg));
     if (retData.retCode == HANDLE_SUCCESS) {
         // 菜单列表
-        let menuList = [
-            {
-                'menu_id' : 'S10000',
-                "menu_name" : '系统管理',
-                'parent_menu' : '',
-                'menu_desc' : '系统管理',
-                "menu_url" : '/',
-                "menu_level" : "1",
-                "is_parent" : '1',
-                "menu_icon" : "bars",
-                "submemus" : [
-                    {
-                        'menu_id' : 'S10100',
-                        "menu_name" : '角色管理',
-                        'parent_menu' : 'S10000',
-                        'menu_desc' : '角色管理',
-                        "menu_url" : 'static/html/system/roleConfig.html',
-                        "menu_level" : "2",
-                        "is_parent" : '0',
-                        "menu_icon" : "bars",
-                        "submemus" : ''
-                    }
-                ]
-            },
-            {
-                'menu_id' : 'S20000',
-                "menu_name" : '项目管理',
-                'parent_menu' : '',
-                'menu_desc' : '项目管理',
-                "menu_url" : '/',
-                "menu_level" : "1",
-                "is_parent" : '1',
-                "menu_icon" : "bars",
-                "submemus" : [
-                    {
-                        'menu_id' : 'S20100',
-                        "menu_name" : '项目立项',
-                        'parent_menu' : 'S20000',
-                        'menu_desc' : '项目立项',
-                        "menu_url" : 'static/html/project/beginProject.html',
-                        "menu_level" : "2",
-                        "is_parent" : '0',
-                        "menu_icon" : "bars",
-                        "submemus" : ''
-                    }
-                ]
-            }
-        ];
+        let menuList = retData.retMap.menuList;
+        console.log(menuList);
         /*================  init MenuTree left  begin ================*/
         let $sidebar_menu = $("#sidebar-menu");// 左侧菜单容器Jquery对象
 

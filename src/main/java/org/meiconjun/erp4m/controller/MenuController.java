@@ -38,7 +38,7 @@ public class MenuController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/menu.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     public String excute(HttpServletRequest request, HttpServletResponse response) {
-        return super.excuteRequest(request, new TypeToken<RequestBean<MenuBean>>(){}.getClass());
+        return super.excuteRequest(request, new TypeToken<RequestBean<MenuBean>>(){}.getType());
     }
 
     /**

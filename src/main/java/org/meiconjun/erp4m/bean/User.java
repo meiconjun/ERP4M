@@ -1,9 +1,13 @@
 package org.meiconjun.erp4m.bean;
 
+import java.io.Serializable;
+
 /**
  * 登录用户Bean
  */
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = -7157721651022408945L;
     /**
      * 用户号
      */

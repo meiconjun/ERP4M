@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.bean;
 
+import java.io.Serializable;
+
 /**
  * @author Lch
  * @Title: MenuBean
@@ -7,7 +9,8 @@ package org.meiconjun.erp4m.bean;
  * @Description: 菜单实体类
  * @date 2020/4/9 20:45
  */
-public class MenuBean {
+public class MenuBean implements Serializable {
+    private static final long serialVersionUID = 239749048512907771L;
     /**
      * 菜单编号
      */

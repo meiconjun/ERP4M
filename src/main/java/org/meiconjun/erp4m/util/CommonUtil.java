@@ -28,7 +28,7 @@ public class CommonUtil {
     /**
      * Json解析器
      */
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
     /**
      * 将Json字符串解析成对象,注意传递数字要使用字符串形式，否则转换类型会异常
