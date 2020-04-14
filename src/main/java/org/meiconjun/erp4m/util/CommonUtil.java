@@ -17,6 +17,14 @@ import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
 import info.monitorenter.cpdetector.io.JChardetFacade;
 import info.monitorenter.cpdetector.io.ParsingDetector;
 import info.monitorenter.cpdetector.io.UnicodeDetector;
+import org.meiconjun.erp4m.bean.User;
+import org.meiconjun.erp4m.interceptor.RequestHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * 公共工具类
@@ -25,6 +33,8 @@ import info.monitorenter.cpdetector.io.UnicodeDetector;
  * @time 2019年4月7日上午1:02:03
  */
 public class CommonUtil {
+
+    private static Logger logger = LoggerFactory.getLogger(CommonUtil.class);
     /**
      * Json解析器
      */
@@ -166,5 +176,19 @@ public class CommonUtil {
             swapStream.close();
         }
         return in2b;
+    }
+
+    /**
+     * 获取当前登录用户
+     * @return
+     */
+    public static User getLoginUser() {
+        HttpServletRequest request = RequestHolder.getHttpServletRequest();
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("USER_SESSION");
+        if (user == null) {
+            logger.error("===================获取登录用户为空====================");
+        }
+        return user;
     }
 }

@@ -102,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
                     menuMap.put("submemus", getMenu(m.getMenu_id(), roleMenuList, userMenuList, user_no));
                 }
                 //获取角色和用户的有权按钮
-                menuMap.put("buttonList", getButton(user_no, m.getMenu_id()));
+                /*menuMap.put("buttonList", getButton(user_no, m.getMenu_id()));*/
                 retList.add(menuMap);
                 idStr += "," + m.getMenu_id();
             }
@@ -124,45 +124,12 @@ public class MenuServiceImpl implements MenuService {
                 }
                 // 获取角色和用户的有权按钮
                 //获取角色和用户的有权按钮
-                menuMap.put("buttonList", getButton(user_no, m.getMenu_id()));
+                /*menuMap.put("buttonList", getButton(user_no, m.getMenu_id()));*/
                 retList.add(menuMap);
             }
         }
         return retList;
     }
 
-    /**
-     * 获取按钮列表
-     * @param user_no
-     * @param menu_id
-     * @return
-     */
-    private List<HashMap<String, String>> getButton(String user_no, String menu_id) {
-        List<HashMap<String, String>> retList = new ArrayList<HashMap<String, String>>();
-        HashMap<String, Object> condMap = new HashMap<String, Object>();
-        condMap.put("user_no", user_no);
-        condMap.put("menu_id", menu_id);
-        List<ButtonBean> roleButtonList = menuDao.selectRoleAuthButton(condMap);
-        List<ButtonBean> userButtonList = menuDao.selectUserAuthButton(condMap);
-        String idStr = "";
-        // 合并角色和用户权限按钮
-        for (ButtonBean b : roleButtonList) {
-            HashMap<String, String> buttonMap = new HashMap<String, String>();
-            buttonMap.put("button_id", b.getButton_id());
-            buttonMap.put("button_name", b.getButton_name());
-            buttonMap.put("button_type", b.getButton_type());
-            retList.add(buttonMap);
-            idStr += "," + b.getButton_id();
-        }
-        for (ButtonBean b : userButtonList) {
-            if (idStr.contains(b.getButton_id())) {
-                HashMap<String, String> buttonMap = new HashMap<String, String>();
-                buttonMap.put("button_id", b.getButton_id());
-                buttonMap.put("button_name", b.getButton_name());
-                buttonMap.put("button_type", b.getButton_type());
-                retList.add(buttonMap);
-            }
-        }
-        return retList;
-    }
+
 }

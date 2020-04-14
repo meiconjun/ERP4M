@@ -24,12 +24,5 @@ public interface MenuDao {
      * 根据用户号获取用户的菜单列表
      */
     public List<MenuBean> selectUserAuthMenu(HashMap<String, Object> condMap);
-    /**
-     * 根据用户角色和菜单号获取角色的菜单按钮
-     */
-    public List<ButtonBean> selectRoleAuthButton(HashMap<String, Object> condMap);
-    /**
-     * 根据用户号和菜单号获取用户的菜单按钮
-     */
-    public List<ButtonBean> selectUserAuthButton(HashMap<String, Object> condMap);
+
 }
