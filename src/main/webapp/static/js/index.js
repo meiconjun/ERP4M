@@ -42,7 +42,9 @@ function initMenuLeft(user_no) {
     if (retData.retCode == HANDLE_SUCCESS) {
         // 菜单列表
         let menuList = retData.retMap.menuList;
-        console.log(menuList);
+        // 菜单列表存到缓存里
+        sessionStorage.setItem("menuList", JSON.stringify(menuList));
+        // 构造左侧菜单
         /*================  init MenuTree left  begin ================*/
         let $sidebar_menu = $("#sidebar-menu");// 左侧菜单容器Jquery对象
 

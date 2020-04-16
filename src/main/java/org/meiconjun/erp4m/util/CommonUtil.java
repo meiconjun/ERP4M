@@ -21,7 +21,6 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

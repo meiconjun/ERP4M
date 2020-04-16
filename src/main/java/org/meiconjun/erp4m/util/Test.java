@@ -38,7 +38,7 @@ public class Test {
         RequestBean bean = (RequestBean) CommonUtil.jsonToObj(json, RequestBean.class);
 
         System.out.println(CommonUtil.formatJson(CommonUtil.objToJson(bean)));*/
-        String aaa = "{\n" +
+        /*String aaa = "{\n" +
                 "        'beanList' : [{\n" +
                 "            \"user_no\" : user_no,\n" +
                 "            'pass_word' : pass_word\n" +
@@ -48,6 +48,6 @@ public class Test {
                 "    }";
         Gson gson = new Gson();
         RequestBean re = (RequestBean) gson.fromJson(aaa, new TypeToken<RequestBean<User>>(){}.getType());
-        User u = (User) re.getBeanList().get(0);
+        User u = (User) re.getBeanList().get(0);*/
     }
 }
