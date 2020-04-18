@@ -1,5 +1,16 @@
+var ws = null;//websocket连接对象
 $(document).ready(function () {
     try {
+        // 建立websocket连接
+        if (ws == null) {
+            let ws_url = getWebSocketUrl();
+            ws = new WebSocket(ws_url);
+            connectToWebSocket(ws);
+        }
+        // 页面刷新或关闭前断开websocket
+        window.onbeforeunload = function () {
+            disconnectWebSocket();
+        }
         /*============初始化操作 begin===============*/
 
         /*============初始化操作 end===============*/

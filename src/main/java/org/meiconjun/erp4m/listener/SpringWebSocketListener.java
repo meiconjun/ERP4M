@@ -19,12 +19,12 @@ import org.meiconjun.erp4m.handler.WebsocketHandler;
  * @date 2020/4/15 22:26
  */
 @Configuration
-@EnableWebMvc
 @EnableWebSocket
-public class SpringWebSocketListener implements WebMvcConfigurer, WebSocketConfigurer {
+@EnableWebMvc
+public class SpringWebSocketListener implements WebSocketConfigurer, WebMvcConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(webSocketHandler(), "/websocket").addInterceptors(new WebSocketInterceptor());
-        registry.addHandler(webSocketHandler(), "/sockjs").addInterceptors(new WebSocketInterceptor()).withSockJS();
+        registry.addHandler(webSocketHandler(), "/websocket.do").addInterceptors(new WebSocketInterceptor());
+        registry.addHandler(webSocketHandler(), "/sockjs.do").addInterceptors(new WebSocketInterceptor()).withSockJS();
     }
 
     @Bean

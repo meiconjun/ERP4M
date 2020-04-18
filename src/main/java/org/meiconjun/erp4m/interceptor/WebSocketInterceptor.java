@@ -8,6 +8,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import javax.servlet.http.HttpSession;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @date 2020/4/16 21:10
  */
 @Component
-public class WebSocketInterceptor extends HttpSessionHandshakeInterceptor {
+public class WebSocketInterceptor implements HandshakeInterceptor {
     private Logger logger = LoggerFactory.getLogger(WebSocketInterceptor.class);
 
     @Override
@@ -40,12 +41,11 @@ public class WebSocketInterceptor extends HttpSessionHandshakeInterceptor {
                 }
             }
         }
-        return super.beforeHandshake(request, response, wsHandler, attributes);
+        return true;
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception ex) {
         logger.info("--------------after handshake--------------");
-        super.afterHandshake(request, response, wsHandler, ex);
     }
 }

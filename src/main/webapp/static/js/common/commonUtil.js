@@ -92,7 +92,7 @@ function commonAjax(url, data, is_async) {
                     commonError("您尚未登录或登录已失效，请重新登录！", function () {
                         window.location.href = 'login.html';
                     });
-                    return;
+                    return null;
                 }
             }
         }
