@@ -22,6 +22,8 @@
           以便使之生效。 -->
     <link rel="stylesheet" href="static/plugins/adminLTE/dist/css/skins/skin-blue.min.css">
     <link rel="stylesheet" href="static/plugins/layui/css/layui.css">
+    <!-- 自定义样式表 -->
+    <link rel="stylesheet" href="static/css/main.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- 警告：Respond.js 不支持 file:// 方式查看（即本地方式查看）-->
     <!--[if lt IE 9]>
@@ -324,9 +326,16 @@ BODY 标签选项：
             <!--------------------------
               | Your Page Content Here |
               -------------------------->
-            <iframe id="menuFrame" name="menuFrame" src="" style="overflow:visible;" scrolling="yes"
-                    frameborder="no" height="100%" width="100%"></iframe>
+            <!--<iframe id="menuFrame" name="menuFrame" src="" style="overflow:visible;" scrolling="yes"
+                    frameborder="no" height="100%" width="100%"></iframe>-->
+            <div class="layui-tab" lay-allowClose="true" lay-filter="main-tab" >
+                <ul class="layui-tab-title custom-tab-title">
 
+                </ul>
+                <div class="layui-tab-content custom-tab-content">
+
+                </div>
+            </div>
         </section>
         <!-- /.content -->
     </div>
@@ -436,6 +445,7 @@ BODY 标签选项：
 <script src="static/plugins/layui/layui.all.js"></script>
 <!-- websocket支持 -->
 <script src="static/js/support/webSocket.js"></script>
+<script src="static/js/support/menuInit.js"></script>
 <script src="static/js/index.js"></script>
 <!-- 或者，
      您可以添加Slimscroll和FastClick插件。

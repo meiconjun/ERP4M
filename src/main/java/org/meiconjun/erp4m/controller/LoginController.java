@@ -44,6 +44,7 @@ public class LoginController extends BaseController {
             if (SystemContants.HANDLE_SUCCESS.equals(responseBean.getRetCode())) {
                 HttpSession session = request.getSession();
                 session.setAttribute("USER_SESSION", responseBean.getRetMap().get("user"));
+                session.setMaxInactiveInterval(30*60);//30分钟超时
             }
         } catch (Exception e) {
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);

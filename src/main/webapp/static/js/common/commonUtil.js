@@ -105,3 +105,26 @@ function commonAjax(url, data, is_async) {
     }
     return result;
 }
+
+/**
+ * 查询用户的菜单按钮权限
+ */
+function commonGetAuthField(user_no, menu_id) {
+    let msg = {
+        "beanList" : [],
+        "paramMap" : {
+            "user_no" : user_no,
+            "menu_id" : menu_id
+        },
+        "operType" : "getUserButton"
+    };
+
+    let retData = commonAjax("button.do", JSON.stringify(msg));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        let buttonList = retData.retMap.buttonList;
+        return buttonList;
+    } else {
+        commonError("获取用户权限按钮失败！");
+        return null;
+    }
+}

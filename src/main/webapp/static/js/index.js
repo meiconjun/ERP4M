@@ -1,4 +1,5 @@
 var ws = null;//websocket连接对象
+var user_info = null;// 当前用户对象
 $(document).ready(function () {
     try {
         // 建立websocket连接
@@ -16,7 +17,7 @@ $(document).ready(function () {
         /*============初始化操作 end===============*/
 
         //获取登录用户信息
-        let user_info;
+        user_info;
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
         } else {
@@ -75,7 +76,7 @@ function initMenuLeft(user_no) {
                     arguments.callee(menuList[i].submemus, menuli.childNodes[1]);
                 } else {
                     //非父级
-                    $(menuli).append("<a href='" + menuList[i].menu_url + "'></a>");
+                    $(menuli).append("<a onclick=\"addTalMenu('" + menuList[i].menu_url + "','" + menuList[i].menu_name + "','" + menuList[i].menu_id + "')\" href='#'></a>");
                     $(menuli.childNodes[0]).append("<i class='fa fa-" + menuList[i].menu_icon + "'></i><span title='" + menuList[i].menu_desc + "'>" + menuList[i].menu_name + "</span>");
                 }
                 contObj.append(menuli);
