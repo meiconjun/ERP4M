@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.interceptor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -15,10 +17,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RequestHolder extends HandlerInterceptorAdapter {
 
+    private static Logger logger = LoggerFactory.getLogger(RequestHolder.class);
+
     private static ThreadLocal<HttpServletRequest> httpServletRequestHolder = new ThreadLocal<HttpServletRequest>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        logger.info("RequestHolder....");
         httpServletRequestHolder.set(request);// 绑定到当前线程
         return true;
     }

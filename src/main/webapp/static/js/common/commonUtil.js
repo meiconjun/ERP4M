@@ -88,10 +88,11 @@ function commonAjax(url, data, is_async) {
                     'retMsg' : '请求后台超时！'
                 };
             } else {
+                console.log(textStatus);
+                console.log(jqXHR);
                 if (jqXHR.status == 999) {
-                    commonError("您尚未登录或登录已失效，请重新登录！", function () {
-                        window.location.href = 'login.html';
-                    });
+                    alert("您尚未登录或登录已失效，请重新登录！");
+                    window.location.href = 'login.html';
                     return null;
                 }
             }
@@ -109,11 +110,10 @@ function commonAjax(url, data, is_async) {
 /**
  * 查询用户的菜单按钮权限
  */
-function commonGetAuthField(user_no, menu_id) {
+function commonGetAuthField(menu_id) {
     let msg = {
         "beanList" : [],
         "paramMap" : {
-            "user_no" : user_no,
             "menu_id" : menu_id
         },
         "operType" : "getUserButton"
@@ -126,5 +126,49 @@ function commonGetAuthField(user_no, menu_id) {
     } else {
         commonError("获取用户权限按钮失败！");
         return null;
+    }
+}
+
+/**
+ * 给普通下拉框构造下拉选项
+ * @param optList 选项列表，可传入数组或数据字典ID
+ * [
+ *      {
+ *          "value" : "",
+ *          "name" : "—— 请选择 ——"
+ *      },
+ *      {
+ *          "value" : "010",
+ *          "name" : "北京"
+ *      }
+ * ];
+ * @param objName select对象ID
+ * @param defaultVal 默认值
+ * @param isRequired 是否必输，false时添加一个空选项
+ * @param onlyName 是否只展示name  默认为value-name
+ */
+function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onlyName) {
+    let thisOpts;
+    if (commonBlank(optList)) {
+        return [];
+    }
+    if (typeof optList == 'string') {// 字符串-字典码
+
+    } else {// 数据对象
+        thisOpts = optList;
+    }
+
+    let html = "";
+    for (let i = 0; i < thisOpts.length; i++) {
+        html += "<option value='" + thisOpts[i].value + "'>";
+        if (onlyName) {
+            html += thisOpts[i].name + "</option>";
+        } else {
+            html += thisOpts[i].value + "-" + thisOpts[i].name + "</option>";
+        }
+    }
+    $("#" + objName).append(html);
+    if (!commonBlank(defaultVal)) {
+        $("#" + objName).val(defaultVal);
     }
 }

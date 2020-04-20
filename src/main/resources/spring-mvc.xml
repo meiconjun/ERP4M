@@ -18,7 +18,8 @@
 
     <!-- 1.注解扫描位置-->
     <context:component-scan base-package="org.meiconjun.erp4m.controller" />
-
+    <!--注解驱动，以使得访问路径与方法的匹配可以通过注解配置-->
+    <mvc:annotation-driven/>
     <!-- 2.配置映射处理和适配器-->
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
     <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
@@ -27,6 +28,10 @@
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
             <bean class="org.meiconjun.erp4m.interceptor.UserSessionInterceptor" />
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="org.meiconjun.erp4m.interceptor.RequestHolder" />
         </mvc:interceptor>
     </mvc:interceptors>
     <!-- 3.视图的解析器-->

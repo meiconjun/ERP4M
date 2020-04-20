@@ -9,3 +9,122 @@
     background-color : white;/*白色背景*/
     box-shadow : -2px -3px 5px 0px #ccc;/*阴影*/
 }
+
+/* 行容器DIV样式 */
+.comm-row {
+    padding: 10px;
+    margin: 0;
+    letter-spacing: -3px;
+    font-size: 0;
+}
+
+.comm-row .row-label, .comm-row .row-input {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #000;
+    font-size: 14px;
+    letter-spacing: 0;
+    vertical-align: top; /*float:left; margin-bottom:10px; color:#000;*/
+}
+
+.comm-row .row-label {
+    clear: left;
+    padding-left: 8px;
+    padding-right: 8px;
+    width: 35%;
+    text-align: right;
+    color: #777;
+    font-weight: normal;
+}
+
+
+.comm-row .row-input {
+    padding-right: 20px;
+    width: 65%;
+}
+
+
+.comm-row.col-4 .row-label {
+    clear: none;
+    width: 8.75%;
+}
+
+.comm-row.col-4 .row-label:nth-of-type(4n+1) {
+    clear: left;
+}
+
+.comm-row.col-4 .row-input {
+    width: 16.25%;
+}
+
+.comm-row.col-4 .row-space {
+    width: 25%;
+}
+
+.comm-row.col-3 .row-label {
+    clear: none;
+    width: 11.66666%;
+}
+
+.comm-row.col-3 .row-label:nth-of-type(4n + 1) {
+    clear: none;
+}
+
+.comm-row.col-3 .row-label:nth-of-type(3n + 1) {
+    clear: left;
+}
+
+.comm-row.col-3 .row-input {
+    width: 21.66666%;
+}
+
+.comm-row.col-3 .row-space {
+    width: 33.33333%;
+}
+
+.comm-row.col-2 .row-label {
+    clear: none;
+    width: 17.5%;
+}
+
+.comm-row.col-2 .row-label:nth-of-type(2n + 1) {
+    clear: left;
+}
+
+.comm-row.col-2 .row-input {
+    width: 32.5%;
+}
+
+.comm-row.col-2 .row-space {
+    width: 50%;
+}
+
+.comm-row.col-1 .row-label {
+    width: 35%;
+}
+
+.comm-row.col-1 .row-input {
+    width: 65%;
+}
+
+.comm-row.col-1 .row-label {
+    clear: left;
+}
+
+.comm-row.col-1 .row-space {
+    width: 100%;
+}
+
+.comm-row.col-0 .row-label {
+    clear: left;
+    margin-bottom: 3px;
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.comm-row.col-0 .row-input {
+    clear: left;
+    width: 100%;
+}

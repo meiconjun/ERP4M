@@ -1,14 +1,14 @@
 $(document).ready(function () {
 
     // 获取按钮权限列表
-    let buttonList = commonGetAuthField(user_info.user_no, 'S10100');
+    let buttonList = commonGetAuthField('S10100');
     // 绑定按钮功能
 
     // 初始化表格
     console.log(layui);
     layui.table.render({
         elem : '#roleConfig_table',
-        height : 400,
+        height: 'full-380',
         url : '',
         page : true,
         cols : [[
@@ -23,4 +23,15 @@ $(document).ready(function () {
             ,{field: 'wealth', title: '财富', sort: true}
         ]]
     });
+    let temp = [
+              {
+                     "value" : "",
+                     "name" : "—— 请选择 ——"
+                 },
+             {
+             "value" : "010",
+             "name" : "北京"
+             }
+ ];
+    commonPutNormalSelectOpts(temp, "roleConfig_Q_position", "", false);
 });

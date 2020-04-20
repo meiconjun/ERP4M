@@ -22,7 +22,7 @@ public class UserSessionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-//        logger.info("进入拦截器");
+        logger.info("UserSessionInterceptor.....");
         Boolean passFlag = false;
         //获取请求的URO：取出http:[ip]:[port]后剩下的
         String uri = request.getRequestURI();
@@ -50,7 +50,8 @@ public class UserSessionInterceptor implements HandlerInterceptor {
                 logger.info("请求未登录，拦截,uri:[" + uri + "]");
                 /*request.setAttribute("err_msg", "您未登录或登录已失效，请重新登录！");
                 request.getRequestDispatcher("/WEB-INF/static/html/login.html").forward(request, response);*/
-                response.sendError(999);
+//                response.sendError(999);
+                response.setStatus(999);
             }
         }
         return passFlag;
