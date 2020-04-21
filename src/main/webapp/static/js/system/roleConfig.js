@@ -34,4 +34,6 @@ $(document).ready(function () {
              }
  ];
     commonPutNormalSelectOpts(temp, "roleConfig_Q_position", "", false);
+    layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
+
 });

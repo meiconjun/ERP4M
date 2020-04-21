@@ -13,11 +13,10 @@ $(document).ready(function () {
             disconnectWebSocket();
         }
         /*============初始化操作 begin===============*/
-
+        initData();
         /*============初始化操作 end===============*/
 
         //获取登录用户信息
-        user_info;
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
         } else {
@@ -88,4 +87,19 @@ function initMenuLeft(user_no) {
     } else {
         commonError(retData.retMsg);
     }
+}
+
+/**
+ * 进行数据字典等数据的缓存
+ */
+function initData() {
+    //初始化数据字典
+    let msg = {
+      "beanList" : [],
+      "operType" : "initFields",
+      "paramMap" : {
+
+      }
+    };
+    let fieldData = commonAjax("field.do", JSON.stringify(msg));
 }

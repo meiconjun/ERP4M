@@ -167,7 +167,7 @@ function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onl
             html += thisOpts[i].value + "-" + thisOpts[i].name + "</option>";
         }
     }
-    $("#" + objName).append(html);
+    $("#" + objName).html(html);
     if (!commonBlank(defaultVal)) {
         $("#" + objName).val(defaultVal);
     }
