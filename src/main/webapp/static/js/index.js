@@ -102,4 +102,13 @@ function initData() {
       }
     };
     let fieldData = commonAjax("field.do", JSON.stringify(msg));
+    if (fieldData.retCode == HANDLE_SUCCESS) {
+        for (let key in fieldData.retMap.fieldMap) {
+            localStorage.setItem(key, JSON.stringify(fieldData.retMap.fieldMap[key]));
+        }
+        // localStorage.setItem("fieldDate", )
+    } else {
+        commonError("加载数据字典失败");
+    }
+
 }
