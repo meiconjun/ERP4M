@@ -93,22 +93,28 @@ function initMenuLeft(user_no) {
  * 进行数据字典等数据的缓存
  */
 function initData() {
-    //初始化数据字典
-    let msg = {
-      "beanList" : [],
-      "operType" : "initFields",
-      "paramMap" : {
+    let curDate = commonCurrentDateStr();
+    let fieldDate = localStorage.getItem("fieldDate");
+    if (curDate >= fieldDate) {
+        //初始化数据字典
+        let msg = {
+            "beanList" : [],
+            "operType" : "initFields",
+            "paramMap" : {
 
-      }
-    };
-    let fieldData = commonAjax("field.do", JSON.stringify(msg));
-    if (fieldData.retCode == HANDLE_SUCCESS) {
-        for (let key in fieldData.retMap.fieldMap) {
-            localStorage.setItem(key, JSON.stringify(fieldData.retMap.fieldMap[key]));
+            }
+        };
+        let fieldData = commonAjax("field.do", JSON.stringify(msg));
+        if (fieldData.retCode == HANDLE_SUCCESS) {
+            for (let key in fieldData.retMap.fieldMap) {
+                if (fieldData.retMap.fieldMap.hasOwnProperty(key)) { //否则会把原型链的属性都循环进去
+                    localStorage.setItem(key, JSON.stringify(fieldData.retMap.fieldMap[key]));
+                }
+
+            }
+            localStorage.setItem("fieldDate", commonCurrentDateStr());
+        } else {
+            commonError("加载数据字典失败");
         }
-        // localStorage.setItem("fieldDate", )
-    } else {
-        commonError("加载数据字典失败");
     }
-
 }

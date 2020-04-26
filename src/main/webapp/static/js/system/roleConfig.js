@@ -5,35 +5,61 @@ $(document).ready(function () {
     // 绑定按钮功能
 
     // 初始化表格
-    console.log(layui);
     layui.table.render({
-        elem : '#roleConfig_table',
+        elem: '#roleConfig_table',
         height: 'full-380',
-        url : '',
-        page : true,
-        cols : [[
-            {field: 'id', title: 'ID', sort: true, fixed: 'left'}
-            ,{field: 'username', title: '用户名'}
-            ,{field: 'sex', title: '性别', sort: true}
-            ,{field: 'city', title: '城市'}
-            ,{field: 'sign', title: '签名'}
-            ,{field: 'experience', title: '积分', sort: true}
-            ,{field: 'score', title: '评分', sort: true}
-            ,{field: 'classify', title: '职业'}
-            ,{field: 'wealth', title: '财富', sort: true}
+        url: 'static/json/tableBlankData.json',
+        // method : 'post',
+        even : true,
+        page: true,
+        skin : 'row',
+        cols: [[
+            {
+                field: 'role_no',
+                title: '角色编号',
+                sort: true, fixed: 'left'
+            }
+            , { field: 'position',
+                title: '职位',
+                templet : function (data) {
+                    return commonFormatValue(FIELD_POSITION, data.position, false);
+                }}
+            , {
+                field: 'level',
+                title: '级别',
+                templet : function (data) {
+                    return commonFormatValue(FIELD_ROLELEVEL, data.level, false);
+                }
+            }
+            , {
+                field: 'department',
+                title: '部门',
+                templet : function (data) {
+                    return commonFormatValue(FIELD_DEPARTMENT, data.department, false);
+                }
+            }
+            , {
+                field: 'last_modi_time',
+                title: '最后修改时间',
+                sort: true ,
+                templet : function (data) {
+                    commonFormatDate(data.last_modi_time);
+                }
+            }
+            , {
+                field: 'edit',
+                title: '操作',
+                sort: true,
+                fixed: 'right',
+                templet : function (data) {
+                    return "操作";
+                }}
         ]]
     });
-    let temp = [
-              {
-                     "value" : "",
-                     "name" : "—— 请选择 ——"
-                 },
-             {
-             "value" : "010",
-             "name" : "北京"
-             }
- ];
-    commonPutNormalSelectOpts(temp, "roleConfig_Q_position", "", false);
+    commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_Q_position", "", false);
+    commonPutNormalSelectOpts(FIELD_DEPARTMENT, "roleConfig_Q_department", "", false);
+    commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_Q_level", "", false);
+
     layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
 
 });

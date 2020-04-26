@@ -68,7 +68,8 @@ public class FieldServiceImpl implements FieldService {
                     parentMap.put(bean.getParent_field(), tempList);
                 }
             }
-            retMap.put("fieldMap", "parentMap");
+            retMap.put("fieldMap", parentMap);
+            responseBean.setRetMap(retMap);
             responseBean.setRetMsg("获取数据字典成功");
             responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         } catch (Exception e) {

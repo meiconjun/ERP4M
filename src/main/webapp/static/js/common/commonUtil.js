@@ -153,12 +153,20 @@ function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onl
         return [];
     }
     if (typeof optList == 'string') {// 字符串-字典码
-
+        let localList = localStorage.getItem(optList);
+        if (commonBlank(localList)) {
+            console.error(optList + "对应的数据字典没有数据");
+            return [];
+        }
+        thisOpts = JSON.parse(localList);
     } else {// 数据对象
         thisOpts = optList;
     }
 
     let html = "";
+    if (!isRequired) {
+        html += "<option value='' selected>-</option>";
+    }
     for (let i = 0; i < thisOpts.length; i++) {
         html += "<option value='" + thisOpts[i].value + "'>";
         if (onlyName) {
@@ -168,7 +176,86 @@ function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onl
         }
     }
     $("#" + objName).html(html);
+    console.log(html);
     if (!commonBlank(defaultVal)) {
         $("#" + objName).val(defaultVal);
     }
+}
+
+/**
+ * 获取当前日期字符串 yyyyMMdd
+ */
+function commonCurrentDateStr() {
+    return new Date().formatDate('yyyyMMdd');
+}
+
+/**
+ * 获取当前时间字符串 yyyyMMddHHmmss
+ */
+function commonCurrentDateTimeStr() {
+    return new Date().formatDate('yyyyMMddHHmmss');
+}
+
+/**
+ * 获取当前日期指定格式字符串
+ */
+function commonCurrentDateFormatStr(format) {
+    return new Date().formatDate(format);
+}
+
+/**
+ * 根据数组或数据字典格式化值
+ */
+function commonFormatValue(fieldId, value, onlyName) {
+    let tempObj = [];
+    if (typeof fieldId == 'string') {
+        let fieldStr = localStorage.getItem(fieldId);
+        if (!commonBlank(fieldStr)) {
+            tempObj = JSON.parse(fieldStr);
+        } else {
+            console.log("缓存内没有数据字典号[" + fieldId + "]对应的数据字典");
+        }
+    } else {
+        tempObj = fieldId;
+    }
+    let retVlue = value;
+    for (let obj in tempObj) {
+        if (obj.value == retVlue) {
+            if (onlyName) {
+                retVlue = obj.name;
+            } else {
+                retVlue = retVlue + "-" + obj.name;
+            }
+        }
+    }
+    return retVlue;
+}
+
+/**
+ * 格式化日期字符串为 yyyy-MM-dd HH:mm:ss格式
+ * @param value
+ * @param formatStr
+ */
+function commonFormatDate(dateStr, formatStr) {
+    if (commonBlank(dateStr)) {
+        return "";
+    }
+    let formatStr1 = formatStr;
+    let formatStr2 = formatStr;
+    if(commonBlank(formatStr)) {
+        formatStr1 = 'yyyy-MM-dd';
+        formatStr2 = 'yyyy-MM-dd HH:mm:ss';
+    }
+    try {
+        if (dateStr.length == 8) {
+            dateStr = dateStr.parseDate("yyyyMMdd").formatDate(formatStr1);
+
+        } else if (dateStr.length == 14) {
+            dateStr = dateStr.parseDate("yyyyMMddHHmmss").formatDate(formatStr2);
+        }
+    } catch (e) {
+        // TODO: handle exception
+        console.error(e);
+    }
+    return dateStr;
 }
