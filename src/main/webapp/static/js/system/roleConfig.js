@@ -9,8 +9,23 @@ $(document).ready(function () {
         id : "roleConfig_tableObj",
         elem: '#roleConfig_table',
         height: 'full-380',
-        url: 'static/json/tableBlankData.json',
-        // method : 'post',
+        url: 'roleConfig.do',
+        where : {
+            message : {
+                "beanList" : [{
+                    "role_no" : "",
+                    "position" : "",
+                    "department" : "",
+                    "level" : ""
+                }],
+                "operType" : "query",
+                "paramMap" : {
+                    "curPage" : 1,// 当前页码
+                    "limit" : FIELD_EACH_PAGE_NUM// 每页条数
+                }
+            }
+        },
+        method : 'post',
         even : true,
         page: true,
         loading : true,
@@ -25,11 +40,20 @@ $(document).ready(function () {
         done : function(res, curr, count){
 
         },
+        parseData: function(res){ //res 即为原始返回的数据
+            return {
+                "code": res.retCode, //解析接口状态
+                "msg": res.retMsg, //解析提示文本
+                "count": res.total, //解析数据长度
+                "data": res.retMap.list //解析数据列表
+            };
+        },
         cols : [[
             {
                 field: 'role_no',
                 title: '角色编号',
-                sort: true, fixed: 'left'
+                sort: true,
+                fixed: 'left'
             }
             , { field: 'position',
                 title: '职位',
@@ -86,6 +110,17 @@ function roleConfig_queryOperation(curPage, limit) {
     let department = $("#roleConfig_Q_department").val();
     let level = $("#roleConfig_Q_level").val();
 
+
+    roleConfig_tableIns.reload({
+        where: { //设定异步数据接口的额外参数，任意设
+            aaaaaa: 'xxx'
+            ,bbb: 'yyy'
+            //…
+        }
+        ,page: {
+            curr: 1 //重新从第 1 页开始
+        }
+    });
     let msg = {
         "beanList" : [{
             "role_no" : role_no,
