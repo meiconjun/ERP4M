@@ -1,19 +1,31 @@
+let roleConfig_tableIns;// 表格对象实例
 $(document).ready(function () {
 
     // 获取按钮权限列表
     let buttonList = commonGetAuthField('S10100');
-    // 绑定按钮功能
 
     // 初始化表格
-    layui.table.render({
+    roleConfig_tableIns = layui.table.render({
+        id : "roleConfig_tableObj",
         elem: '#roleConfig_table',
         height: 'full-380',
         url: 'static/json/tableBlankData.json',
         // method : 'post',
         even : true,
         page: true,
+        loading : true,
+        limit : FIELD_EACH_PAGE_NUM,
+        jump : function(obj, first){
+            //obj包含了当前分页的所有参数，比如：
+            console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+            console.log(obj.limit); //得到每页显示的条数
+            roleConfig_queryOperation(obj.curr, obj.limit);// 重载页面
+        },
         skin : 'row',
-        cols: [[
+        done : function(res, curr, count){
+
+        },
+        cols : [[
             {
                 field: 'role_no',
                 title: '角色编号',
@@ -62,4 +74,29 @@ $(document).ready(function () {
 
     layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
 
+    // 绑定按钮功能
+    $("#roleConfig_Q_query").click(function () {
+        roleConfig_queryOperation(1, limit);
+    });
 });
+
+function roleConfig_queryOperation(curPage, limit) {
+    let role_no = $("#roleConfig_Q_id").val();
+    let position = $("#roleConfig_Q_position").val();
+    let department = $("#roleConfig_Q_department").val();
+    let level = $("#roleConfig_Q_level").val();
+
+    let msg = {
+        "beanList" : [{
+            "role_no" : role_no,
+            "position" : position,
+            "department" : department,
+            "level" : level
+        }],
+        "operType" : "query",
+        "paramMap" : {
+            "curPage" : curPage,// 当前页码
+            "limit" : limit// 每页条数
+        }
+    };
+}
