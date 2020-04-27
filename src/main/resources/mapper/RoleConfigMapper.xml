@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.RoleConfigDao">
+    <select id="selectRoles" resultType="org.meiconjun.erp4m.bean.RoleBean">
+        select * from sys_role_tb 
+        where 1 = 1 
+        <if test="bean.role_no != null and bean.role_no != ''">
+            and role_no like concat('%', #{bean.role_no}, '%')
+        </if>
+        <if test="bean.position != null and bean.position != ''">
+            and position = #{bean.position}
+        </if>
+        <if test="bean.department != null and bean.department != ''">
+            and department = #{bean.department}
+        </if>
+        <if test="bean.level != null and bean.level != ''">
+            and level = #{bean.level}
+        </if>
+    </select>
+
+</mapper>

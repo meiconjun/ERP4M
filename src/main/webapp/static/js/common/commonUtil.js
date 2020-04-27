@@ -176,7 +176,7 @@ function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onl
         }
     }
     $("#" + objName).html(html);
-    console.log(html);
+    // console.log(html);
     if (!commonBlank(defaultVal)) {
         $("#" + objName).val(defaultVal);
     }
@@ -219,12 +219,12 @@ function commonFormatValue(fieldId, value, onlyName) {
         tempObj = fieldId;
     }
     let retVlue = value;
-    for (let obj in tempObj) {
-        if (obj.value == retVlue) {
+    for (let i = 0; i < tempObj.length; i++) {
+        if (tempObj[i].value == retVlue) {
             if (onlyName) {
-                retVlue = obj.name;
+                retVlue = tempObj[i].name;
             } else {
-                retVlue = retVlue + "-" + obj.name;
+                retVlue = retVlue + "-" + tempObj[i].name;
             }
         }
     }

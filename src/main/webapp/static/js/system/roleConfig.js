@@ -1,6 +1,5 @@
-let roleConfig_tableIns;// 表格对象实例
 $(document).ready(function () {
-
+    let roleConfig_tableIns;// 表格对象实例
     // 获取按钮权限列表
     let buttonList = commonGetAuthField('S10100');
 
@@ -11,7 +10,7 @@ $(document).ready(function () {
         height: 'full-380',
         url: 'roleConfig.do',
         where : {
-            message : {
+            message : JSON.stringify({
                 "beanList" : [{
                     "role_no" : "",
                     "position" : "",
@@ -20,21 +19,23 @@ $(document).ready(function () {
                 }],
                 "operType" : "query",
                 "paramMap" : {
-                    "curPage" : 1,// 当前页码
+                    "curPage" : '1',// 当前页码
                     "limit" : FIELD_EACH_PAGE_NUM// 每页条数
                 }
-            }
+            })
         },
         method : 'post',
         even : true,
         page: true,
         loading : true,
-        limit : FIELD_EACH_PAGE_NUM,
+        limit : Number(FIELD_EACH_PAGE_NUM),
         jump : function(obj, first){
             //obj包含了当前分页的所有参数，比如：
             console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
             console.log(obj.limit); //得到每页显示的条数
-            roleConfig_queryOperation(obj.curr, obj.limit);// 重载页面
+            if (!first) {
+                roleConfig_queryOperation(obj.curr, obj.limit, roleConfig_tableIns);// 重载页面
+            }
         },
         skin : 'row',
         done : function(res, curr, count){
@@ -44,7 +45,7 @@ $(document).ready(function () {
             return {
                 "code": res.retCode, //解析接口状态
                 "msg": res.retMsg, //解析提示文本
-                "count": res.total, //解析数据长度
+                "count": res.retMap.total, //解析数据长度
                 "data": res.retMap.list //解析数据列表
             };
         },
@@ -100,18 +101,18 @@ $(document).ready(function () {
 
     // 绑定按钮功能
     $("#roleConfig_Q_query").click(function () {
-        roleConfig_queryOperation(1, limit);
+        roleConfig_queryOperation('1', limit, roleConfig_tableIns);
     });
 });
 
-function roleConfig_queryOperation(curPage, limit) {
+function roleConfig_queryOperation(curPage, limit, inst) {
     let role_no = $("#roleConfig_Q_id").val();
     let position = $("#roleConfig_Q_position").val();
     let department = $("#roleConfig_Q_department").val();
     let level = $("#roleConfig_Q_level").val();
 
 
-    roleConfig_tableIns.reload({
+    inst.reload({
         where: { //设定异步数据接口的额外参数，任意设
             aaaaaa: 'xxx'
             ,bbb: 'yyy'
