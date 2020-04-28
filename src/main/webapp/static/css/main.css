@@ -128,3 +128,15 @@
     clear: left;
     width: 100%;
 }
+
+/* 表格底端工具栏*/
+.table-footer-left {
+    display: inline-block;
+}
+
+.table-footer-right {
+    display: inline-block;
+    position: absolute;
+    right: 40px;
+    margin-top: 9px;
+}
