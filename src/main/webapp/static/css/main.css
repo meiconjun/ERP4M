@@ -140,3 +140,18 @@
     right: 40px;
     margin-top: 9px;
 }
+
+/* 弹框 内边距*/
+.comm-dialog {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.comm-dialog-button {
+    min-height: 36px;
+    position: absolute;
+    bottom: 0;
+    right: 20px;
+}

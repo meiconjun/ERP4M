@@ -23,6 +23,7 @@
 <!--    <link rel="stylesheet" href="static/plugins/adminLTE/dist/css/skins/skin-blue.min.css">-->
     <link rel="stylesheet" href="static/plugins/adminLTE/dist/css/skins/skin-blue.css">
     <link rel="stylesheet" href="static/plugins/layui/css/layui.css">
+    <link rel="stylesheet" href="static/plugins/zTree/css/zTreeStyle.css">
     <!-- 自定义样式表 -->
     <link rel="stylesheet" href="static/css/main.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -73,7 +74,7 @@ BODY 标签选项：
         <!-- Header Navbar -->
         <nav class="navbar navbar-static-top" role="navigation">
             <!-- Sidebar toggle button-->
-            <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <a href="#" class="sidebar-toggle" id="sidebar-toggle" data-toggle="push-menu" role="button">
                 <span class="sr-only">切换导航</span>
             </a>
             <!-- Navbar Right Menu -->
@@ -322,7 +323,7 @@ BODY 标签选项：
         </section>
 
         <!-- Main content -->
-        <section class="content container-fluid">
+        <section class="content container-fluid" id="container-fluid">
 
             <!--------------------------
               | Your Page Content Here |
@@ -444,6 +445,8 @@ BODY 标签选项：
 <script src="static/js/common/contants.js"></script>
 <!-- layui插件-->
 <script src="static/plugins/layui/layui.all.js"></script>
+<!-- zTree插件 -->
+<script src="static/plugins/zTree/js/jquery.ztree.all.js"></script>
 <!-- websocket支持 -->
 <script src="static/js/support/webSocket.js"></script>
 <script src="static/js/support/menuInit.js"></script>

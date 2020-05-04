@@ -32,7 +32,7 @@ public class FieldController extends BaseController {
     @ResponseBody
     @RequestMapping(value = "/field.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     public String excute(HttpServletRequest request, HttpServletResponse response) {
-        return  super.excuteRequest(request, new TypeToken<RequestBean<FieldBean>>(){}.getType());
+        return super.excuteRequest(request, new TypeToken<RequestBean<FieldBean>>(){}.getType());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FieldController extends BaseController {
             responseBean = fieldService.excute(requestBean);
         } catch (Exception e) {
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);
-            responseBean.setRetMsg("调用后台服务异常");
+            responseBean.setRetMsg(e.getMessage());
             logger.error("调用后台服务异常：" + e.getMessage(), e);
         }
         return responseBean;

@@ -48,7 +48,7 @@ public class ButtonController extends BaseController {
             responseBean = buttonService.excute(requestBean);
         } catch (Exception e) {
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);
-            responseBean.setRetMsg("调用后台服务异常");
+            responseBean.setRetMsg(e.getMessage());
             logger.error("调用后台服务异常:" + e.getMessage(), e);
         }
         return responseBean;

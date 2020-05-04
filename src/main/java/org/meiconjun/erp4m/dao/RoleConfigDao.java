@@ -18,5 +18,28 @@ public interface RoleConfigDao {
      * @param condMap
      * @return
      */
-    public List<RoleBean> selectRoles(HashMap<String, Object> condMap);
+    List<RoleBean> selectRoles(HashMap<String, Object> condMap);
+    /**
+     * 插入角色信息
+     */
+    int insertRole(RoleBean bean);
+
+    /**
+     * 修改角色信息
+     * @param bean
+     * @return
+     */
+    int updateRole(RoleBean bean);
+    /**
+     * 删除角色信息
+     */
+    int deleteRole(RoleBean bean);
+    /**
+     * 查询关联角色的用户
+     */
+    int selectRoleUserNum(RoleBean bean);
+    /**
+     * 删除角色权限
+     */
+    int deleteRoleRight(RoleBean bean);
 }

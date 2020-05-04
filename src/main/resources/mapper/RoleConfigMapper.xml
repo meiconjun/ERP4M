@@ -17,5 +17,29 @@
             and level = #{bean.level}
         </if>
     </select>
+    <insert id="insertRole" parameterType="org.meiconjun.erp4m.bean.RoleBean">
+        insert into sys_role_tb (role_no, `position`, `level`, department, `desc`, last_modi_time, role_name)
+        values(#{role_no}, #{position}, #{level}, #{department}, #{desc}, #{last_modi_time}, #{role_name})
+    </insert>
 
+    <update id="updateRole" parameterType="org.meiconjun.erp4m.bean.RoleBean">
+        update sys_role_tb
+        set `position` = #{position}, `level` = #{level}, department = #{department}, `desc` = #{desc}, role_name = #{role_name}
+        where role_no = #{role_no}
+    </update>
+    
+    <delete id="deleteRole" parameterType="org.meiconjun.erp4m.bean.RoleBean">
+        delete from sys_role_tb
+        where role_no = #{role_no}
+    </delete>
+
+    <select id="selectRoleUserNum" parameterType="org.meiconjun.erp4m.bean.RoleBean" resultType="java.lang.Integer">
+        select count(0) from sys_user_role_tb
+        where role_no = #{role_no}
+    </select>
+
+    <delete id="deleteRoleRight" parameterType="org.meiconjun.erp4m.bean.RoleBean">
+        delete from sys_role_right_tb
+        where role_no = #{role_no}
+    </delete>
 </mapper>

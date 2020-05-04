@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -189,5 +191,23 @@ public class CommonUtil {
             logger.error("===================获取登录用户为空====================");
         }
         return user;
+    }
+
+    /**
+     * 获取当前时间字符串 格式yyyyMMddHHmmss
+     * @return
+     */
+    public static String getCurrentTimeStr() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        return sdf.format(new Date());
+    }
+
+    /**
+     * 获取当前日期字符串 格式yyyyMMdd
+     * @return
+     */
+    public static String getCurrentDateStr() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        return sdf.format(new Date());
     }
 }

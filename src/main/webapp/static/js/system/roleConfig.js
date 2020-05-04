@@ -1,7 +1,7 @@
 var roleConfig_curr = 1;
 var roleConfig_count = 0;
+var roleConfig_tableIns;
 $(document).ready(function () {
-    let roleConfig_tableIns;// 表格对象实例
     // 获取按钮权限列表
     let buttonList = commonGetAuthField('S10100');
 
@@ -29,17 +29,6 @@ $(document).ready(function () {
         method : 'post',
         even : true,
         page: false,
-            /*{
-            limit : Number(FIELD_EACH_PAGE_NUM),
-            jump : function(obj, first){
-                //obj包含了当前分页的所有参数，比如：
-                console.log(obj.limit); //得到每页显示的条数
-                if (!first) {
-                    console.log("分页查询！");
-                    roleConfig_queryOperation(obj.curr, obj.limit, roleConfig_tableIns);// 重载页面
-                }
-            },
-        },*/
         loading : true,
         skin : 'row',
         done : function(res, curr, count){
@@ -59,7 +48,7 @@ $(document).ready(function () {
                     //obj包含了当前分页的所有参数，比如：
                     // console.log(obj.limit); //得到每页显示的条数
                     if (!first) {
-                        roleConfig_queryOperation(obj.curr, obj.limit, roleConfig_tableIns);// 重载页面
+                        roleConfig_queryOperation(obj.curr, obj.limit);// 重载页面
                     }
                 }
             });
@@ -128,8 +117,8 @@ $(document).ready(function () {
                 fixed: 'right',
                 align : 'center',
                 templet : function (data) {
-                    return "<a class=\"layui-btn layui-btn-xs\" id='roleConfig_rightBtn'>权限设定</a>" +
-                        "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" id='roleConfig_modifyBtn'>修改信息</a>";
+                    return "<a class=\"layui-btn layui-btn-xs\" id='roleConfig_rightBtn' onclick='roleConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>" +
+                        "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" id='roleConfig_modifyBtn' onclick='roleConfig_modifyOperation(" + commonFormatObj(data) + ")'>修改信息</a>";
                 }}
         ]]
     });
@@ -140,19 +129,30 @@ $(document).ready(function () {
 
     layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
     // 绑定按钮功能
+    //查询
     $("#roleConfig_Q_query").click(function () {
-        roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM, roleConfig_tableIns);
+        roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
     });
+    //新增
+    $("#roleConfig_addBtn").click(function () {
+        roleConfig_addOperation();
+    });
+    //删除
+    $("#roleConfig_deleteBtn").click(function () {
+        roleConfig_deleteOperation();
+    });
+    // 绑定重置表格事件
+    commonResizeTable('roleConfig_tableObj');
 });
 
-function roleConfig_queryOperation(curPage, limit, inst) {
+function roleConfig_queryOperation(curPage, limit) {
     let role_no = $("#roleConfig_Q_id").val();
     let position = $("#roleConfig_Q_position").val();
     let department = $("#roleConfig_Q_department").val();
     let level = $("#roleConfig_Q_level").val();
 
     roleConfig_curr = curPage;
-    inst.reload({
+    roleConfig_tableIns.reload({
         where: { //设定异步数据接口的额外参数，任意设
             message : JSON.stringify({
                 "beanList" : [{
@@ -169,5 +169,200 @@ function roleConfig_queryOperation(curPage, limit, inst) {
             })
         }
     });
+}
 
+/**
+ * 新增角色
+ */
+function roleConfig_addOperation() {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '600px'],// 宽高
+        title: '新增角色',// 标题
+        content: $("#roleConfig_addDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            let dialogIndex = index;// 弹框层索引
+            commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_position_addTxt", "", true);
+            commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_level_addTxt", "", true);
+            commonPutNormalSelectOpts(FIELD_DEPARTMENT, "roleConfig_department_addTxt", "", true);
+
+            roleConfig_digSubmit(dialogIndex, "add");
+            layui.form.render();
+        }
+    });
+}
+
+/**
+ * 修改角色信息
+ */
+function roleConfig_modifyOperation(oldData) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '600px'],// 宽高
+        title: '修改角色',// 标题
+        content: $("#roleConfig_addDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            let dialogIndex = index;// 弹框层索引
+            commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_position_addTxt", oldData.position, true);
+            commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_level_addTxt", oldData.level, true);
+            commonPutNormalSelectOpts(FIELD_DEPARTMENT, "roleConfig_department_addTxt", oldData.department, true);
+
+            // 设置表单val
+            $("#roleConfig_roleNo_addTxt").val(oldData.role_no).attr('disabled', 'disabled').addClass('layui-disabled');//禁用输入框并添加禁用的样式
+            $("#roleConfig_roleName_addTxt").val(oldData.role_name);
+            $("#roleConfig_desc_addTxt").val(oldData.desc);
+            roleConfig_digSubmit(dialogIndex, "modify");
+            layui.form.render();
+        }
+    });
+}
+
+function roleConfig_digSubmit(dialogIndex, operType) {
+    layui.form.on('submit(roleConfig_addSubmit)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
+        layui.layer.confirm("是否确认提交？", function(index) {
+            let fieldObj = data.field;// 表单字段集合
+            let retData = commonAjax("roleConfig.do", JSON.stringify({
+                "beanList" : [{
+                    "role_no" : fieldObj.roleConfig_roleNo_addTxt,
+                    "role_name" : fieldObj.roleConfig_roleName_addTxt,
+                    "position" : fieldObj.roleConfig_position_addTxt,
+                    "level" : fieldObj.roleConfig_level_addTxt,
+                    "department" : fieldObj.roleConfig_department_addTxt,
+                    "desc" : fieldObj.roleConfig_desc_addTxt
+                }],
+                "operType" : operType,
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("操作成功");
+                layui.layer.close(dialogIndex);
+                roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+        return false;
+    });
+}
+
+function roleConfig_deleteOperation() {
+    let checkData = layui.table.checkStatus('roleConfig_tableObj').data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要删除的角色");
+        return;
+    } else {
+        layui.layer.confirm("是否确认删除选中的角色？", function(index) {
+            let retData = commonAjax("roleConfig.do", JSON.stringify({
+                "beanList" : checkData,
+                "operType" : "delete",
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("删除成功");
+                roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+    }
+}
+
+function roleConfig_rightOperation(data) {
+    let addRight = {};//新增权限列表
+    let delRight = {};//删除权限列表
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['450px', '600px'],// 宽高
+        title: '角色权限设定',// 标题
+        content: $("#roleConfig_rightTree"),//内容，直接取dom对象
+        btn: ['提交'],
+        yes: function (index1, layero) {
+            //确认按钮的回调，提交表单
+            layui.layer.confirm("是否确认提交修改？", function(index) {
+                if ($.isEmptyObject(addRight) && $.isEmptyObject(delRight)) {
+                    commonInfo("没有任何修改");
+                    return;
+                } else {
+                    let retData = commonAjax("roleRight.do", JSON.stringify({
+                        "beanList": [data],
+                        "operType": "updateRight",
+                        "paramMap": {
+                            "addRight" : addRight,
+                            "delRight" : delRight
+                        }
+                    }));
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        commonOk("更新成功");
+                        layui.layer.close(index1);
+                    } else {
+                        commonError(retData.retMsg);
+                    }
+                }
+            });
+        },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            let retData = commonAjax("roleRight.do", JSON.stringify({
+                "beanList" : [data],
+                "operType" : "getRoleRight",
+                "paramMap" : {}
+            }));
+            console.log(retData.retMap.dataList);
+            if (retData.retCode == HANDLE_SUCCESS) {
+                // 渲染树形组件
+                let treeInst = layui.tree.render({
+                    elem: '#roleConfig_rightTree',
+                    id: 'roleConfig_rightTree',
+                    showCheckbox: true,
+                    edit: false,
+                    oncheck: function (obj) {
+                        console.log(obj);
+                        let checkState = obj.checked;
+                        let tempFun = function (data) {
+                            if (checkState == true) {
+                                if (delRight.hasOwnProperty(data.id)) {
+                                    // 删除删除列表里的该要素
+                                    delete delRight[data.id];
+                                } else {
+                                    // 添加进新增列表
+                                    addRight[data.id] = data.field_type;
+                                }
+                            } else {
+                                if (addRight.hasOwnProperty(data.id)) {
+                                    // 删除新增列表里的该要素
+                                    delete addRight[data.id];
+                                } else {
+                                    // 添加进删除列表
+                                    delRight[data.id] = data.field_type;
+                                }
+
+                            }
+                            if (data.hasOwnProperty('children')) {
+                                for (let g = 0; g < data.children.length; g++) {
+                                    tempFun(data.children[g]);
+                                }
+                            }
+                        }
+                        tempFun(obj.data);
+                    },
+                    data: retData.retMap.dataList
+                });
+                // 树构造完成时会触发根节点的勾选事件，所以会自动往下述两个列表里添加要素，先清空
+                addRight = {};
+                delRight = {};
+            } else {
+                commonError("加载角色权限失败！" + retData.retMsg);
+            }
+
+        }
+    });
 }

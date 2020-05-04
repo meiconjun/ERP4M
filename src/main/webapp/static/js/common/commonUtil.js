@@ -259,3 +259,32 @@ function commonFormatDate(dateStr, formatStr) {
     }
     return dateStr;
 }
+
+/**
+ * 格式化对象，使其可以作为onclick中的参数传递
+ */
+function commonFormatObj(obj) {
+    return JSON.stringify(obj).replace(/"/g, '&quot;');
+}
+
+/**
+ * 点击切换导航时，重置表格大小
+ */
+function commonResizeTable(tebleId) {
+    $("#sidebar-toggle").click(function () {
+        setTimeout(function () {
+            layui.table.resize(tebleId);
+        }, 500);
+    });
+    // 创建一个观察者监听指定div的变化
+    /*let MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+    console.log("MutationObserver");
+    let target = document.getElementById("container-fluid");
+    let observer = new MutationObserver(function (mutations) {
+        console.log("sadasda");
+        layui.table.resize(tebleId);
+    });
+    observer.observe(target, {
+        attributes : true
+    });*/
+}
