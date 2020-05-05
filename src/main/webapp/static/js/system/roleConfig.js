@@ -2,147 +2,169 @@ var roleConfig_curr = 1;
 var roleConfig_count = 0;
 var roleConfig_tableIns;
 $(document).ready(function () {
-    // 获取按钮权限列表
-    let buttonList = commonGetAuthField('S10100');
-
-    // 初始化表格
-    roleConfig_tableIns = layui.table.render({
-        id : "roleConfig_tableObj",
-        elem: '#roleConfig_table',
-        height: 'full-450',
-        url: 'roleConfig.do',
-        where : {
-            message : JSON.stringify({
-                "beanList" : [{
-                    "role_no" : "",
-                    "position" : "",
-                    "department" : "",
-                    "level" : ""
-                }],
-                "operType" : "query",
-                "paramMap" : {
-                    "curPage" : '1',// 当前页码
-                    "limit" : FIELD_EACH_PAGE_NUM// 每页条数
+    try {
+        // 获取按钮权限列表
+        let buttonMap = commonGetAuthField('S10100');
+        let buttonStr = buttonMap.buttonStr;
+        // 初始化表格
+        roleConfig_tableIns = layui.table.render({
+            id : "roleConfig_tableObj",
+            elem: '#roleConfig_table',
+            height: 'full-450',
+            url: 'roleConfig.do',
+            where : {
+                message : JSON.stringify({
+                    "beanList" : [{
+                        "role_no" : "",
+                        "position" : "",
+                        "department" : "",
+                        "level" : ""
+                    }],
+                    "operType" : "query",
+                    "paramMap" : {
+                        "curPage" : '1',// 当前页码
+                        "limit" : FIELD_EACH_PAGE_NUM// 每页条数
+                    }
+                })
+            },
+            method : 'post',
+            even : true,
+            page: false,
+            loading : true,
+            skin : 'row',
+            done : function(res, curr, count){
+                // 分页初始化
+                layui.laypage.render({
+                    elem : 'roleConfig_page',
+                    limit : Number(FIELD_EACH_PAGE_NUM),
+                    groups : 5,
+                    curr : roleConfig_curr,
+                    count : count,
+                    prev : '上一页',
+                    next : '下一页',
+                    first : '首页',
+                    last : '尾页',
+                    layout : ['prev', 'first', 'page', 'last', 'next', 'count'],
+                    jump : function(obj, first){
+                        //obj包含了当前分页的所有参数，比如：
+                        // console.log(obj.limit); //得到每页显示的条数
+                        if (!first) {
+                            roleConfig_queryOperation(obj.curr, obj.limit);// 重载页面
+                        }
+                    }
+                });
+            },
+            parseData: function(res){ //res 即为原始返回的数据
+                return {
+                    "code": res.retCode, //解析接口状态
+                    "msg": res.retMsg, //解析提示文本
+                    "count": res.retMap.total, //解析数据长度
+                    "data": res.retMap.list //解析数据列表
+                };
+            },
+            cols : [[
+                {//复选框
+                    type : 'checkbox',
+                    fixed: 'left'
+                },
+                {
+                    field: 'role_no',
+                    title: '角色编号',
+                    sort: true,
+                    align : 'center'
+                },
+                {
+                    field: 'role_name',
+                    title: '角色名称',
+                    sort: true,
+                    align : 'center'
                 }
-            })
-        },
-        method : 'post',
-        even : true,
-        page: false,
-        loading : true,
-        skin : 'row',
-        done : function(res, curr, count){
-            // 分页初始化
-            layui.laypage.render({
-                elem : 'roleConfig_page',
-                limit : Number(FIELD_EACH_PAGE_NUM),
-                groups : 5,
-                curr : roleConfig_curr,
-                count : count,
-                prev : '上一页',
-                next : '下一页',
-                first : '首页',
-                last : '尾页',
-                layout : ['prev', 'first', 'page', 'last', 'next', 'count'],
-                jump : function(obj, first){
-                    //obj包含了当前分页的所有参数，比如：
-                    // console.log(obj.limit); //得到每页显示的条数
-                    if (!first) {
-                        roleConfig_queryOperation(obj.curr, obj.limit);// 重载页面
+                , { field: 'position',
+                    title: '职位',
+                    align : 'center',
+                    templet : function (data) {
+                        return commonFormatValue(FIELD_POSITION, data.position, false);
+                    }}
+                , {
+                    field: 'level',
+                    title: '级别',
+                    align : 'center',
+                    templet : function (data) {
+                        return commonFormatValue(FIELD_ROLELEVEL, data.level, false);
                     }
                 }
-            });
-        },
-        parseData: function(res){ //res 即为原始返回的数据
-            return {
-                "code": res.retCode, //解析接口状态
-                "msg": res.retMsg, //解析提示文本
-                "count": res.retMap.total, //解析数据长度
-                "data": res.retMap.list //解析数据列表
-            };
-        },
-        cols : [[
-            {//复选框
-                type : 'checkbox',
-                fixed: 'left'
-            },
-            {
-                field: 'role_no',
-                title: '角色编号',
-                sort: true,
-                align : 'center'
-            },
-            {
-                field: 'role_name',
-                title: '角色名称',
-                sort: true,
-                align : 'center'
-            }
-            , { field: 'position',
-                title: '职位',
-                align : 'center',
-                templet : function (data) {
-                    return commonFormatValue(FIELD_POSITION, data.position, false);
-                }}
-            , {
-                field: 'level',
-                title: '级别',
-                align : 'center',
-                templet : function (data) {
-                    return commonFormatValue(FIELD_ROLELEVEL, data.level, false);
+                , {
+                    field: 'department',
+                    title: '部门',
+                    align : 'center',
+                    templet : function (data) {
+                        return commonFormatValue(FIELD_DEPARTMENT, data.department, false);
+                    }
                 }
-            }
-            , {
-                field: 'department',
-                title: '部门',
-                align : 'center',
-                templet : function (data) {
-                    return commonFormatValue(FIELD_DEPARTMENT, data.department, false);
+                , {
+                    field: 'last_modi_time',
+                    title: '最后修改时间',
+                    sort: true ,
+                    align : 'center',
+                    templet : function (data) {
+                        return commonFormatDate(data.last_modi_time);
+                    }
                 }
-            }
-            , {
-                field: 'last_modi_time',
-                title: '最后修改时间',
-                sort: true ,
-                align : 'center',
-                templet : function (data) {
-                    return commonFormatDate(data.last_modi_time);
-                }
-            }
-            , {
-                field: 'edit',
-                title: '操作',
-                width : 170,
-                sort: true,
-                fixed: 'right',
-                align : 'center',
-                templet : function (data) {
-                    return "<a class=\"layui-btn layui-btn-xs\" id='roleConfig_rightBtn' onclick='roleConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>" +
-                        "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" id='roleConfig_modifyBtn' onclick='roleConfig_modifyOperation(" + commonFormatObj(data) + ")'>修改信息</a>";
-                }}
-        ]]
-    });
+                , {
+                    field: 'edit',
+                    title: '操作',
+                    width : 170,
+                    sort: true,
+                    fixed: 'right',
+                    align : 'center',
+                    templet : function (data) {
+                        let html = "";
+                        if (buttonStr.indexOf("roleConfig_rightBtn") != -1) {
+                            html += "<a class=\"layui-btn layui-btn-xs\" name='roleConfig_rightBtn' onclick='roleConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>";
+                        }
+                        if (buttonStr.indexOf("roleConfig_modifyBtn") != -1) {
+                            html += "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='roleConfig_modifyBtn' onclick='roleConfig_modifyOperation(" + commonFormatObj(data) + ")'>修改信息</a>";
+                        }
+                        return html;
+                    }}
+            ]]
+        });
 
-    commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_Q_position", "", false);
-    commonPutNormalSelectOpts(FIELD_DEPARTMENT, "roleConfig_Q_department", "", false);
-    commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_Q_level", "", false);
+        commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_Q_position", "", false);
+        commonPutNormalSelectOpts(FIELD_DEPARTMENT, "roleConfig_Q_department", "", false);
+        commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_Q_level", "", false);
 
-    layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
-    // 绑定按钮功能
-    //查询
-    $("#roleConfig_Q_query").click(function () {
-        roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
-    });
-    //新增
-    $("#roleConfig_addBtn").click(function () {
-        roleConfig_addOperation();
-    });
-    //删除
-    $("#roleConfig_deleteBtn").click(function () {
-        roleConfig_deleteOperation();
-    });
-    // 绑定重置表格事件
-    commonResizeTable('roleConfig_tableObj');
+        layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
+        // 绑定按钮功能
+        //查询
+        $("#roleConfig_Q_query").click(function () {
+            roleConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+        });
+        //新增
+        $("#roleConfig_addBtn").click(function () {
+            roleConfig_addOperation();
+        });
+        //删除
+        $("#roleConfig_deleteBtn").click(function () {
+            roleConfig_deleteOperation();
+        });
+
+        // 权限控制
+        if (buttonStr.indexOf("roleConfig_Q_query") == -1) {
+            $("#roleConfig_Q_query").hide();
+        }
+        if (buttonStr.indexOf("roleConfig_addBtn") == -1) {
+            $("#roleConfig_addBtn").hide();
+        }
+        if (buttonStr.indexOf("roleConfig_deleteBtn") == -1) {
+            $("#roleConfig_deleteBtn").hide();
+        }
+        // 绑定重置表格事件
+        commonResizeTable('roleConfig_tableObj');
+    } catch (e) {
+        console.error(e.message, e);
+        commonError(e.message);
+    }
 });
 
 function roleConfig_queryOperation(curPage, limit) {
@@ -278,6 +300,9 @@ function roleConfig_deleteOperation() {
 }
 
 function roleConfig_rightOperation(data) {
+    let treeInst;
+    let beforeNodes = [];
+    let afterNodes = [];
     let addRight = {};//新增权限列表
     let delRight = {};//删除权限列表
     layui.layer.open({
@@ -289,6 +314,21 @@ function roleConfig_rightOperation(data) {
         yes: function (index1, layero) {
             //确认按钮的回调，提交表单
             layui.layer.confirm("是否确认提交修改？", function(index) {
+                afterNodes = treeInst.getCheckedNodes(true);// 获取最终的勾选节点
+                for (let i = 0; i < afterNodes.length; i++) {
+                    if (!beforeNodes.some(function (curValue) {
+                        return curValue.field_no == afterNodes[i].field_no;
+                    })) {
+                        addRight[afterNodes[i].field_no] = afterNodes[i].field_type;
+                    }
+                }
+                for (let i = 0; i < beforeNodes.length; i++) {
+                    if (!afterNodes.some(function (curValue) {
+                        return curValue.field_no == beforeNodes[i].field_no;
+                    })) {
+                        delRight[beforeNodes[i].field_no] = beforeNodes[i].field_type;
+                    }
+                }
                 if ($.isEmptyObject(addRight) && $.isEmptyObject(delRight)) {
                     commonInfo("没有任何修改");
                     return;
@@ -316,10 +356,21 @@ function roleConfig_rightOperation(data) {
                 "operType" : "getRoleRight",
                 "paramMap" : {}
             }));
-            console.log(retData.retMap.dataList);
             if (retData.retCode == HANDLE_SUCCESS) {
+                let treeConfig = {
+                    check: {
+                        chkboxType: {'Y': "ps", "N": 'ps'},
+                        chkStyle: 'checkbox',
+                        enable: true
+                    },
+                    edit: {
+                        enable: false//不可编辑
+                    }
+                };
                 // 渲染树形组件
-                let treeInst = layui.tree.render({
+                treeInst = $.fn.zTree.init($("#roleConfig_rightTree"), treeConfig, retData.retMap.dataList);
+                beforeNodes = treeInst.getCheckedNodes(true);//获取初始的勾选节点
+                /*let treeInst = layui.tree.render({
                     elem: '#roleConfig_rightTree',
                     id: 'roleConfig_rightTree',
                     showCheckbox: true,
@@ -355,10 +406,8 @@ function roleConfig_rightOperation(data) {
                         tempFun(obj.data);
                     },
                     data: retData.retMap.dataList
-                });
+                });*/
                 // 树构造完成时会触发根节点的勾选事件，所以会自动往下述两个列表里添加要素，先清空
-                addRight = {};
-                delRight = {};
             } else {
                 commonError("加载角色权限失败！" + retData.retMsg);
             }

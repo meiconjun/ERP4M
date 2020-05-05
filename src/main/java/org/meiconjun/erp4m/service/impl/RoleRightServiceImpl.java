@@ -85,11 +85,10 @@ public class RoleRightServiceImpl implements RoleRightService {
                 if (Integer.valueOf(menuBean.getMenu_level()) == i) {
                     HashMap<String, Object> treeMap = new HashMap<String, Object>();
                     treeMap.put("parent_menu", menuBean.getParent_menu());
-                    treeMap.put("title", menuBean.getMenu_name());
-                    treeMap.put("id", menuBean.getMenu_id());
-                    treeMap.put("field", menuBean.getMenu_id());
+                    treeMap.put("name", menuBean.getMenu_name());
+                    treeMap.put("field_no", menuBean.getMenu_id());
                     treeMap.put("field_type", "1");// 要素类型-菜单
-                    treeMap.put("spread", true);
+                    treeMap.put("open", true);
                     // 判断是否有此菜单权限
                     int count = roleRightDao.selectRoleFieldRight(bean.getRole_no(), menuBean.getMenu_id());
                     if (count == 1) {
@@ -102,11 +101,10 @@ public class RoleRightServiceImpl implements RoleRightService {
                     List<ButtonBean> buttonList = roleRightDao.selectBtnByMenuId(menuBean.getMenu_id());
                     for (ButtonBean buttonBean : buttonList) {
                         HashMap<String, Object> buttonTreeMap = new HashMap<String, Object>();
-                        buttonTreeMap.put("title", buttonBean.getButton_name());
-                        buttonTreeMap.put("id", buttonBean.getButton_id());
-                        buttonTreeMap.put("field", buttonBean.getButton_id());
+                        buttonTreeMap.put("name", buttonBean.getButton_name());
+                        buttonTreeMap.put("field_no", buttonBean.getButton_id());
                         buttonTreeMap.put("field_type", "2");// 要素类型-按钮
-                        buttonTreeMap.put("spread", true);
+                        buttonTreeMap.put("open", true);
                         // 判断是否有此按钮权限
                         count = roleRightDao.selectRoleFieldRight(bean.getRole_no(), buttonBean.getButton_id());
                         if (count == 1) {
@@ -124,6 +122,7 @@ public class RoleRightServiceImpl implements RoleRightService {
                         if (menuBean.getMenu_id().equals(parent_menu)) {
                             childTreeList.add(tempMap);
                             dataList.remove(j);
+                            j--;//IMPORTANT
                         }
                     }
                     if (!childTreeList.isEmpty()) {

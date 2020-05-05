@@ -1,0 +1,103 @@
+<!--<div class="layadmin-tabsbody-item layui-show">-->
+<!--    <div class="layui-fluid">-->
+<!--        <div class="layui-row layui-col-space15">-->
+<!--            <div class="layui-col-md12">-->
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            用户号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="userConfig_Q_userNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            用户名称：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="userConfig_Q_userName" autocomplete="off">
+        </div>
+        <div class="row-label">
+            角色：
+        </div>
+        <div class="row-input">
+            <select  id="userConfig_Q_role" >
+            </select>
+        </div>
+
+        <button class="layui-btn" id="userConfig_Q_query" data-type="reload">查询</button>
+    </div>
+    <table id="userConfig_table">
+
+    </table>
+    <div>
+        <div id="userConfig_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="userConfig_addBtn">新增用户</a>
+            <a class="layui-btn layui-btn-sm layui-btn-danger" id="userConfig_deactBtn">删除用户</a>
+            <a class="layui-btn layui-btn-sm layui-btn-danger" id="userConfig_deleteBtn">删除用户</a>
+        </div>
+    </div>
+</div>
+
+<!-- 注意表单字段要用name做标识 -->
+<div hidden="hidden" class="comm-dialog" id="userConfig_addDiv">
+    <form class="layui-form layui-form-pane" id="userConfig_addFrm" action="">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">用户号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userConfig_add_userNo" id="userConfig_add_userNo" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">用户名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userConfig_add_userName" id="userConfig_add_userName" lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userConfig_add_email" id="userConfig_add_email" lay-verify="email" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">手机</label>
+                <div class="layui-input-inline">
+                    <input type="tel" name="userConfig_add_phone" id="userConfig_add_phone" lay-verify="phone" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">角色</label>
+                <div class="layui-input-inline">
+                    <select name="userConfig_add_roleNo" id="userConfig_add_roleNo" required lay-verify="required">
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">用户状态</label>
+                <div class="layui-input-inline">
+                    <select name="userConfig_add_status" id="userConfig_add_status" required lay-verify="required">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item comm-dialog-button">
+            <!--            <div class="layui-input-block">-->
+            <button class="layui-btn" lay-submit lay-filter="userConfig_addSubmit">确定</button>
+            <!--            </div>-->
+        </div>
+    </form>
+</div>
+<!-- 树组件DIV -->
+<div id="userConfig_rightTree" class="comm-dialog ztree" hidden="hidden"></div>
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<script src="static/js/system/userConfig.js"></script>

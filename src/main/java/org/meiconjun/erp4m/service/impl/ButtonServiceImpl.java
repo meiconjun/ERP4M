@@ -71,15 +71,20 @@ public class ButtonServiceImpl implements ButtonService {
             idStr += "," + b.getButton_id();
         }
         for (ButtonBean b : userButtonList) {
-            if (idStr.contains(b.getButton_id())) {
+            if (!idStr.contains(b.getButton_id())) {
                 HashMap<String, String> buttonMap = new HashMap<String, String>();
                 buttonMap.put("button_id", b.getButton_id());
                 buttonMap.put("button_name", b.getButton_name());
                 buttonMap.put("button_type", b.getButton_type());
                 retList.add(buttonMap);
+                idStr += "," + b.getButton_id();
             }
         }
+        if (!CommonUtil.isStrBlank(idStr)) {
+            idStr = idStr.substring(1);
+        }
         HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("buttonStr", idStr);
         retMap.put("buttonList", retList);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         responseBean.setRetMsg("获取按钮权限成功");

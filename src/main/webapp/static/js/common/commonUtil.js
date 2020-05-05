@@ -122,7 +122,11 @@ function commonGetAuthField(menu_id) {
     let retData = commonAjax("button.do", JSON.stringify(msg));
     if (retData.retCode == HANDLE_SUCCESS) {
         let buttonList = retData.retMap.buttonList;
-        return buttonList;
+        let buttonStr = retData.retMap.buttonStr;
+        return {
+            "buttonList" : buttonList,
+            "buttonStr" : buttonStr
+        };
     } else {
         commonError("获取用户权限按钮失败！");
         return null;
