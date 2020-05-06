@@ -43,6 +43,16 @@
 <div hidden="hidden" class="comm-dialog" id="userConfig_addDiv">
     <form class="layui-form layui-form-pane" id="userConfig_addFrm" action="">
         <div class="layui-form-item">
+            <div class="layui-upload-drag" id="userConfig_uploadHeader">
+                <i class="layui-icon"></i>
+                <p>点击上传头像，或将文件拖拽到此处</p>
+                <div class="layui-hide" id="userConfig_uploadHeaderPrev">
+                    <hr>
+                    <img src="" alt="上传成功后渲染" style="max-width: 196px">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <div class="layui-inline">
                 <label class="layui-form-label">用户号</label>
                 <div class="layui-input-inline">

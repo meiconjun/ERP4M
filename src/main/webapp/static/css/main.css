@@ -148,10 +148,10 @@
     padding-left: 30px;
     padding-right: 30px;
 }
-
+/*弹框右下方按钮*/
 .comm-dialog-button {
     min-height: 36px;
-    position: absolute;
-    bottom: 0;
-    right: 20px;
+    position: relative;
+    margin-right: 20px;
+    float: right;
 }

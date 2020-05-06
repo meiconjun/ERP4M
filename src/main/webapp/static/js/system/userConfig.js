@@ -196,7 +196,7 @@ function userConfig_queryOperation(curPage, limit) {
 function userConfig_addOperation(roleList) {
     layui.layer.open({
         type: 1,// 页面层
-        area: ['800px', '500px'],// 宽高
+        area: ['720px', '550px'],// 宽高
         title: '新增用户',// 标题
         content: $("#userConfig_addDiv"),//内容，直接取dom对象
         // btn: ['确定'],
@@ -211,6 +211,28 @@ function userConfig_addOperation(roleList) {
 
             // roleConfig_digSubmit(dialogIndex, "add");
             layui.form.render();
+
+            // 文件上传组件
+            layui.upload.render({
+                elem: '#userConfig_uploadHeader',
+                url: 'uploadHeaderImg.do',//改成您自己的上传接口
+                accept: 'images',//只允许上传图片
+                acceptMime: 'images',// 规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
+                exts: 'jpg|png|gif|bmp|jpeg',
+                auto: false,// 选择文件后是否自动上传
+                multiple: false,// 是否允许多文件上传
+                choose: function(obj) {
+                    //预读本地文件,如果是多文件，则会遍历
+                    obj.preview(function (index, file, result) {
+                        layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', result);
+                    });
+                },
+                done: function(res){
+                    layer.msg('上传成功');
+                    layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.files.file);
+                    console.log(res)
+                }
+            });
         }
     });
 }
