@@ -216,21 +216,30 @@ function userConfig_addOperation(roleList) {
             layui.upload.render({
                 elem: '#userConfig_uploadHeader',
                 url: 'uploadHeaderImg.do',//改成您自己的上传接口
+                data: {
+                    "user_no": function () {
+                        return $("#userConfig_add_userNo").val();
+                    }
+                },
                 accept: 'images',//只允许上传图片
                 acceptMime: 'images',// 规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
                 exts: 'jpg|png|gif|bmp|jpeg',
-                auto: false,// 选择文件后是否自动上传
+                auto: true,// 选择文件后是否自动上传
                 multiple: false,// 是否允许多文件上传
                 choose: function(obj) {
                     //预读本地文件,如果是多文件，则会遍历
                     obj.preview(function (index, file, result) {
+                        layui.$('#userConfig_uploadHeaderPrev').prev().hide();
+                        layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
                         layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', result);
                     });
                 },
-                done: function(res){
-                    layer.msg('上传成功');
-                    layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.files.file);
-                    console.log(res)
+                done: function(res, index, upload){
+                    //触发表单提交
+                    $("#userConfig_add_filePath").val(res.data.filePath)
+                },
+                error: function (index, upload) {
+                    commonError("上传头像失败");
                 }
             });
         }

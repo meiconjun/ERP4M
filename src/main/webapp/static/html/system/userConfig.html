@@ -47,7 +47,6 @@
                 <i class="layui-icon"></i>
                 <p>点击上传头像，或将文件拖拽到此处</p>
                 <div class="layui-hide" id="userConfig_uploadHeaderPrev">
-                    <hr>
                     <img src="" alt="上传成功后渲染" style="max-width: 196px">
                 </div>
             </div>
@@ -96,9 +95,15 @@
                 </div>
             </div>
         </div>
+        <div class="layui-form-item" hidden="hidden">
+            <label class="layui-form-label">头像路径</label>
+            <div class="layui-input-block">
+                <input type="text" name="userConfig_add_filePath" id="userConfig_add_filePath"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
         <div class="layui-form-item comm-dialog-button">
             <!--            <div class="layui-input-block">-->
-            <button class="layui-btn" lay-submit lay-filter="userConfig_addSubmit">确定</button>
+            <button id="userConfig_addSubmit" class="layui-btn" lay-submit lay-filter="userConfig_addSubmit">确定</button>
             <!--            </div>-->
         </div>
     </form>
