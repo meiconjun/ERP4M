@@ -3,7 +3,7 @@ var userConfig_tableIns;
 $(document).ready(function () {
     try {
         // 获取按钮权限列表
-        let buttonMap = commonGetAuthField('S10100');
+        let buttonMap = commonGetAuthField('S02000');
         let buttonStr = buttonMap.buttonStr;
         // 获取角色列表
         let roleList = UserConfig_getRoleList();
@@ -115,7 +115,7 @@ $(document).ready(function () {
                             html += "<a class=\"layui-btn layui-btn-xs\" name='userConfig_rightBtn' onclick='userConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>";
                         }
                         if (buttonStr.indexOf("userConfig_modifyBtn") != -1) {
-                            html += "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='userConfig_modifyBtn' onclick='userConfig_modifyOperation(" + commonFormatObj(data) + ")'>修改信息</a>";
+                            html += "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='userConfig_modifyBtn' onclick='userConfig_modifyOperation(" + commonFormatObj(data) + "," +  commonFormatObj(roleList) + ")'>修改信息</a>";
                         }
                         return html;
                     }}
@@ -205,43 +205,106 @@ function userConfig_addOperation(roleList) {
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
             // 渲染弹框元素
-            let dialogIndex = index;// 弹框层索引
             commonPutNormalSelectOpts(roleList, "userConfig_add_roleNo", "", true);
             commonPutNormalSelectOpts(FIELD_USER_STATUS, "userConfig_add_status", "", true);
 
             // roleConfig_digSubmit(dialogIndex, "add");
             layui.form.render();
+            userConfig_initFileUpload();
+            userConfig_digSubmit(index, "add");
 
-            // 文件上传组件
-            layui.upload.render({
-                elem: '#userConfig_uploadHeader',
-                url: 'uploadHeaderImg.do',//改成您自己的上传接口
-                data: {
-                    "user_no": function () {
-                        return $("#userConfig_add_userNo").val();
-                    }
-                },
-                accept: 'images',//只允许上传图片
-                acceptMime: 'images',// 规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
-                exts: 'jpg|png|gif|bmp|jpeg',
-                auto: true,// 选择文件后是否自动上传
-                multiple: false,// 是否允许多文件上传
-                choose: function(obj) {
-                    //预读本地文件,如果是多文件，则会遍历
-                    obj.preview(function (index, file, result) {
-                        layui.$('#userConfig_uploadHeaderPrev').prev().hide();
-                        layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
-                        layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', result);
-                    });
-                },
-                done: function(res, index, upload){
-                    //触发表单提交
-                    $("#userConfig_add_filePath").val(res.data.filePath)
-                },
-                error: function (index, upload) {
-                    commonError("上传头像失败");
-                }
-            });
         }
+    });
+}
+
+/**
+ * 修改用户
+ * @param oldData
+ */
+function userConfig_modifyOperation(oldData, roleList) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['720px', '550px'],// 宽高
+        title: '修改用户',// 标题
+        content: $("#userConfig_addDiv"),//内容，直接取dom对象
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            commonPutNormalSelectOpts(roleList, "userConfig_add_roleNo", oldData.role_no, true);
+            commonPutNormalSelectOpts(FIELD_USER_STATUS, "userConfig_add_status", oldData.status, true);
+
+            //TODO 设置头像回显
+
+            $("#userConfig_add_userNo").val(oldData.user_no).attr('disabled', 'disabled').addClass('layui-disabled');//禁用输入框并添加禁用的样式
+            $("#userConfig_add_userName").val(oldData.user_name);
+            $("#userConfig_add_email").val(oldData.email);
+            $("#userConfig_add_phone").val(oldData.phone);
+            layui.form.render();
+            userConfig_initFileUpload();
+            userConfig_digSubmit(index, "modify");
+
+        }
+    });
+}
+function userConfig_initFileUpload() {
+    // 初始化文件上传组件
+    layui.upload.render({
+        elem: '#userConfig_uploadHeader',
+        url: 'uploadHeaderImg.do',//改成您自己的上传接口
+        data: {
+            "user_no": function () {
+                return $("#userConfig_add_userNo").val();
+            }
+        },
+        accept: 'images',//只允许上传图片
+        acceptMime: 'images',// 规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
+        exts: 'jpg|png|gif|bmp|jpeg',
+        auto: true,// 选择文件后是否自动上传
+        multiple: false,// 是否允许多文件上传
+        choose: function(obj) {
+            //预读本地文件,如果是多文件，则会遍历
+            obj.preview(function (index, file, result) {
+                layui.$('#userConfig_uploadHeaderPrev').prev().hide();
+                layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
+                layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', result);
+            });
+        },
+        done: function(res, index, upload){
+            // 将头像地址赋值给表单
+            $("#userConfig_add_filePath").val(res.data.filePath)
+        },
+        error: function (index, upload) {
+            commonError("上传头像失败");
+        }
+    });
+}
+
+function userConfig_digSubmit(dialogIndex, operType) {
+    layui.form.on('submit(userConfig_addSubmit)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
+        layui.layer.confirm("是否确认提交？", function(index) {
+            let fieldObj = data.field;// 表单字段集合
+            let retData = commonAjax("userConfig.do", JSON.stringify({
+                "beanList" : [{
+                    "user_no" : fieldObj.userConfig_add_userNo,
+                    "user_name" : fieldObj.userConfig_add_userName,
+                    "pass_word" : "",
+                    "picture" : fieldObj.userConfig_add_filePath,
+                    "email" : fieldObj.userConfig_add_email,
+                    "phone" : fieldObj.userConfig_add_phone,
+                    "status" : fieldObj.userConfig_add_status
+                }],
+                "operType" : operType,
+                "paramMap" : {
+                    "role_no" : fieldObj.userConfig_add_roleNo
+                }
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("操作成功");
+                layui.layer.close(dialogIndex);
+                userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+        return false;
     });
 }

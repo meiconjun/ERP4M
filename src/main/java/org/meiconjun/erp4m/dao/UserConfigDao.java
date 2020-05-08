@@ -1,5 +1,8 @@
 package org.meiconjun.erp4m.dao;
 
+import org.apache.ibatis.annotations.Param;
+import org.meiconjun.erp4m.bean.User;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,4 +24,20 @@ public interface UserConfigDao {
      * 查询用户列表
      */
     List<HashMap<String, Object>> selectUsers(HashMap<String, Object> condMap);
+    /**
+     * 新增用户
+     */
+    int insertUser(HashMap<String, Object> condMap);
+    /**
+     * 新增用户角色关联
+     */
+    int inserUserRole(HashMap<String, Object> condMap);
+    /**
+     * 更新用户信息
+     */
+    int updateUser(User user);
+    /**
+     * 删除旧的用户角色信息
+     */
+    int deleteUserRoleOld(@Param("user_no") String user_no);
 }

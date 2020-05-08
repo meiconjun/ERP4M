@@ -4,7 +4,7 @@ var roleConfig_tableIns;
 $(document).ready(function () {
     try {
         // 获取按钮权限列表
-        let buttonMap = commonGetAuthField('S10100');
+        let buttonMap = commonGetAuthField('S01000');
         let buttonStr = buttonMap.buttonStr;
         // 初始化表格
         roleConfig_tableIns = layui.table.render({

@@ -8,6 +8,8 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.UserConfigDao;
 import org.meiconjun.erp4m.service.UserConfigService;
+import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,8 +44,60 @@ public class UserConfigServiceImpl implements UserConfigService {
             queryOperation(requestBean, responseBean);
         } else if ("getRoleList".equals(operType)) {
             getRoleListOperation(requestBean, responseBean);
+        } else if ("add".equals(operType)) {
+            addOperation(requestBean, responseBean);
+        } else if ("modify".equals(operType)) {
+            modifyOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 修改用户信息
+     * @param requestBean
+     * @param responseBean
+     */
+    private void modifyOperation(RequestBean requestBean, ResponseBean responseBean) {
+        User bean = (User) requestBean.getBeanList().get(0);
+        HashMap<String, Object> paramMap = (HashMap<String, Object>) requestBean.getParamMap();
+        bean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
+
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("bean", bean);
+        condMap.put("role_no", paramMap.get("role_no"));
+        //修改用户信息
+        userConfigDao.updateUser(bean);
+        //删除旧的用户角色信息
+        userConfigDao.deleteUserRoleOld(bean.getUser_no());
+        //更新用户角色信息
+        userConfigDao.inserUserRole(condMap);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    /**
+     * 新增用户操作
+     * @param requestBean
+     * @param responseBean
+     */
+    private void addOperation(RequestBean requestBean, ResponseBean responseBean) {
+        User bean = (User) requestBean.getBeanList().get(0);
+        HashMap<String, Object> paramMap = (HashMap<String, Object>) requestBean.getParamMap();
+        bean.setAuth_user(CommonUtil.getLoginUser().getUser_no());
+
+        String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
+        if (CommonUtil.isStrBlank(defaultPsw)) {
+            defaultPsw = "123456";
+        }
+        bean.setPass_word(defaultPsw);
+        bean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("bean", bean);
+        condMap.put("role_no", paramMap.get("role_no"));
+        userConfigDao.insertUser(condMap);
+        userConfigDao.inserUserRole(condMap);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**

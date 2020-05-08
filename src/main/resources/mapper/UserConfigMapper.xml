@@ -18,4 +18,28 @@
     <select id="selectRoles" resultType="java.util.HashMap">
         select role_no as value, role_name as name from sys_role_tb
     </select>
+
+    <insert id="insertUser" parameterType="java.util.HashMap">
+        insert into sys_user_tb (user_no, user_name, pass_word, picture, email, phone, last_modi_time, auth_user, status)
+        values(#{bean.user_no}, #{bean.user_name}, #{bean.pass_word}, #{bean.picture}, #{bean.email}, #{bean.phone},
+        #{bean.last_modi_time}, #{bean.auth_user}, #{bean.status})
+    </insert>
+
+    <insert id="inserUserRole" parameterType="java.util.HashMap">
+        insert into sys_user_role_tb (user_no, role_no, last_modi_time)
+        values(#{bean.user_no}, #{role_no}, #{bean.last_modi_time})
+    </insert>
+
+    <update id="updateUser" parameterType="org.meiconjun.erp4m.bean.User">
+        update sys_user_tb
+        set user_name = #{user_name}, pass_word = #{pass_word}, picture = #{picture},
+        email = #{email}, phone = #{phone}, last_modi_time = #{last_modi_time}, auth_user = #{auth_user},
+        status = #{status}
+        where user_no = #{user_no}
+    </update>
+    <delete id="deleteUserRoleOld" parameterType="java.lang.String">
+        delete from sys_user_role_tb
+        where user_no = #{user_no}
+    </delete>
+
 </mapper>
