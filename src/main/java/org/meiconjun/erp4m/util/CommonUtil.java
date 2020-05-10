@@ -23,6 +23,7 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -209,5 +210,18 @@ public class CommonUtil {
     public static String getCurrentDateStr() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         return sdf.format(new Date());
+    }
+
+    /**
+     * 将文件转为Base64
+     * @param file
+     * @return
+     */
+    public static String fileToBase64(File file) throws IOException {
+        FileInputStream is = new FileInputStream(file);
+        byte[] buffer = new byte[(int) file.length()];
+        is.read(buffer);
+        is.close();
+        return new BASE64Encoder().encode(buffer);
     }
 }

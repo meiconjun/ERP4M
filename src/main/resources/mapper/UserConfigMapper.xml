@@ -3,7 +3,7 @@
 <mapper namespace="org.meiconjun.erp4m.dao.UserConfigDao">
     <select id="selectUsers" resultType="java.util.HashMap">
         select a.*, b.role_no from sys_user_tb a, sys_user_role_tb b
-        where 1 = 1
+        where 1 = 1 and a.user_no = b.user_no
         <if test="bean.user_no != null and bean.user_no != ''">
             and a.user_no like concat('%', #{bean.user_no}, '%')
         </if>
@@ -32,9 +32,12 @@
 
     <update id="updateUser" parameterType="org.meiconjun.erp4m.bean.User">
         update sys_user_tb
-        set user_name = #{user_name}, pass_word = #{pass_word}, picture = #{picture},
-        email = #{email}, phone = #{phone}, last_modi_time = #{last_modi_time}, auth_user = #{auth_user},
+        set user_name = #{user_name}, picture = #{picture},
+        email = #{email}, phone = #{phone}, last_modi_time = #{last_modi_time},
         status = #{status}
+        <if test="pass_word != null and pass_word != ''">
+            , pass_word = #{pass_word}
+        </if>
         where user_no = #{user_no}
     </update>
     <delete id="deleteUserRoleOld" parameterType="java.lang.String">
@@ -42,4 +45,19 @@
         where user_no = #{user_no}
     </delete>
 
+    <delete id="deleteUser" parameterType="java.lang.String">
+        delete from sys_user_tb
+        where user_no = #{user_no}
+    </delete>
+
+    <delete id="deleteUserRight" parameterType="java.lang.String">
+        delete from sys_user_right_tb
+        where user_no = #{user_no}
+    </delete>
+
+    <update id="updateUserStatus" parameterType="org.meiconjun.erp4m.bean.User">
+        update sys_user_tb
+        set status = #{status}
+        where user_no = #{user_no}
+    </update>
 </mapper>

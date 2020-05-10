@@ -1,42 +1,5 @@
-<!--<div class="layadmin-tabsbody-item layui-show">-->
-<!--    <div class="layui-fluid">-->
-<!--        <div class="layui-row layui-col-space15">-->
-<!--            <div class="layui-col-md12">-->
 <div class="layui-card">
-    <div class="comm-row col-4 layui-form">
-        <div class="row-label">
-            用户号：
-        </div>
-        <div class="row-input">
-            <input class="layui-input" id="userConfig_Q_userNo" autocomplete="off">
-        </div>
-        <div class="row-label">
-            用户名称：
-        </div>
-        <div class="row-input">
-            <input class="layui-input" id="userConfig_Q_userName" autocomplete="off">
-        </div>
-        <div class="row-label">
-            角色：
-        </div>
-        <div class="row-input">
-            <select  id="userConfig_Q_role" >
-            </select>
-        </div>
-
-        <button class="layui-btn" id="userConfig_Q_query" data-type="reload">查询</button>
-    </div>
-    <table id="userConfig_table">
-
-    </table>
-    <div>
-        <div id="userConfig_page" class="table-footer-left"></div>
-        <div class="table-footer-right">
-            <a class="layui-btn layui-btn-sm layui-btn-normal" id="userConfig_addBtn">新增用户</a>
-            <a class="layui-btn layui-btn-sm layui-btn-danger" id="userConfig_deactBtn">启/停用用户</a>
-            <a class="layui-btn layui-btn-sm layui-btn-danger" id="userConfig_deleteBtn">删除用户</a>
-        </div>
-    </div>
+    <div id="projectDocDefind_mainTree" class="ztree"></div>
 </div>
 
 <!-- 注意表单字段要用name做标识 -->
@@ -109,10 +72,9 @@
     </form>
 </div>
 <!-- 树组件DIV -->
-<div id="userConfig_rightTree" class="comm-dialog ztree" hidden="hidden"></div>
 <!--            </div>-->
 <!--        </div>-->
 <!--    </div>-->
 <!--</div>-->
 
-<script src="static/js/system/userConfig.js"></script>
+<script src="static/js/project/projectDocDefind.js"></script>

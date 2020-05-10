@@ -137,6 +137,24 @@ $(document).ready(function () {
         $("#userConfig_deleteBtn").click(function () {
             userConfig_deleteOperation();
         });
+        //停用启用用户
+        $("#userConfig_deactBtn").click(function () {
+            userConfig_deactOperation();
+        });
+
+        //权限控制
+        if (buttonStr.indexOf(("userConfig_Q_query") == -1)) {
+            $("#userConfig_Q_query").hide();
+        }
+        if (buttonStr.indexOf(("userConfig_addBtn") == -1)) {
+            $("#userConfig_addBtn").hide();
+        }
+        if (buttonStr.indexOf(("userConfig_deleteBtn") == -1)) {
+            $("#userConfig_deleteBtn").hide();
+        }
+        if (buttonStr.indexOf(("userConfig_deactBtn") == -1)) {
+            $("#userConfig_deactBtn").hide();
+        }
     } catch (e) {
         console.error(e.message, e);
         commonError(e.message);
@@ -204,6 +222,7 @@ function userConfig_addOperation(roleList) {
         //     //确认按钮的回调，提交表单
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            userConfig_cleanForm();
             // 渲染弹框元素
             commonPutNormalSelectOpts(roleList, "userConfig_add_roleNo", "", true);
             commonPutNormalSelectOpts(FIELD_USER_STATUS, "userConfig_add_status", "", true);
@@ -228,16 +247,31 @@ function userConfig_modifyOperation(oldData, roleList) {
         title: '修改用户',// 标题
         content: $("#userConfig_addDiv"),//内容，直接取dom对象
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            userConfig_cleanForm();
             // 渲染弹框元素
             commonPutNormalSelectOpts(roleList, "userConfig_add_roleNo", oldData.role_no, true);
             commonPutNormalSelectOpts(FIELD_USER_STATUS, "userConfig_add_status", oldData.status, true);
 
-            //TODO 设置头像回显
+            // 设置头像回显
+            let imgData = commonAjax("userConfig.do", JSON.stringify({
+                "beanList": [],
+                "operType": "getImgBase64",
+                "paramMap": {
+                    "imgUrl": oldData.picture
+                }
+            }));
+            if (imgData.retCode == HANDLE_SUCCESS) {
+                layui.$('#userConfig_uploadHeaderPrev').prev().hide();
+                layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
+                layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', "data:image/jpg;base64," + imgData.retMap.imgBase64);
+            }
+
 
             $("#userConfig_add_userNo").val(oldData.user_no).attr('disabled', 'disabled').addClass('layui-disabled');//禁用输入框并添加禁用的样式
             $("#userConfig_add_userName").val(oldData.user_name);
             $("#userConfig_add_email").val(oldData.email);
             $("#userConfig_add_phone").val(oldData.phone);
+            $("#userConfig_add_filePath").val(oldData.picture);
             layui.form.render();
             userConfig_initFileUpload();
             userConfig_digSubmit(index, "modify");
@@ -306,5 +340,155 @@ function userConfig_digSubmit(dialogIndex, operType) {
             }
         });
         return false;
+    });
+}
+
+/**
+ * 清空表单
+ */
+function userConfig_cleanForm() {
+    layui.$('#userConfig_uploadHeaderPrev').prev().show();
+    layui.$('#userConfig_uploadHeaderPrev').prev().prev().show();
+    layui.$('#userConfig_uploadHeaderPrev').addClass('layui-hide').find('img').attr('src', "");
+    $("#userConfig_add_userNo").removeAttr('disabled').removeClass('layui-disabled');
+    layui.form.val("userConfig_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+        "userConfig_add_userNo": "", // "name": "value"
+        "userConfig_add_userName": "",
+        "userConfig_add_email": '',
+        "userConfig_add_phone": '',
+        "userConfig_add_roleNo": '',
+        "userConfig_add_status": "",
+        "userConfig_add_filePath": ""
+    });
+}
+
+/**
+ * 删除用户
+ */
+function userConfig_deleteOperation() {
+    let checkData = layui.table.checkStatus("userConfig_tableObj").data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要删除的用户");
+        return;
+    } else {
+        layui.layer.confirm("是否确认删除选中的用户？", function(index) {
+            let retData = commonAjax("userConfig.do", JSON.stringify({
+                "beanList" : checkData,
+                "operType" : "delete",
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("删除成功");
+                userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+    }
+}
+
+function userConfig_deactOperation() {
+    let checkData = layui.table.checkStatus("userConfig_tableObj").data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要启用/停用的用户");
+        return;
+    } else if (checkData.length > 1) {
+        commonInfo("只能同时启用/停用一个用户");
+        return;
+    } else {
+        let checked = checkData[0];
+        layui.layer.confirm(checked.status == 1 ? "是否确认停用选中的用户？" : "是否确认启用选中的用户？", function(index) {
+            let retData = commonAjax("userConfig.do", JSON.stringify({
+                "beanList" : checkData,
+                "operType" : "deact",
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("启用/停用用户成功");
+                userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+    }
+
+}
+
+function userConfig_rightOperation(data) {
+    let treeInst;
+    let beforeNodes = [];
+    let afterNodes = [];
+    let addRight = {};//新增权限列表
+    let delRight = {};//删除权限列表
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['450px', '600px'],// 宽高
+        title: '用户权限设定',// 标题
+        content: $("#userConfig_rightTree"),//内容，直接取dom对象
+        btn: ['提交'],
+        yes: function (index1, layero) {
+            //确认按钮的回调，提交表单
+            layui.layer.confirm("是否确认提交修改？", function(index) {
+                afterNodes = treeInst.getCheckedNodes(true);// 获取最终的勾选节点
+                for (let i = 0; i < afterNodes.length; i++) {
+                    if (!beforeNodes.some(function (curValue) {
+                        return curValue.field_no == afterNodes[i].field_no;
+                    })) {
+                        addRight[afterNodes[i].field_no] = afterNodes[i].field_type;
+                    }
+                }
+                for (let i = 0; i < beforeNodes.length; i++) {
+                    if (!afterNodes.some(function (curValue) {
+                        return curValue.field_no == beforeNodes[i].field_no;
+                    })) {
+                        delRight[beforeNodes[i].field_no] = beforeNodes[i].field_type;
+                    }
+                }
+                if ($.isEmptyObject(addRight) && $.isEmptyObject(delRight)) {
+                    commonInfo("没有任何修改");
+                    return;
+                } else {
+                    let retData = commonAjax("userRight.do", JSON.stringify({
+                        "beanList": [data],
+                        "operType": "updateRight",
+                        "paramMap": {
+                            "addRight" : addRight,
+                            "delRight" : delRight
+                        }
+                    }));
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        commonOk("更新成功");
+                        layui.layer.close(index1);
+                    } else {
+                        commonError(retData.retMsg);
+                    }
+                }
+            });
+        },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            let retData = commonAjax("userRight.do", JSON.stringify({
+                "beanList" : [data],
+                "operType" : "getUserRight",
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                let treeConfig = {
+                    check: {
+                        chkboxType: {'Y': "ps", "N": 'ps'},
+                        chkStyle: 'checkbox',
+                        enable: true
+                    },
+                    edit: {
+                        enable: false//不可编辑
+                    }
+                };
+                // 渲染树形组件
+                treeInst = $.fn.zTree.init($("#userConfig_rightTree"), treeConfig, retData.retMap.dataList);
+                beforeNodes = treeInst.getCheckedNodes(true);//获取初始的勾选节点
+            } else {
+                commonError("加载用户权限失败！" + retData.retMsg);
+            }
+
+        }
     });
 }

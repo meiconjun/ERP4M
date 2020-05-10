@@ -208,6 +208,7 @@ function roleConfig_addOperation() {
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
             // 渲染弹框元素
+            roleConfig_cleanForm();
             let dialogIndex = index;// 弹框层索引
             commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_position_addTxt", "", true);
             commonPutNormalSelectOpts(FIELD_ROLELEVEL, "roleConfig_level_addTxt", "", true);
@@ -233,6 +234,7 @@ function roleConfig_modifyOperation(oldData) {
         //     //确认按钮的回调，提交表单
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            roleConfig_cleanForm();
             // 渲染弹框元素
             let dialogIndex = index;// 弹框层索引
             commonPutNormalSelectOpts(FIELD_POSITION, "roleConfig_position_addTxt", oldData.position, true);
@@ -413,5 +415,20 @@ function roleConfig_rightOperation(data) {
             }
 
         }
+    });
+}
+
+/**
+ * 清空表单
+ */
+function roleConfig_cleanForm() {
+    $("#roleConfig_roleNo_addTxt").removeAttr('disabled').removeClass('layui-disabled');
+    layui.form.val("roleConfig_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+        "roleConfig_roleNo_addTxt": "", // "name": "value"
+        "roleConfig_roleName_addTxt": "",
+        "roleConfig_position_addTxt": '',
+        "roleConfig_level_addTxt": '',
+        "roleConfig_department_addTxt": '',
+        "roleConfig_desc_addTxt": ""
     });
 }

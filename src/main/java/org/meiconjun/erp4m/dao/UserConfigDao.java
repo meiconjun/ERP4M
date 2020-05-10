@@ -40,4 +40,16 @@ public interface UserConfigDao {
      * 删除旧的用户角色信息
      */
     int deleteUserRoleOld(@Param("user_no") String user_no);
+    /**
+     * 删除用户
+     */
+    int deleteUser(@Param("user_no") String user_no);
+    /**
+     * 删除用户权限
+     */
+    int deleteUserRight(@Param("user_no") String user_no);
+    /**
+     * 更新用户状态
+     */
+    int updateUserStatus(User user);
 }

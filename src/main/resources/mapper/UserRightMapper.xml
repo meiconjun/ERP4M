@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.UserRightDao">
+    <select id="selectAllMenu" resultType="org.meiconjun.erp4m.bean.MenuBean">
+        select m.* from sys_menu_tb m
+    </select>
+
+    <select id="selectBtnByMenuId" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.ButtonBean">
+        select * from sys_button_tb
+        where menu_id = #{menu_id}
+    </select>
+
+    <select id="selectUserFieldRight" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(0) from sys_user_right_tb
+        where user_no = #{user_no} and field_no = #{field_no}
+    </select>
+
+    <insert id="insertUserRight" parameterType="java.util.HashMap">
+        insert into sys_user_right_tb (user_no, field_no, field_type, last_modi_time)
+        values(#{user_no}, #{field_no}, #{field_type}, #{last_modi_time})
+    </insert>
+
+    <delete id="deleteUserRight" parameterType="java.lang.String">
+        delete from sys_user_right_tb
+        where user_no = #{user_no} and field_no = #{field_no}
+    </delete>
+</mapper>

@@ -14,6 +14,7 @@ $(document).ready(function () {
         }
         /*============初始化操作 begin===============*/
         initData();
+        initFilePath();
         /*============初始化操作 end===============*/
 
         //获取登录用户信息
@@ -116,5 +117,21 @@ function initData() {
         } else {
             commonError("加载数据字典失败");
         }
+    }
+}
+
+/**
+ * 获取文件存储根路径
+ */
+function initFilePath() {
+    let retData = commonAjax("init.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initFilePath",
+        "paramMap": {}
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        localStorage.setItem("filePath", retData.retMap.filePath);
+    } else {
+        commonError("初始化文件存储路径失败！" + retData.retMsg);
     }
 }

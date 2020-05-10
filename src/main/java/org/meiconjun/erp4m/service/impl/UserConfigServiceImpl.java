@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +50,63 @@ public class UserConfigServiceImpl implements UserConfigService {
             addOperation(requestBean, responseBean);
         } else if ("modify".equals(operType)) {
             modifyOperation(requestBean, responseBean);
+        } else if ("getImgBase64".equals(operType)) {
+            getImgBase64(requestBean, responseBean);
+        } else if ("delete".equals(operType)) {
+            deleteOperation(requestBean, responseBean);
+        } else if ("deact".equals(operType)) {
+            deactOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 启用/停用用户
+     * @param requestBean
+     * @param responseBean
+     */
+    private void deactOperation(RequestBean requestBean, ResponseBean responseBean) {
+        User user = (User) requestBean.getBeanList().get(0);
+        String status = "1";
+        if ("1".equals(user.getStatus())) {
+            status = "2";
+        }
+        user.setStatus(status);
+        int effect = userConfigDao.updateUserStatus(user);
+        if (effect == 0) {
+            throw new RuntimeException("更新用户状态失败");
+        }
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    private void deleteOperation(RequestBean requestBean, ResponseBean responseBean) {
+        List<User> beanList = requestBean.getBeanList();
+
+        for (User user : beanList) {
+            // 删除用户
+            int effect = userConfigDao.deleteUser(user.getUser_no());
+            if (effect < 1) {
+                throw new RuntimeException("用户[" + user.getUser_no() + "]删除失败");
+            }
+            // 删除用户角色关联
+            userConfigDao.deleteUserRoleOld(user.getUser_no());
+            // 删除用户权限
+            userConfigDao.deleteUserRight(user.getUser_no());
+        }
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    private void getImgBase64(RequestBean requestBean, ResponseBean responseBean) throws IOException {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String imgPath = (String) paramMap.get("imgUrl");
+        imgPath = PropertiesUtil.getProperty("fileSavePath") + imgPath;
+
+        File file = new File(imgPath);
+        String imgBase64 = CommonUtil.fileToBase64(file);
+        Map <String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("imgBase64", imgBase64);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
     }
 
     /**
@@ -59,7 +116,7 @@ public class UserConfigServiceImpl implements UserConfigService {
      */
     private void modifyOperation(RequestBean requestBean, ResponseBean responseBean) {
         User bean = (User) requestBean.getBeanList().get(0);
-        HashMap<String, Object> paramMap = (HashMap<String, Object>) requestBean.getParamMap();
+        Map<String, Object> paramMap = (Map<String, Object>) requestBean.getParamMap();
         bean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
 
         HashMap<String, Object> condMap = new HashMap<String, Object>();
@@ -82,7 +139,7 @@ public class UserConfigServiceImpl implements UserConfigService {
      */
     private void addOperation(RequestBean requestBean, ResponseBean responseBean) {
         User bean = (User) requestBean.getBeanList().get(0);
-        HashMap<String, Object> paramMap = (HashMap<String, Object>) requestBean.getParamMap();
+        Map<String, Object> paramMap = (Map<String, Object>) requestBean.getParamMap();
         bean.setAuth_user(CommonUtil.getLoginUser().getUser_no());
 
         String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
