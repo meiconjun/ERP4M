@@ -12,3 +12,5 @@ const FIELD_ROLELEVEL = 'S010300';
 const FIELD_USER_STATUS = 'S020100';
 /** 分页 每页数据条数 */
 const FIELD_EACH_PAGE_NUM = '20';
+/** 项目阶段*/
+const FIELD_STAGE = "S020200";

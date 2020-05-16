@@ -2,75 +2,46 @@
     <div id="projectDocDefind_mainTree" class="ztree"></div>
 </div>
 
-<!-- 注意表单字段要用name做标识 -->
-<div hidden="hidden" class="comm-dialog" id="userConfig_addDiv">
-    <form class="layui-form layui-form-pane" lay-filter="userConfig_addFrm" id="userConfig_addFrm" action="">
+<div hidden="hidden" class="comm-dialog" id="projectDocDefind_addDiv">
+    <form class="layui-form layui-form-pane" lay-filter="projectDocDefind_addFrm" id="projectDocDefind_addFrm" action="">
         <div class="layui-form-item">
-            <div class="layui-upload-drag" id="userConfig_uploadHeader">
-                <i class="layui-icon"></i>
-                <p>点击上传头像，或将文件拖拽到此处</p>
-                <div class="layui-hide" id="userConfig_uploadHeaderPrev">
-                    <img src="" alt="上传成功后渲染" style="max-width: 196px">
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">用户号</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="userConfig_add_userNo" id="userConfig_add_userNo" lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">用户名</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="userConfig_add_userName" id="userConfig_add_userName" lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">邮箱</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="userConfig_add_email" id="userConfig_add_email" lay-verify="email" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">手机</label>
-                <div class="layui-input-inline">
-                    <input type="tel" name="userConfig_add_phone" id="userConfig_add_phone" lay-verify="phone" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">角色</label>
-                <div class="layui-input-inline">
-                    <select name="userConfig_add_roleNo" id="userConfig_add_roleNo" required lay-verify="required">
-                    </select>
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">用户状态</label>
-                <div class="layui-input-inline">
-                    <select name="userConfig_add_status" id="userConfig_add_status" required lay-verify="required">
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="layui-form-item" hidden="hidden">
-            <label class="layui-form-label">头像路径</label>
+            <label class="layui-form-label">文档编号</label>
             <div class="layui-input-block">
-                <input type="text" name="userConfig_add_filePath" id="userConfig_add_filePath"  autocomplete="off" class="layui-input">
+                <input type="text" name="projectDocDefind_add_docNo" id="projectDocDefind_add_docNo" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="projectDocDefind_add_docName" id="projectDocDefind_add_docName" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属阶段</label>
+            <div class="layui-input-block">
+                <select name="projectDocDefind_add_stage" id="projectDocDefind_add_stage" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责部门</label>
+            <div class="layui-input-block">
+                <select name="projectDocDefind_add_department" id="projectDocDefind_add_department" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="projectDocDefind_add_desc" id="projectDocDefind_add_desc" placeholder="备注" class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item comm-dialog-button">
-            <!--            <div class="layui-input-block">-->
-            <button id="userConfig_addSubmit" class="layui-btn" lay-submit lay-filter="userConfig_addSubmit">确定</button>
-            <!--            </div>-->
+            <button id="projectDocDefind_addSubmit" class="layui-btn" lay-submit lay-filter="projectDocDefind_addSubmit">确定</button>
         </div>
     </form>
 </div>
+
 <!-- 树组件DIV -->
 <!--            </div>-->
 <!--        </div>-->

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.ProjectDocDefindDao">
+    <select id="selectProjectDoc" resultType="org.meiconjun.erp4m.bean.ProjectDocBean">
+        select * from pd_doc_defined_tb
+    </select>
+
+    <insert id="insertDoc" parameterType="org.meiconjun.erp4m.bean.ProjectDocBean">
+        insert into pd_doc_defined_tb(doc_no, doc_name, secret_level, stage, department, description)
+        values (#{doc_no}, #{doc_name}, #{secret_level}, #{stage}, #{department}, #{description})
+    </insert>
+
+    <update id="updateDoc" parameterType="org.meiconjun.erp4m.bean.ProjectDocBean">
+        update pd_doc_defined_tb
+        set doc_name = #{doc_name}, secret_level = #{secret_level}, department = #{department}, description = #{description}
+        where doc_no = #{doc_no}
+    </update>
+
+    <delete id="deleteDoc" parameterType="java.lang.String">
+        delete from pd_doc_defined_tb
+        where doc_no = #{doc_no}
+    </delete>
+</mapper>
