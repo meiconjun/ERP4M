@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.CreateProjectDao">
+    <select id="selectProjectByStage" resultType="java.util.HashMap">
+        select doc_no as value, doc_name as name from pd_doc_defined_tb
+        where stage = #{stage}
+    </select>
+
+    <select id="selectDocDepartment" resultType="java.lang.String" parameterType="java.lang.String">
+        select department from pd_doc_defined_tb
+        where doc_no = #{doc_no}
+    </select>
+
+    <select id="selectUserByDepartment" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select a.user_no as value, a.user_name as name from sys_user_tb a, sys_role_tb b, sys_user_role_tb c
+        where a.user_no = c.user_no and b.role_no = c.role_no and b.department = #{department}
+    </select>
+</mapper>

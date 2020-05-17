@@ -143,16 +143,16 @@ $(document).ready(function () {
         });
 
         //权限控制
-        if (buttonStr.indexOf(("userConfig_Q_query") == -1)) {
+        if (buttonStr.indexOf("userConfig_Q_query") == -1) {
             $("#userConfig_Q_query").hide();
         }
-        if (buttonStr.indexOf(("userConfig_addBtn") == -1)) {
+        if (buttonStr.indexOf("userConfig_addBtn") == -1) {
             $("#userConfig_addBtn").hide();
         }
-        if (buttonStr.indexOf(("userConfig_deleteBtn") == -1)) {
+        if (buttonStr.indexOf("userConfig_deleteBtn") == -1) {
             $("#userConfig_deleteBtn").hide();
         }
-        if (buttonStr.indexOf(("userConfig_deactBtn") == -1)) {
+        if (buttonStr.indexOf("userConfig_deactBtn") == -1) {
             $("#userConfig_deactBtn").hide();
         }
     } catch (e) {

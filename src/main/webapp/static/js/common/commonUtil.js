@@ -151,7 +151,7 @@ function commonGetAuthField(menu_id) {
  * @param isRequired 是否必输，false时添加一个空选项
  * @param onlyName 是否只展示name  默认为value-name
  */
-function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onlyName) {
+function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onlyName, tips) {
     let thisOpts;
     if (commonBlank(optList)) {
         return [];
@@ -169,7 +169,10 @@ function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onl
 
     let html = "";
     if (!isRequired) {
-        html += "<option value='' selected>-</option>";
+        if (commonBlank(tips)) {
+            tips = "";
+        }
+        html += "<option value='' selected>" + tips + "</option>";
     }
     for (let i = 0; i < thisOpts.length; i++) {
         html += "<option value='" + thisOpts[i].value + "'>";
