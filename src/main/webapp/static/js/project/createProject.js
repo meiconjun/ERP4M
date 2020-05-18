@@ -41,10 +41,22 @@ $(document).ready(function () {
             done: function(res, index, upload){
                 if (res.code == '0') {
                     createProject_fileUploadFlag = true;
+                    let reqMsg = {
+                        "beanList": [],
+                        "operType": "createProject",
+                        "paramMap": {
+                            "project_name": $("#createProject_name").val(),
+                            "chn_name": $("#createProject_chnName").val(),
+                            "product_doc_path": res.data.filePath,
+                            "begin_date": $("#createProject_beginDate").val().replaceAll("-", ""),
+                        }
+                    };
+                } else {
+                    commonError("上传规格说明书失败:" + res.msg)
                 }
             },
             error: function (index, upload) {
-                commonError("上传文件失败");
+                commonError("上传规格说明书失败，请稍后重试");
             }
         });
         // 渲染日期组件
@@ -134,6 +146,12 @@ function createProject_addStage() {
         "name" : "（阶段负责人）请先选择阶段文档",
         "value" : "-"
     }], "createProject_stageUser" + createProject_stageCount_temp, "", true, true);
+    layui.form.on('select(createProject_stageUser' + createProject_stageCount_temp + ')', function(data){
+        let menbers = $("#createProject_members").val();
+        if (menbers.indexOf($(data.elem).val()) == -1) {
+            $("#createProject_members").val(menbers + "，" + $(data.elem).val());
+        }
+    });
     //渲染表单元素
     layui.form.render();
     // 渲染日期组件
@@ -257,28 +275,7 @@ function createProject_submit() {
         layui.layer.confirm("是否确认提交？", function(index) {
             //先提交规格说明书
             createProject_fileUploadInst.upload();// 异步的
-            /*let fieldObj = data.field;// 表单字段集合
-            let retData = commonAjax("createProject.do", JSON.stringify({
-                "beanList" : [{
-                    "user_no" : fieldObj.userConfig_add_userNo,
-                    "user_name" : fieldObj.userConfig_add_userName,
-                    "pass_word" : "",
-                    "picture" : fieldObj.userConfig_add_filePath,
-                    "email" : fieldObj.userConfig_add_email,
-                    "phone" : fieldObj.userConfig_add_phone,
-                    "status" : fieldObj.userConfig_add_status
-                }],
-                "operType" : "createProject",
-                "paramMap" : {
-                }
-            }));
-            if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("操作成功");
-                layui.layer.close(dialogIndex);
-                userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
-            } else {
-                commonError(retData.retMsg);
-            }*/
+            // 表单提交操作放到上传成功的回调函数内
         });
         return false;
     });
