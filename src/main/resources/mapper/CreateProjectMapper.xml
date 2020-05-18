@@ -15,4 +15,16 @@
         select a.user_no as value, a.user_name as name from sys_user_tb a, sys_role_tb b, sys_user_role_tb c
         where a.user_no = c.user_no and b.role_no = c.role_no and b.department = #{department}
     </select>
+
+    <insert id="insertNewProjectMain" parameterType="java.util.HashMap">
+        insert into project_main_tb (project_no, project_name, chn_name, principal, specifications, begin_date,
+        project_menbers, project_state, create_state)
+        values(#{project_no}, #{project_name}, #{chn_name}, #{principal}, #{specifications}, #{begin_date},
+        #{project_menbers}, #{project_state}, #{create_state})
+    </insert>
+
+    <insert id="insertNewProjectStage" parameterType="java.util.HashMap">
+        insert into project_stage_tb (project_no, principal, stage_num, stage, begin_date, end_date, doc_serial, is_end)
+        values(#{project_no}, #{principal}, #{stage_num}, #{stage}, #{begin_date}, #{end_date}, #{doc_serial}, #{is_end})
+    </insert>
 </mapper>

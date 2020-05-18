@@ -16,6 +16,12 @@ $(document).ready(function () {
             "name" : "（阶段负责人）请先选择阶段文档",
             "value" : "-"
         }], "createProject_stageUser1", "", true, true);
+        layui.form.on('select(createProject_stageUser1)', function(data){
+            let menbers = $("#createProject_members").val();
+            if (menbers.indexOf($(data.elem).val()) == -1) {
+                $("#createProject_members").val(menbers + "，" + $(data.elem).val());
+            }
+        });
         //渲染表单元素
         layui.form.render();
 
@@ -41,6 +47,21 @@ $(document).ready(function () {
             done: function(res, index, upload){
                 if (res.code == '0') {
                     createProject_fileUploadFlag = true;
+                    // 获取阶段信息
+                    let stageList = [];
+                    for (let i = 1; i <= createProject_stageCount; i++) {
+                        let tempStage = {
+                            "stageCount": String(i),// 用数字会被转为double
+                            "stage_type": $("#createProject_stage" + i).val(),
+                            "stage_begin": $("#createProject_stage_beginDate" + i).val().replaceAll("-", ""),
+                            "stage_end": $("#createProject_stage_endDate" + i).val().replaceAll("-", ""),
+                            "stage_doc": $("#createProject_stageDoc" + i).val(),
+                            "doc_writer": $("#createProject_docWriter" + i).val(),
+                            "principal": $("#createProject_stageUser" + i).val()
+                        }
+                        stageList.push(tempStage);
+                    }
+                    // 构造请求报文
                     let reqMsg = {
                         "beanList": [],
                         "operType": "createProject",
@@ -49,8 +70,18 @@ $(document).ready(function () {
                             "chn_name": $("#createProject_chnName").val(),
                             "product_doc_path": res.data.filePath,
                             "begin_date": $("#createProject_beginDate").val().replaceAll("-", ""),
+                            "member": $("#createProject_members").val(),
+                            "stageList": stageList
                         }
                     };
+                    let retData = commonAjax("createProject.do", JSON.stringify(reqMsg));
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        commonOk("提交立项申请成功!");
+                        // 关闭标签页
+                        layui.element.tabDelete("main-tab", "P02000");
+                    } else {
+                        commonError(retData.retMsg);
+                    }
                 } else {
                     commonError("上传规格说明书失败:" + res.msg)
                 }
@@ -90,7 +121,6 @@ $(document).ready(function () {
  */
 function createProject_addStage() {
     let createProject_stageCount_temp = createProject_stageCount + 1;
-    ;
     let html =
         "        <div stageCount=\"" + createProject_stageCount_temp + "\">\n" +
         "            &nbsp;&nbsp;&nbsp;&nbsp;阶段" + createProject_stageCount_temp + "\n" +
@@ -177,6 +207,9 @@ function createProject_minStage() {
     if (createProject_stageCount == 1) {
         return;
     }
+    let menbers = $("#createProject_members").val();
+    menbers = menbers.replaceAll($("#createProject_stageUser" + createProject_stageCount).val(), "");
+    $("#createProject_members").val(menbers);
     $("div[stageCount='" + createProject_stageCount + "']").remove();
     createProject_stageCount--;
 }

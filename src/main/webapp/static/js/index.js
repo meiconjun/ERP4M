@@ -82,6 +82,13 @@ function initMenuLeft(user_no) {
                 contObj.append(menuli);
             }
         };
+        //注册TAB删除事件，若全部tab都删除了，隐藏TAb div，展示主页
+        layui.element.on('tabDelete(main-tab)', function(data){
+            if (data.index == 0) {// 关闭了最后一个标签
+                $("div[lay-filter='main-tab']").attr("hidden", "hidden");
+            }
+            $("#main-page").removeAttr("hidden");
+        });
         createMenu(menuList, $sidebar_menu);
 
         /*================  init MenuTree left  end ================*/

@@ -25,4 +25,12 @@ public interface CreateProjectDao {
      * 根据部门编号查询用户列表
      */
     List<HashMap<String, Object>> selectUserByDepartment(@Param("department") String department);
+    /**
+     * 新增项目主表信息
+     */
+    int insertNewProjectMain(HashMap<String, Object> condMap);
+    /**
+     * 新增阶段信息表
+     */
+    int insertNewProjectStage(HashMap<String, Object> condMap);
 }
