@@ -44,6 +44,6 @@ function connectToWebSocket(ws) {
     }
     // 连接断开的回调函数
     ws.onclose = function (event) {
-        console.error("websocket连接失败")
+        console.error("websocket连接断开")
     }
 }
