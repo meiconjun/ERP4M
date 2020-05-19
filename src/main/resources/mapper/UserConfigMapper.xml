@@ -60,4 +60,9 @@
         set status = #{status}
         where user_no = #{user_no}
     </update>
+
+    <select id="selectUsersByRole" parameterType="java.lang.String" resultType="java.lang.String">
+        select user_no from sys_user_role_tb
+        where role_no = #{role_no}
+    </select>
 </mapper>

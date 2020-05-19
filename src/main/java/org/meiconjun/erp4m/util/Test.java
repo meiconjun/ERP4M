@@ -49,13 +49,17 @@ public class Test {
         Gson gson = new Gson();
         RequestBean re = (RequestBean) gson.fromJson(aaa, new TypeToken<RequestBean<User>>(){}.getType());
         User u = (User) re.getBeanList().get(0);*/
-        SerialNumberGenerater se = SerialNumberGenerater.getInstance();
+        /*SerialNumberGenerater se = SerialNumberGenerater.getInstance();
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
+        System.out.println(se.generaterNextNumber());*/
+        List<String> list = new ArrayList<String>();
+        list.add("aa");
+        list.add("bb");
+        System.out.println(list.contains("aa"));
     }
 }

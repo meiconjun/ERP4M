@@ -52,4 +52,8 @@ public interface UserConfigDao {
      * 更新用户状态
      */
     int updateUserStatus(User user);
+    /**
+     * 根据角色号查询用户
+     */
+    List<String> selectUsersByRole(@Param("role_no") String role_no);
 }
