@@ -30,7 +30,39 @@ function showNotificationKeep(title, content, func) {
  */
 function showProjectCountersignDialog(msgStr) {
     let msgBean = JSON.parse(msgStr);
-    let html = "";
+    let html = "<div class=\"comm-dialog\" id=\"projectCountersign_dialogDiv\">\n" +
+        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">项目名称</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_roleNo\" id=\"projectCountersign_roleNo\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">中文名称</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_chnName\" id=\"projectCountersign_chnName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">产品规格书</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"text\" name=\"projectCountersign_produceDoc\" id=\"projectCountersign_produceDoc\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <button id=\"projectCountersign_produceDoc_download\" class=\"layui-btn\" >下载规格书</button>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">项目开始日期</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_beginDate\" id=\"projectCountersign_beginDate\" lay-verify=\"date\" placeholder=\"yyyy-MM-dd\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "    </form>\n" +
+        "</div>";
     layui.layer.open({
         type : '1',
         title: '项目立项会签',
