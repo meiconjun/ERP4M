@@ -27,7 +27,7 @@ $(document).ready(function () {
             edit: {
                 enable: false//可编辑
             }
-        };;
+        };
 
         mainTreeInst = $.fn.zTree.init($("#projectDocDefind_mainTree"), treeConfig, treeData.retMap.dataList);
     } catch (e) {

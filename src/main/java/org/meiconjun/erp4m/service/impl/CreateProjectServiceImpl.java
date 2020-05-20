@@ -1,21 +1,22 @@
 package org.meiconjun.erp4m.service.impl;
 
+import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.CreateProjectDao;
+import org.meiconjun.erp4m.dao.MessageDao;
 import org.meiconjun.erp4m.service.CreateProjectService;
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
+import org.meiconjun.erp4m.util.WebsocketMsgUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Lch
@@ -31,6 +32,8 @@ public class CreateProjectServiceImpl implements CreateProjectService {
 
     @Resource
     private CreateProjectDao createProjectDao;
+    @Resource
+    private MessageDao messageDao;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -42,8 +45,77 @@ public class CreateProjectServiceImpl implements CreateProjectService {
             getUserListOperation(requestBean, responseBean);
         } else if ("createProject".equals(operType)) {
             createProjectOperation(requestBean, responseBean);
+        } else if ("countersign".equals(operType)) {
+            countersignOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 会签
+     * @param requestBean
+     * @param responseBean
+     */
+    private void countersignOperation(RequestBean requestBean, ResponseBean responseBean) {
+        String user_no = CommonUtil.getLoginUser().getUser_no();
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String state = (String) paramMap.get("state");//1-同意 2-拒绝
+        String msg_no = (String) paramMap.get("msg_no");// 消息编号
+        String status = "0";//处理状态
+        String project_no = (String) paramMap.get("project_no");//项目编号
+        // 更新消息表已阅用户和处理状态
+        HashMap<String, Object> msgUserMap = messageDao.selectReadAndUnReadUser(msg_no);
+        String readUser = (String) msgUserMap.get("read_user");
+        if (!CommonUtil.isStrBlank(readUser)) {
+            readUser += "," + user_no;
+        } else {
+            readUser = user_no;
+        }
+        List<String> readUsers = Arrays.asList(readUser.split(","));
+        List<String> receiveUsers = Arrays.asList(((String) msgUserMap.get("receive_user")).split(","));
+        if (readUsers.size() >= receiveUsers.size()) {
+            status = "1";
+        }
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("read_user", readUser);
+        condMap.put("status", status);
+        messageDao.updateReadUserAndStatus(condMap);
+        // 更新项目主表信息
+        String create_state = "1";//会签中
+        String project_state = "1";//立项中
+        HashMap<String, Object> projectInfo = createProjectDao.selectProjectMain(project_no);
+        String countersign_y = (String) projectInfo.get("countersign_y");//同意人员列表
+        String countersign_n = (String) projectInfo.get("countersign_n");//拒绝人员列表
+        String project_menbers = (String) projectInfo.get("project_menbers");//项目成员
+        if ("2".equals(state)) {
+            create_state = "3";//立项结束
+            project_state = "2";//立项失败
+            if (CommonUtil.isStrBlank(countersign_n)) {
+                countersign_n = user_no;
+            } else {
+                countersign_n += "," + user_no;
+            }
+            //TODO 推送消息给立项人，立项失败
+
+        } else {
+            if (CommonUtil.isStrBlank(countersign_y)) {
+                countersign_y = user_no;
+            } else {
+                countersign_y += "," + user_no;
+            }
+            if (countersign_y.split(",").length >= project_menbers.split(",").length) {
+                create_state = "2";//老板审核
+                //TODO 推送给老板审核
+            }
+        }
+        HashMap<String, Object> condMap2 = new HashMap<String, Object>();
+        condMap2.put("countersign_y", countersign_y);
+        condMap2.put("countersign_n", countersign_n);
+        condMap2.put("create_state", create_state);
+        condMap2.put("project_state", project_state);
+        createProjectDao.updateProjectMain(condMap2);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -102,8 +174,28 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 throw new RuntimeException("新增项目阶段信息失败");
             }
         }
-        // TODO 推送消息给项目成员进行会签
+        // 推送消息给项目成员进行会签
+        MessageBean messageBean = new MessageBean();
+        messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+        messageBean.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+        messageBean.setMsg_content("项目[" + project_name + "]正在发起立项");
+        messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_COUNTERSIGN);
+        Map<String, Object> msg_param = new HashMap<String, Object>();
+        msg_param.put("project_no", project_no);
+        msg_param.put("project_name", project_name);
+        msg_param.put("chn_name", chn_name);
+        msg_param.put("begin_date", begin_date);
+        msg_param.put("file_path", specifications);
+        messageBean.setMsg_param(msg_param);
+        List<String> userList = Arrays.asList((project_menbers.split(",")));
+        String deal_type = "2";
+        String end_time = CommonUtil.getCurrentDateAfterDays(7);
 
+        String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+        messageBean.setMsg_no(msg_no);
+        WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**

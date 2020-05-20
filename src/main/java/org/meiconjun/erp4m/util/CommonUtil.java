@@ -6,7 +6,10 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,8 +22,11 @@ import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
 import info.monitorenter.cpdetector.io.JChardetFacade;
 import info.monitorenter.cpdetector.io.ParsingDetector;
 import info.monitorenter.cpdetector.io.UnicodeDetector;
+import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
+import org.meiconjun.erp4m.dao.MessageDao;
 import org.meiconjun.erp4m.interceptor.RequestHolder;
+import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
@@ -37,6 +43,12 @@ import javax.servlet.http.HttpSession;
 public class CommonUtil {
 
     private static Logger logger = LoggerFactory.getLogger(CommonUtil.class);
+
+    private static MessageDao messageDao;
+
+    static {
+        messageDao = SpringContextHolder.getBean("messageDao");
+    }
     /**
      * Json解析器
      */
@@ -223,5 +235,59 @@ public class CommonUtil {
         is.read(buffer);
         is.close();
         return new BASE64Encoder().encode(buffer);
+    }
+
+    /**
+     * 新增系统消息表数据
+     * @return 消息编号
+     */
+    public static String addMessageAndSend(List<String> userList, List<String> roleList, MessageBean messageBean, String deal_type, String end_time) {
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        String receive_role = "";
+        String receive_user = "";
+        for (String role_no: roleList) {
+            receive_role += "," + role_no;
+        }
+        if (!CommonUtil.isStrBlank(receive_role)) {
+            receive_role = receive_role.substring(1);
+        }
+        for (String user_no: userList) {
+            receive_user += "," + user_no;
+        }
+        if (!CommonUtil.isStrBlank(receive_user)) {
+            receive_user = receive_user.substring(1);
+        }
+        String msg_no = SerialNumberGenerater.getInstance().generaterNextNumber();
+        condMap.put("msg_no", msg_no);
+        condMap.put("msg_type", messageBean.getMsg_type());
+        condMap.put("create_user", messageBean.getCreate_user());
+        condMap.put("create_time", messageBean.getCreate_time());
+        condMap.put("receive_role", receive_role);
+        condMap.put("receive_user", receive_user);
+        condMap.put("read_user", "");
+        condMap.put("msg_param", CommonUtil.objToJson(messageBean.getMsg_param()));
+        condMap.put("msg_content", messageBean.getMsg_content());
+        condMap.put("status", "");
+        condMap.put("end_time", end_time);
+        condMap.put("deal_type", deal_type);
+        messageDao.insertNewMessage(condMap);
+
+        return msg_no;
+    }
+
+    /**
+     * 获取当前日期N日后的日期或N日前的日期，正数为往后，复数为往前
+     * @param afterNum
+     * @return
+     */
+    public static String getCurrentDateAfterDays(int afterNum) {
+        Date dNow = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dNow);
+        calendar.add(Calendar.DATE, afterNum);
+        dNow = calendar.getTime();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
+        String defaultDate = sdf.format(dNow);
+        return defaultDate;
     }
 }

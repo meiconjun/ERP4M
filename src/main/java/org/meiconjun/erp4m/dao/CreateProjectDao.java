@@ -33,4 +33,12 @@ public interface CreateProjectDao {
      * 新增阶段信息表
      */
     int insertNewProjectStage(HashMap<String, Object> condMap);
+    /**
+     * 查询项目主表信息
+     */
+    HashMap<String, Object> selectProjectMain(@Param("project_no") String project_no);
+    /**
+     * 更新项目主表
+     */
+    int updateProjectMain(HashMap<String, Object> condMap);
 }

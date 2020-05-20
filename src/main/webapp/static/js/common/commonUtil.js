@@ -295,3 +295,20 @@ function commonResizeTable(tebleId) {
         attributes : true
     });*/
 }
+
+/**
+ * 文件下载
+ * @param fileName
+ * @param filePath
+ */
+function commonFileDownload(fileName, filePath) {
+    //隐藏的表单，用于请求下载服务
+    let html = "<form id='commonFileDownloadFrm' hidden='hidden' target='#' method='post' action='fileDownload.do'>" +
+                    "<input type='hidden' name='fileName' value=''>" +
+                    "<input type='hidden' name='filePath' value=''>" +
+                "</form>";
+    let $html = $(html);
+    $html.find('[name="fileName"]').val(fileName.replace(/\s+/g, ""));
+    $html.find('[name="filePath"]').val(filePath);
+    $html.submit();
+}

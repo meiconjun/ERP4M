@@ -27,4 +27,15 @@
         insert into project_stage_tb (project_no, principal, stage_num, stage, begin_date, end_date, doc_serial, is_end)
         values(#{project_no}, #{principal}, #{stage_num}, #{stage}, #{begin_date}, #{end_date}, #{doc_serial}, #{is_end})
     </insert>
+
+    <select id="selectProjectMain" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from project_main_tb
+        where project_no = #{project_no}
+    </select>
+
+    <update id="updateProjectMain" parameterType="java.util.HashMap">
+        update project_main_tb set
+        countersign_y = #{countersign_y}, countersign_n = #{countersign_n}, create_state = #{create_state},
+        project_state = #{project_state}
+    </update>
 </mapper>

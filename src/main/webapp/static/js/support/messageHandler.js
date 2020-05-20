@@ -1,7 +1,19 @@
 /**
  * 消息推送相关处理
  */
+/*=========================================================================*/
+/**
+ * 判断消息类型，调用对应方法
+ */
+function distributionMessage(msgStr) {
+    let msgBean = JSON.parse(msgStr);
+    if (FIELD_MSG_TYPE_COUNTERSIGN == msgBean.msg_type) {
+        showNotificationKeep("项目立项会签", msgBean.msg_content, showProjectCountersignDialog(msgStr));
+    }
+}
 
+
+/*=========================================================================*/
 /**
  * 右下角消息弹框,多条消息叠加展示
  */
@@ -35,7 +47,7 @@ function showProjectCountersignDialog(msgStr) {
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目名称</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCountersign_roleNo\" id=\"projectCountersign_roleNo\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_projectName\" id=\"projectCountersign_projectName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
@@ -70,13 +82,47 @@ function showProjectCountersignDialog(msgStr) {
         content: html,
         btn: ['同意', '拒绝'],
         yes: function(index, layero) {// 同意按钮回调
-
+            let retData = commonAjax("createProject.do", JSON.stringify({
+                "beanList": [],
+                "operType": "countersign",
+                "paramMap": {
+                    "state": "1",//1-同意 2-拒绝
+                    "msg_no": msgBean.msg_no,
+                    "project_no": msgBean.msg_param.project_no
+                }
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("操作成功");
+                layui.layer.close(index);
+            }
         },
         btn2: function(index, layero) {//拒绝按钮回调
-
+            let retData = commonAjax("createProject.do", JSON.stringify({
+                "beanList": [],
+                "operType": "countersign",
+                "paramMap": {
+                    "state": "2",//1-同意 2-拒绝
+                    "msg_no": msgBean.msg_no,
+                    "project_no": msgBean.msg_param.project_no
+                }
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("操作成功");
+                layui.layer.close(index);
+            }
         },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-
+            $("#projectCountersign_projectName").val(msgBean.msg_param.project_name);
+            $("#projectCountersign_chnName").val(msgBean.msg_param.chn_name);
+            $("#projectCountersign_produceDoc").val(msgBean.msg_param.project_name);
+            layui.laydate.render({
+                elem: '#projectCountersign_beginDate',
+                value : commonFormatDate(msgBean.msg_param.begin_date)
+            });
+            $("#projectCountersign_produceDoc_download").click(function () {
+                // 下载文件
+                commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.file_path);
+            });
         }
     });
 }

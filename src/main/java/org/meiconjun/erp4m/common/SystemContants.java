@@ -16,4 +16,8 @@ public class SystemContants {
      * 操作失败
      */
     public static final String HANDLE_FAIL = "1";
+
+
+    /** 消息类型-立项会签 */
+    public static final String FIELD_MSG_TYPE_COUNTERSIGN = "1";
 }
