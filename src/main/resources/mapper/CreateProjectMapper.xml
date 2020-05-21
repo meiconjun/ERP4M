@@ -39,4 +39,25 @@
         project_state = #{project_state}, fail_reason = #{fail_reason}
         where project_no = #{project_no}
     </update>
+
+    <select id="selectStageMin" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select min(stage_num), principal, stage, begin_date, end_date, doc_serial, is_end, unupload_doc
+        from project_stage_tb
+        where project_no = #{project_no} and is_end = '0'
+    </select>
+
+    <insert id="insertStageDocInfo" parameterType="java.util.HashMap">
+        insert into project_stage_doc_tb (serial_no, doc_no, doc_name, doc_writer, doc_version, upload_date, file_path)
+        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_writer}, #{doc_version}, #{upload_date}, #{file_path})
+    </insert>
+
+    <select id="selectProjectDocName" parameterType="java.lang.String" resultType="java.lang.String">
+        select doc_name from pd_doc_defined_tb
+        where doc_no = #{doc_no}
+    </select>
+    
+    <select id="selectStageDocInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from project_stage_doc_tb
+        where serial_no = #{serial_no}
+    </select>
 </mapper>

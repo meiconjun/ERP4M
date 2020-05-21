@@ -40,7 +40,7 @@ function connectToWebSocket(ws) {
     };
     // 接收消息的回调函数
     ws.onmessage = function (event) {
-
+        distributionMessage(event.data);
     }
     // 连接断开的回调函数
     ws.onclose = function (event) {

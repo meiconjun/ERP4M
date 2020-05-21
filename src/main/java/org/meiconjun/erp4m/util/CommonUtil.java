@@ -24,6 +24,7 @@ import info.monitorenter.cpdetector.io.ParsingDetector;
 import info.monitorenter.cpdetector.io.UnicodeDetector;
 import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
+import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.MessageDao;
 import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.meiconjun.erp4m.interceptor.SpringContextHolder;
@@ -46,9 +47,11 @@ public class CommonUtil {
     private static Logger logger = LoggerFactory.getLogger(CommonUtil.class);
 
     private static MessageDao messageDao;
+    private static CommonDao commonDao;
 
     static {
         messageDao = SpringContextHolder.getBean("messageDao");
+        commonDao = SpringContextHolder.getBean("commonDao");
     }
     /**
      * Json解析器
@@ -297,7 +300,7 @@ public class CommonUtil {
      * @param msg_no
      * @return
      */
-    public String updateMsgStatus(String msg_no) {
+    public static String updateMsgStatus(String msg_no) {
         String user_no = CommonUtil.getLoginUser().getUser_no();
         String status = messageDao.selectMessageStatus(msg_no);
         if ("1".equals(status)) {
@@ -340,5 +343,16 @@ public class CommonUtil {
     		retStr = target + splitStr + str;
     	}
     	return retStr;
+    }
+
+    /**
+     * 获取数据字典值对应的中文名称
+     * @param parent_field
+     * @param field_value
+     * @return
+     */
+    public static String getFieldName(String parent_field, String field_value) {
+        String retValue = commonDao.selectFieldName(field_value, parent_field);
+        return retValue;
     }
 }

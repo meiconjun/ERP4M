@@ -41,4 +41,20 @@ public interface CreateProjectDao {
      * 更新项目主表
      */
     int updateProjectMain(HashMap<String, Object> condMap);
+    /**
+     * 查询当前未进行的最小阶段（根据阶段顺序）
+     */
+    HashMap<String, Object> selectStageMin(@Param("project_no") String project_no);
+    /**
+     * 新增阶段文档信息
+     */
+    int insertStageDocInfo(HashMap<String, Object> condMap);
+    /**
+     * 获取项目文档名称
+     */
+    String selectProjectDocName(@Param("doc_no") String doc_no);
+    /**
+     * 查询阶段文档信息
+     */
+    HashMap<String, Object> selectStageDocInfo(@Param("serial_no") String serial_no);
 }

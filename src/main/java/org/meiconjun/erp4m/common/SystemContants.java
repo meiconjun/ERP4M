@@ -24,4 +24,10 @@ public class SystemContants {
     public static final String FIELD_MSG_TYPE_COUNTERSIGN_RESULT = "2";
     /** 消息类型-立项-老板审批 */
     public static final String FIELD_MSG_TYPE_BOSS_CHECK = "3";
+    /** 消息类型-项目阶段提醒 */
+    public static final String FIELD_MSG_TYPE_PROJECT_STAGE = "4";
+
+
+    /** 项目阶段*/
+    public static final String FIELD_STAGE = "P010100";
 }

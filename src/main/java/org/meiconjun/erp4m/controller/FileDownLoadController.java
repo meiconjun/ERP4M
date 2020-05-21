@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -32,6 +34,13 @@ public class FileDownLoadController {
 		String fileName = request.getParameter("fileName");//文件名
 		String filePath = request.getParameter("filePath");//文件全路径
 
+		String rootPath = PropertiesUtil.getProperty("fileSavePath");
+		if (CommonUtil.isStrBlank(rootPath)) {
+			// TODO 推送错误给客户端
+			logger.error("未配置文件存储根路径");
+			return;
+		}
+		filePath = rootPath + filePath;
 		logger.info("文件名称：" + fileName + "，文件下载路径：" + filePath);
 		response.setCharacterEncoding("utf-8");
 	    response.setContentType("application/x-download;charset=utf-8");
