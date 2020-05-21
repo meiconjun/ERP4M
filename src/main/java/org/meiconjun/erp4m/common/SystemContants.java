@@ -20,4 +20,8 @@ public class SystemContants {
 
     /** 消息类型-立项会签 */
     public static final String FIELD_MSG_TYPE_COUNTERSIGN = "1";
+    /** 消息类型-立项结果 */
+    public static final String FIELD_MSG_TYPE_COUNTERSIGN_RESULT = "2";
+    /** 消息类型-立项-老板审批 */
+    public static final String FIELD_MSG_TYPE_BOSS_CHECK = "3";
 }

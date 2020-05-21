@@ -30,6 +30,7 @@ import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
+import sun.plugin2.message.Message;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -289,5 +290,55 @@ public class CommonUtil {
         SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMdd");
         String defaultDate = sdf.format(dNow);
         return defaultDate;
+    }
+
+    /**
+     * 更新消息的处理状态，更新成功返回空，更新失败返回错误信息
+     * @param msg_no
+     * @return
+     */
+    public String updateMsgStatus(String msg_no) {
+        String user_no = CommonUtil.getLoginUser().getUser_no();
+        String status = messageDao.selectMessageStatus(msg_no);
+        if ("1".equals(status)) {
+            return "该事项已被其他用户处理！";
+        }
+        // 更新已阅用户列表，处理状态
+        HashMap<String, Object> msgUserMap = messageDao.selectMessageInfo(msg_no);
+        String readUser = (String) msgUserMap.get("read_user");//已阅用户
+        if (!CommonUtil.isStrBlank(readUser)) {
+        	readUser += "," + user_no;
+        } else {
+        	readUser = user_no;
+        }
+        //单人处理形式时，直接结束事项
+        String deal_type = (String) msgUserMap.get("deal_type");//已阅用户
+        if ("1".equals(deal_type)) {
+        	status = "1";//已处理
+        } else {
+        	// 比对已阅用户和目标用户
+        	String receive_user = (String) msgUserMap.get("receive_user");
+        	if (readUser.split(",").length >= receive_user.split(",").length) {
+        		status = "1";//已处理
+        	}
+        }
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("read_user", readUser);
+        condMap.put("status", status);
+        
+        messageDao.updateReadUserAndStatus(condMap);
+        return "";
+    }
+    /**
+     * 给字符串拼接子字符串，以'splitStr'为分隔符分隔
+     */
+    public static String addStringSplitByStr(String target, String str, String splitStr) {
+    	String retStr = "";
+    	if (CommonUtil.isStrBlank(target)) {
+    		retStr = str;
+    	} else {
+    		retStr = target + splitStr + str;
+    	}
+    	return retStr;
     }
 }

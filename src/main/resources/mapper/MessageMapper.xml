@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.meiconjun.erp4m.dao.MessageDao">
 
-    <select id="selectReadAndUnReadUser" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select receive_user, read_user from sys_message_tb
+    <select id="selectMessageInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from sys_message_tb
         where msg_no = #{msg_no}
     </select>
 
@@ -18,4 +18,9 @@
         values (#{msg_no}, #{msg_type}, #{create_user}, #{create_time}, #{receive_role}, #{receive_user},
         #{read_user}, #{msg_param}, #{msg_content}, #{status}, #{end_time}, #{deal_type})
     </insert>
+
+    <select id="selectMessageStatus" parameterType="java.lang.String" resultType="java.lang.String">
+        select status from sys_message_tb
+        where msg_no = #{msg_no}
+    </select>
 </mapper>

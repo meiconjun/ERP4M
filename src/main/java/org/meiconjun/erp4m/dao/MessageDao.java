@@ -18,7 +18,7 @@ public interface MessageDao {
      * @param msg_no
      * @return
      */
-    HashMap<String, Object> selectReadAndUnReadUser(@Param("msg_no") String msg_no);
+    HashMap<String, Object> selectMessageInfo(@Param("msg_no") String msg_no);
     /**
      * 更新已阅用户列表和处理状态
      */
@@ -27,4 +27,8 @@ public interface MessageDao {
      * 新增系统消息
      */
     int insertNewMessage(HashMap<String, Object> condMap);
+    /**
+     * 查询消息的处理状态
+     */
+    String selectMessageStatus(@Param("msg_no") String msg_no);
 }

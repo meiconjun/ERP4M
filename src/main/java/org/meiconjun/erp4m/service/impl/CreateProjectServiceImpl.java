@@ -64,7 +64,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         String status = "0";//处理状态
         String project_no = (String) paramMap.get("project_no");//项目编号
         // 更新消息表已阅用户和处理状态
-        HashMap<String, Object> msgUserMap = messageDao.selectReadAndUnReadUser(msg_no);
+        HashMap<String, Object> msgUserMap = messageDao.selectMessageInfo(msg_no);
         String readUser = (String) msgUserMap.get("read_user");
         if (!CommonUtil.isStrBlank(readUser)) {
             readUser += "," + user_no;
@@ -87,6 +87,8 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         String countersign_y = (String) projectInfo.get("countersign_y");//同意人员列表
         String countersign_n = (String) projectInfo.get("countersign_n");//拒绝人员列表
         String project_menbers = (String) projectInfo.get("project_menbers");//项目成员
+        String fail_reason = (String) projectInfo.get("fail_reason");//失败原因
+        String project_name = (String) projectInfo.get("project_name");
         if ("2".equals(state)) {
             create_state = "3";//立项结束
             project_state = "2";//立项失败
@@ -95,8 +97,27 @@ public class CreateProjectServiceImpl implements CreateProjectService {
             } else {
                 countersign_n += "," + user_no;
             }
+            //添加立项失败原因
+            fail_reason = CommonUtil.addStringSplitByStr(fail_reason, "会签拒绝：" + user_no, ";");
             //TODO 推送消息给立项人，立项失败
-
+            MessageBean messageBean = new MessageBean();
+            messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+            messageBean.setCreate_user("");
+            messageBean.setMsg_content("项目[" + project_name + "]发起立项失败：会签失败<br>请到项目信息查询页面查看详细失败原因");
+            messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_COUNTERSIGN_RESULT);//立项结果
+            Map<String, Object> msg_param = new HashMap<String, Object>();
+            /*msg_param.put("project_no", project_no);
+            msg_param.put("project_name", project_name);
+            msg_param.put("chn_name", chn_name);
+            msg_param.put("begin_date", begin_date);
+            msg_param.put("file_path", specifications);*/
+            messageBean.setMsg_param(null);
+            List<String> userList = Arrays.asList(new String[]{user_no});
+            String deal_type = "1";
+            String end_time = CommonUtil.getCurrentDateAfterDays(7);
+            String msg_no2 = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+            messageBean.setMsg_no(msg_no2);
+            WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
         } else {
             if (CommonUtil.isStrBlank(countersign_y)) {
                 countersign_y = user_no;
@@ -105,14 +126,22 @@ public class CreateProjectServiceImpl implements CreateProjectService {
             }
             if (countersign_y.split(",").length >= project_menbers.split(",").length) {
                 create_state = "2";//老板审核
-                //TODO 推送给老板审核
+                //TODO 推送给老板审核,需要全部项目信息
+                MessageBean messageBean = new MessageBean();
+                messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+                messageBean.setCreate_user((String) projectInfo.get("principal"));
+                messageBean.setMsg_content("项目[" + project_name + "]正在立项，请审核");
+                messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_BOSS_CHECK);//老板审核
+                Map<String, Object> msg_param = new HashMap<String, Object>();
             }
         }
         HashMap<String, Object> condMap2 = new HashMap<String, Object>();
+        condMap2.put("project_no", project_no);
         condMap2.put("countersign_y", countersign_y);
         condMap2.put("countersign_n", countersign_n);
         condMap2.put("create_state", create_state);
         condMap2.put("project_state", project_state);
+        condMap2.put("fail_reason", fail_reason);
         createProjectDao.updateProjectMain(condMap2);
 
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
