@@ -8,11 +8,13 @@
 function distributionMessage(msgStr) {
     let msgBean = JSON.parse(msgStr);
     if (FIELD_MSG_TYPE_COUNTERSIGN == msgBean.msg_type) {
-        showNotificationKeep("项目立项会签", msgBean.msg_content, showProjectCountersignDialog(msgStr));
+        showProjectCountersignDialog("项目立项会签", msgBean.msg_content, msgStr);
     } else if (FIELD_MSG_TYPE_COUNTERSIGN_RESULT == msgBean.msg_type) {
-        showNotificationKeep("立项结果", msgBean.msg_content);
+        showNotificationKeep("立项结果", msgBean.msg_content, msgBean.msg_no);
     } else if (FIELD_MSG_TYPE_BOSS_CHECK == msgBean.msg_type) {
         showNotificationKeep("立项审核", msgBean.msg_content, showProjectBossCheckDig(msgStr));
+    } else if (FIELD_MSG_TYPE_PROJECT_STAGE == msgBean.msg_type) {
+        showNotificationKeep("项目阶段提醒", msgBean.msg_content, msgBean.msg_no);
     }
 }
 
@@ -21,9 +23,9 @@ function distributionMessage(msgStr) {
 /**
  * 右下角消息弹框,多条消息叠加展示
  */
-function showNotificationKeep(title, content, func) {
+function showNotificationKeep(title, content, msg_no) {
     let config;
-    if (!func) {
+    // if (typeof func == 'string') {
         config = {
             title: title,
             text: content,
@@ -31,11 +33,19 @@ function showNotificationKeep(title, content, func) {
             buttons: [{
                 text: '确定',
                 click: function (e) {
-                    e.closeNotification()
+                    e.closeNotification();
+                    //更新为已读
+                    commonAjax("common.do", JSON.stringify({
+                        "beanList": [],
+                        "operType": "updateMessage",
+                        "paramMap": {
+                            'msg_no': msg_no
+                        }
+                    }));
                 }
             }]
         };
-    } else {
+    /*} else {
         config = {
             title: title,
             text: content,
@@ -53,14 +63,14 @@ function showNotificationKeep(title, content, func) {
                 }
             }]
         };
-    }
+    }*/
     naranja()['log'](config)
 }
 
 /**
  * 项目立项会签消息
  */
-function showProjectCountersignDialog(msgStr) {
+function showProjectCountersignDialog(title, content, msgStr) {
     let msgBean = JSON.parse(msgStr);
     let html = "<div class=\"comm-dialog\" id=\"projectCountersign_dialogDiv\">\n" +
         "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
@@ -95,56 +105,74 @@ function showProjectCountersignDialog(msgStr) {
         "        </div>\n" +
         "    </form>\n" +
         "</div>";
-    layui.layer.open({
-        type : '1',
-        title: '项目立项会签',
-        area: ['50px', '550px'],// 宽高
-        content: html,
-        btn: ['同意', '拒绝'],
-        yes: function(index, layero) {// 同意按钮回调
-            let retData = commonAjax("createProject.do", JSON.stringify({
-                "beanList": [],
-                "operType": "countersign",
-                "paramMap": {
-                    "state": "1",//1-同意 2-拒绝
-                    "msg_no": msgBean.msg_no,
-                    "project_no": msgBean.msg_param.project_no
-                }
-            }));
-            if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("操作成功");
-                layui.layer.close(index);
+
+    naranja()['log']({
+        title: title,
+        text: content,
+        timeout: 'keep',// 一直存在
+        buttons: [{
+            text: '查看详情',
+            click: function (e) {
+                // 执行函数,
+                e.closeNotification()
+                layui.layer.open({
+                    type: '1',
+                    title: '项目立项会签',
+                    area: ['500px', '550px'],// 宽高
+                    content: html,
+                    btn: ['同意', '拒绝'],
+                    yes: function (index, layero) {// 同意按钮回调
+                        let retData = commonAjax("createProject.do", JSON.stringify({
+                            "beanList": [],
+                            "operType": "countersign",
+                            "paramMap": {
+                                "state": "1",//1-同意 2-拒绝
+                                "msg_no": msgBean.msg_no,
+                                "project_no": msgBean.msg_param.project_no
+                            }
+                        }));
+                        if (retData.retCode == HANDLE_SUCCESS) {
+                            commonOk("操作成功");
+                            layui.layer.close(index);
+                        }
+                    },
+                    btn2: function (index, layero) {//拒绝按钮回调
+                        let retData = commonAjax("createProject.do", JSON.stringify({
+                            "beanList": [],
+                            "operType": "countersign",
+                            "paramMap": {
+                                "state": "2",//1-同意 2-拒绝
+                                "msg_no": msgBean.msg_no,
+                                "project_no": msgBean.msg_param.project_no
+                            }
+                        }));
+                        if (retData.retCode == HANDLE_SUCCESS) {
+                            commonOk("操作成功");
+                            layui.layer.close(index);
+                        }
+                    },
+                    success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                        $("#projectCountersign_projectName").val(msgBean.msg_param.project_name);
+                        $("#projectCountersign_chnName").val(msgBean.msg_param.chn_name);
+                        $("#projectCountersign_produceDoc").val(msgBean.msg_param.project_name);
+                        layui.laydate.render({
+                            elem: '#projectCountersign_beginDate',
+                            value: commonFormatDate(msgBean.msg_param.begin_date)
+                        });
+                        $("#projectCountersign_produceDoc_download").click(function () {
+                            // 下载文件
+                            commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.file_path);
+                        });
+                    }
+                });
             }
-        },
-        btn2: function(index, layero) {//拒绝按钮回调
-            let retData = commonAjax("createProject.do", JSON.stringify({
-                "beanList": [],
-                "operType": "countersign",
-                "paramMap": {
-                    "state": "2",//1-同意 2-拒绝
-                    "msg_no": msgBean.msg_no,
-                    "project_no": msgBean.msg_param.project_no
-                }
-            }));
-            if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("操作成功");
-                layui.layer.close(index);
+        }, {
+            text: '关闭',
+            click: function (e) {
+                e.closeNotification()
             }
-        },
-        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-            $("#projectCountersign_projectName").val(msgBean.msg_param.project_name);
-            $("#projectCountersign_chnName").val(msgBean.msg_param.chn_name);
-            $("#projectCountersign_produceDoc").val(msgBean.msg_param.project_name);
-            layui.laydate.render({
-                elem: '#projectCountersign_beginDate',
-                value : commonFormatDate(msgBean.msg_param.begin_date)
-            });
-            $("#projectCountersign_produceDoc_download").click(function () {
-                // 下载文件
-                commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.file_path);
-            });
-        }
-    });
+        }]
+    })
 }
 
 function showProjectBossCheckDig(msgStr) {
@@ -197,7 +225,7 @@ function showProjectBossCheckDig(msgStr) {
         layui.layer.open({
             type : '1',
             title: '项目立项审批',
-            area: ['50px', '700px'],// 宽高
+            area: ['500px', '700px'],// 宽高
             content: html,
             btn: ['同意', '拒绝'],
             yes: function(index, layero) {// 同意按钮回调
@@ -243,6 +271,7 @@ function showProjectBossCheckDig(msgStr) {
                 $("#projectCreate_bossCheck_download").click(function () {
                     // 下载文件
                     commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.specifications);
+                    return false;
                 });
             }
         });

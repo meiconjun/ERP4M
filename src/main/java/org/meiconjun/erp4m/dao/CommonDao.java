@@ -3,6 +3,7 @@ package org.meiconjun.erp4m.dao;
 import org.apache.ibatis.annotations.Param;
 import org.meiconjun.erp4m.bean.User;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,4 +23,8 @@ public interface CommonDao {
      * 查询数据字典名称
      */
     String selectFieldName(@Param("field_value")String field_value, @Param("parent_field") String parent_field);
+    /**
+     * 查询用户号和用户名
+     */
+    List<HashMap<String, String>> selectAllUserNoAndName();
 }

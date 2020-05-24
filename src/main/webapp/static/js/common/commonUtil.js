@@ -303,12 +303,37 @@ function commonResizeTable(tebleId) {
  */
 function commonFileDownload(fileName, filePath) {
     //隐藏的表单，用于请求下载服务
-    let html = "<form id='commonFileDownloadFrm' hidden='hidden' target='#' method='post' action='fileDownload.do'>" +
+    let html = "<form style='display: none' id='commonFileDownloadFrm' target='commonIframe' hidden='hidden'  method='post' action='fileDownload.do'>" +
                     "<input type='hidden' name='fileName' value=''>" +
                     "<input type='hidden' name='filePath' value=''>" +
                 "</form>";
     let $html = $(html);
+    // $(document)[0].append($html);
+    $(document.body).append($html);
     $html.find('[name="fileName"]').val(fileName.replace(/\s+/g, ""));
     $html.find('[name="filePath"]').val(filePath);
     $html.submit();
+}
+
+/**
+ * 格式化用户号
+ */
+function  commonFormatUserNo(value, onlyName) {
+    let tempObj = {};
+    let fieldStr = localStorage.getItem("allUser");
+    if (!commonBlank(fieldStr)) {
+        tempObj = JSON.parse(fieldStr);
+    } else {
+        console.log("缓存内没有全用户数据");
+    }
+    let retValue = value;
+    if (!commonBlank(tempObj[value])) {
+        if (onlyName) {
+            retValue = tempObj[value];
+        } else {
+            retValue = retValue + tempObj[value];
+        }
+
+    }
+    return retValue;
 }

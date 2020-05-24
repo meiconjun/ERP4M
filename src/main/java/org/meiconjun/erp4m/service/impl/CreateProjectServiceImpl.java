@@ -122,13 +122,23 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                         "前上传阶段文档<br>[" + doc_name + ",作者：" + doc_writer + "]");
                 messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_PROJECT_STAGE);//项目阶段提醒
                 Map<String, Object> msg_param = new HashMap<String, Object>();
-                // TODO 填入前端所需要素 推送
+                // 填入前端所需要素 推送
                 messageBean.setMsg_param(msg_param);
-                List<String> userList = Arrays.asList(new String[]{principal});
+                List<String> userList = Arrays.asList(new String[]{stage_principal});
                 String deal_type = "1";
                 String end_time = CommonUtil.getCurrentDateAfterDays(7);
+                String msg_no2 = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+                messageBean.setMsg_no(msg_no2);
+                WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
             }
+            // 更新项目状态
+            HashMap<String, Object> mainMap = new HashMap<String, Object>();
+            mainMap.put("project_no", project_no);
+            mainMap.put("create_state", create_state);
+            mainMap.put("project_state", project_state);
+            mainMap.put("fail_reason", fail_reason);
 
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);
@@ -164,6 +174,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         HashMap<String, Object> condMap = new HashMap<String, Object>();
         condMap.put("read_user", readUser);
         condMap.put("status", status);
+        condMap.put("msg_no", msg_no);
         messageDao.updateReadUserAndStatus(condMap);
         // 更新项目主表信息
         String create_state = "1";//会签中

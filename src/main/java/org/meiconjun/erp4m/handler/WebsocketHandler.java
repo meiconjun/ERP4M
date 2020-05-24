@@ -39,11 +39,11 @@ public class WebsocketHandler extends TextWebSocketHandler {
             long id = users.getWebSocketId();
             logger.info("生成随机UserId：{}", id);
             users.putUserNoAndWebSocketSession(String.valueOf(id), session);
-            session.sendMessage(new TextMessage("连接建立成功，userNo：" + userNo));
+//            session.sendMessage(new TextMessage("连接建立成功，userNo：" + userNo));
         } else {
             logger.info("userNo：{}" + userNo);
             users.putUserNoAndWebSocketSession(userNo, session);
-            session.sendMessage(new TextMessage("连接建立成功，userNo：" + userNo));
+//            session.sendMessage(new TextMessage("连接建立成功，userNo：" + userNo));
         }
         // 读取离线消息，推送用户
         List<TextMessage> message = WebsocketHandler.getOfflineMsg(userNo);

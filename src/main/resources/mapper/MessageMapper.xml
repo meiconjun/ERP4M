@@ -10,6 +10,7 @@
     <update id="updateReadUserAndStatus" parameterType="java.util.HashMap" >
         update sys_message_tb
         set read_user = #{read_user}, status = #{status}
+        where msg_no = #{msg_no}
     </update>
 
     <insert id="insertNewMessage" parameterType="java.util.HashMap">
@@ -22,5 +23,11 @@
     <select id="selectMessageStatus" parameterType="java.lang.String" resultType="java.lang.String">
         select status from sys_message_tb
         where msg_no = #{msg_no}
+    </select>
+
+    <select id="selectUnReadMsg" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from sys_message_tb
+        where concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%')
+        and concat(',', read_user, ',') not like concat('%,', #{user_no}, ',%')
     </select>
 </mapper>

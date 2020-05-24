@@ -31,6 +31,7 @@ public class FileDownLoadController {
 	
 	@RequestMapping(value = "/fileDownload.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
 	public void fileDownload(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		logger.info("----------------开始下载文件-------------------");
 		String fileName = request.getParameter("fileName");//文件名
 		String filePath = request.getParameter("filePath");//文件全路径
 

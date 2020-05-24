@@ -249,15 +249,20 @@ public class CommonUtil {
         HashMap<String, Object> condMap = new HashMap<String, Object>();
         String receive_role = "";
         String receive_user = "";
-        for (String role_no: roleList) {
-            receive_role += "," + role_no;
+        if (roleList != null) {
+            for (String role_no: roleList) {
+                receive_role += "," + role_no;
+            }
         }
         if (!CommonUtil.isStrBlank(receive_role)) {
             receive_role = receive_role.substring(1);
         }
-        for (String user_no: userList) {
-            receive_user += "," + user_no;
+        if (userList != null) {
+            for (String user_no: userList) {
+                receive_user += "," + user_no;
+            }
         }
+
         if (!CommonUtil.isStrBlank(receive_user)) {
             receive_user = receive_user.substring(1);
         }
@@ -328,7 +333,7 @@ public class CommonUtil {
         HashMap<String, Object> condMap = new HashMap<String, Object>();
         condMap.put("read_user", readUser);
         condMap.put("status", status);
-        
+        condMap.put("msg_no", msg_no);
         messageDao.updateReadUserAndStatus(condMap);
         return "";
     }

@@ -8,7 +8,7 @@
             and a.user_no like concat('%', #{bean.user_no}, '%')
         </if>
         <if test="bean.user_name != null and bean.user_name != ''">
-            and a.user_name = #{bean.user_name}
+            and a.user_name like concat('%', #{bean.user_name}, '%')
         </if>
         <if test="role_no != null and role_no != ''">
             and b.role_no = #{role_no}

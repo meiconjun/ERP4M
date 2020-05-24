@@ -12,11 +12,6 @@ $(document).ready(function () {
         window.onbeforeunload = function () {
             disconnectWebSocket();
         }
-        /*============初始化操作 begin===============*/
-        initData();
-        initFilePath();
-        /*============初始化操作 end===============*/
-
         //获取登录用户信息
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
@@ -30,6 +25,14 @@ $(document).ready(function () {
         $("#user_name_min").text(user_info.user_name);
         $("#user_name_main").text(user_info.user_name + ' - 普通员工');
         $("#user_name_sidebar").text(user_info.user_name);
+        /*============初始化操作 begin===============*/
+        initData();
+        initAllUser();
+        initFilePath();
+        initUnReadMessage(user_info.user_no);
+        /*============初始化操作 end===============*/
+
+
 
         initMenuLeft(user_info.user_no);
     } catch (e) {
@@ -118,7 +121,7 @@ function initData() {
                 if (fieldData.retMap.fieldMap.hasOwnProperty(key)) { //否则会把原型链的属性都循环进去
                     localStorage.setItem(key, JSON.stringify(fieldData.retMap.fieldMap[key]));
                 }
-
+                console.log("初始化数据字典成功");
             }
             localStorage.setItem("fieldDate", commonCurrentDateStr());
         } else {
@@ -138,7 +141,48 @@ function initFilePath() {
     }));
     if (retData.retCode == HANDLE_SUCCESS) {
         localStorage.setItem("filePath", retData.retMap.filePath);
+        console.log("初始化文件路径成功");
     } else {
         commonError("初始化文件存储路径失败！" + retData.retMsg);
+    }
+}
+
+/**
+ * 查询未读消息并弹出
+ * @param user_no
+ */
+function initUnReadMessage(user_no) {
+    let retData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initUnReadMessage",
+        "paramMap": {
+            "user_no": user_no
+        }
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        let beanList = retData.retMap.msgBeanList;
+        for (let i = 0; i < beanList.length; i++) {
+            distributionMessage(JSON.stringify(beanList[i]));
+        }
+    } else {
+        commonError("初始化离线消息失败！")
+    }
+}
+
+/**
+ * 将全用户的用户号和用户名存储在缓存中，便于格式化
+ */
+function initAllUser() {
+    let retData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": 'getAllUserNoAndName',
+        "paramMap": {}
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        let allUser = retData.retMap.allUser;
+        localStorage.setItem("allUser", JSON.stringify(allUser));
+        console.log("初始化用户数据成功");
+    } else {
+        commonError("初始化用户数据失败");
     }
 }

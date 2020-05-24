@@ -35,7 +35,13 @@
 
     <update id="updateProjectMain" parameterType="java.util.HashMap">
         update project_main_tb set
-        countersign_y = #{countersign_y}, countersign_n = #{countersign_n}, create_state = #{create_state},
+        <if test="countersign_y != '' and countersign_y != null">
+            countersign_y = #{countersign_y},
+        </if>
+        <if test="countersign_n != '' and countersign_n != null">
+            countersign_n = #{countersign_n},
+        </if>
+        create_state = #{create_state},
         project_state = #{project_state}, fail_reason = #{fail_reason}
         where project_no = #{project_no}
     </update>

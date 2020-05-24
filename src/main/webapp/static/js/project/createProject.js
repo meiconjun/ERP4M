@@ -17,10 +17,7 @@ $(document).ready(function () {
             "value" : "-"
         }], "createProject_stageUser1", "", true, true);
         layui.form.on('select(createProject_stageUser1)', function(data){
-            let menbers = $("#createProject_members").val();
-            if (menbers.indexOf($(data.elem).val()) == -1) {
-                $("#createProject_members").val(menbers + "，" + $(data.elem).val());
-            }
+            $("#createProject_members").val(createProject_getAllStageUser());
         });
         //渲染表单元素
         layui.form.render();
@@ -53,8 +50,8 @@ $(document).ready(function () {
                         let tempStage = {
                             "stageCount": String(i),// 用数字会被转为double
                             "stage_type": $("#createProject_stage" + i).val(),
-                            "stage_begin": $("#createProject_stage_beginDate" + i).val().replaceAll("-", ""),
-                            "stage_end": $("#createProject_stage_endDate" + i).val().replaceAll("-", ""),
+                            "stage_begin": $("#createProject_stage_beginDate" + i).val().replace(/-/g, ""),
+                            "stage_end": $("#createProject_stage_endDate" + i).val().replace(/-/g, ""),
                             "stage_doc": $("#createProject_stageDoc" + i).val(),
                             "doc_writer": $("#createProject_docWriter" + i).val(),
                             "principal": $("#createProject_stageUser" + i).val()
@@ -69,7 +66,7 @@ $(document).ready(function () {
                             "project_name": $("#createProject_name").val(),
                             "chn_name": $("#createProject_chnName").val(),
                             "product_doc_path": res.data.filePath,
-                            "begin_date": $("#createProject_beginDate").val().replaceAll("-", ""),
+                            "begin_date": $("#createProject_beginDate").val().replace(/-/g, ""),
                             "member": $("#createProject_members").val(),
                             "stageList": stageList
                         }
@@ -155,7 +152,7 @@ function createProject_addStage() {
         "                    <input type=\"text\" placeholder=\"文档作者\" name=\"createProject_docWriter" + createProject_stageCount_temp + "\" id=\"createProject_docWriter" + createProject_stageCount_temp + "\" required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">\n" +
         "                </div>" +
         "                <div class=\"layui-inline layui-inline\">\n" +
-        "                    <select name=\"createProject_stageUser" + createProject_stageCount_temp + "\" id=\"createProject_stageUser" + createProject_stageCount_temp + "\" required lay-verify=\"required\">\n" +
+        "                    <select lay-filter=\"createProject_stageUser" + createProject_stageCount_temp + "\" name=\"createProject_stageUser" + createProject_stageCount_temp + "\" id=\"createProject_stageUser" + createProject_stageCount_temp + "\" required lay-verify=\"required\">\n" +
         "                    </select>\n" +
         "                </div>\n" +
         "                <button type=\"button\" class=\"layui-btn\" onclick=\"createProject_addStage()\"><i class=\"layui-icon layui-icon-add-circle\"></i></button>" +
@@ -177,10 +174,7 @@ function createProject_addStage() {
         "value" : "-"
     }], "createProject_stageUser" + createProject_stageCount_temp, "", true, true);
     layui.form.on('select(createProject_stageUser' + createProject_stageCount_temp + ')', function(data){
-        let menbers = $("#createProject_members").val();
-        if (menbers.indexOf($(data.elem).val()) == -1) {
-            $("#createProject_members").val(menbers + "，" + $(data.elem).val());
-        }
+        $("#createProject_members").val(createProject_getAllStageUser());
     });
     //渲染表单元素
     layui.form.render();
@@ -207,11 +201,12 @@ function createProject_minStage() {
     if (createProject_stageCount == 1) {
         return;
     }
-    let menbers = $("#createProject_members").val();
-    menbers = menbers.replaceAll($("#createProject_stageUser" + createProject_stageCount).val(), "");
-    $("#createProject_members").val(menbers);
+    // let menbers = $("#createProject_members").val();
+    // menbers = menbers.replace($("#createProject_stageUser" + createProject_stageCount).val(), "");
+    // $("#createProject_members").val(menbers);
     $("div[stageCount='" + createProject_stageCount + "']").remove();
     createProject_stageCount--;
+    $("#createProject_members").val(createProject_getAllStageUser());
 }
 
 /**
@@ -312,4 +307,17 @@ function createProject_submit() {
         });
         return false;
     });
+}
+
+function createProject_getAllStageUser() {
+    let selects = $("select[name^='createProject_stageUser']");
+    let retStr = "";
+    for (let i = 0; i < selects.length; i++) {
+        if (i == 0) {
+            retStr = $(selects[i]).val();
+        } else {
+            retStr += "," + $(selects[i]).val();
+        }
+    }
+    return retStr;
 }

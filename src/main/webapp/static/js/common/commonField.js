@@ -16,6 +16,8 @@ const FIELD_EACH_PAGE_NUM = '20';
 const FIELD_STAGE = "P010100";
 /** 项目阶段-细分*/
 const FIELD_STAGE_DETAIL = "P010200";
+/** 项目状态*/
+const FIELD_PROJECT_STATE = "P020100";
 
 
 /*=================== 消息相关 ============================*/

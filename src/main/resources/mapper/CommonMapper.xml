@@ -10,4 +10,8 @@
         select field_name from sys_field_tb
         where parent_field = #{parent_field} and field_value = #{field_value}
     </select>
+
+    <select id="selectAllUserNoAndName" resultType="java.util.HashMap">
+        select user_no, user_name from sys_user_tb
+    </select>
 </mapper>

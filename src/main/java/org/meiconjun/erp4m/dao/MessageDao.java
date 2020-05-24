@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface MessageDao {
     /**
-     * 查询消息的推送用户和已阅用户
+     * 查询消息的全部信息
      * @param msg_no
      * @return
      */
@@ -31,4 +31,8 @@ public interface MessageDao {
      * 查询消息的处理状态
      */
     String selectMessageStatus(@Param("msg_no") String msg_no);
+    /**
+     * 查询用户未读消息
+     */
+    List<HashMap<String, Object>> selectUnReadMsg(@Param("user_no") String user_no);
 }

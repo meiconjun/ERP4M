@@ -1,6 +1,6 @@
 <div class="layui-card">
     <form class="layui-form layui-form-pane" lay-filter="createProjectFrm" id="roleConfig_addFrm" action="">
-        &nbsp;&nbsp;&nbsp;&nbsp;项目主要信息
+        &nbsp;&nbsp;&nbsp;&nbsp;项目主要信息 <button id="createProject_submit" style="float: right;margin-bottom: 10px;" class="layui-btn" lay-submit lay-filter="createProject_submit">提交申请</button>
         <hr>
         <div class="layui-form-item">
             <label class="layui-form-label">项目名称</label>
@@ -65,7 +65,7 @@
                     <input type="text" placeholder="文档作者" name="createProject_docWriter1" id="createProject_docWriter1" required  lay-verify="required" autocomplete="off" class="layui-input">
                 </div>
                 <div class="layui-inline layui-inline">
-                    <select name="createProject_stageUser1" id="createProject_stageUser1" required lay-verify="required">
+                    <select lay-filter="createProject_stageUser1" name="createProject_stageUser1" id="createProject_stageUser1" required lay-verify="required">
                     </select>
                 </div>
                 <button type="button" class="layui-btn" onclick="createProject_addStage()"><i class="layui-icon layui-icon-add-circle"></i></button>
@@ -77,8 +77,8 @@
             </div>
         </div>
 
-        <div class="layui-form-item comm-dialog-button">
-            <button id="createProject_submit" class="layui-btn" lay-submit lay-filter="createProject_submit">提交申请</button>
+        <div class="layui-form-item">
+
 <!--            <button id="createProject_fileSubmit" class="layui-btn">确定</button>-->
         </div>
     </form>
@@ -96,9 +96,9 @@
 
     </div>
 </div>
-<script src="static/js/project/createProject.js"></script>
 
-<div class="comm-dialog" id="projectCreate_bossCheckDiv">
+
+<div class="comm-dialog" id="projectCreate_bossCheckDiv"  hidden="hidden">
     <form class="layui-form layui-form-pane" lay-filter="" action="">
         <div class="layui-form-item">
             <label class="layui-form-label">项目名称</label>
@@ -143,3 +143,5 @@
         </div>
     </form>
 </div>
+
+<script src="static/js/project/createProject.js"></script>
