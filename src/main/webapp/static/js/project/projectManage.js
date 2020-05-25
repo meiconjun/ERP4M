@@ -157,3 +157,27 @@ $(document).ready(function () {
         commonError(e.message);
     }
 });
+
+function projectManage_queryOperation(curPage, limit) {
+    let project_name = $("#projectManage_projectName_Q").val();
+    let chn_name = $("#projectManage_chnName_Q").val();
+    let principal = $("#projectManage_principal_Q").val();
+
+    projectManage_curr = curPage;
+    projectManage_tableIns.reload({
+        where: { //设定异步数据接口的额外参数，任意设
+            message : JSON.stringify({
+                "beanList" : [{
+                    "project_name" : project_name,
+                    "chn_name" : chn_name,
+                    "principal" : principal
+                }],
+                "operType" : "query",
+                "paramMap" : {
+                    "curPage" : String(curPage),// 当前页码
+                    "limit" : String(limit)// 每页条数
+                }
+            })
+        }
+    });
+}

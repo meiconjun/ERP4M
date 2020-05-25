@@ -82,6 +82,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
             String project_name = (String) projectInfo.get("project_name");
             String principal = (String) projectInfo.get("principal");
             // 审核拒绝，项目立项结束，推送失败消息给负责人
+            HashMap<String, Object> mainMap = new HashMap<String, Object>();
             if ("2".equals(state)) {
                 create_state = "3";//立项结束
                 project_state = "2";//立项失败
@@ -103,6 +104,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
             } else {
                 //审核通过，项目进入第一阶段,推送消息给该阶段负责人;并通知所有相关人员，项目开始
+                mainMap.put("stage_num", "1");
                 create_state = "3";//立项结束
                 project_state = "3";//项目进行中
                 // 查询阶段一负责人
@@ -132,11 +134,11 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
             }
             // 更新项目状态
-            HashMap<String, Object> mainMap = new HashMap<String, Object>();
             mainMap.put("project_no", project_no);
             mainMap.put("create_state", create_state);
             mainMap.put("project_state", project_state);
             mainMap.put("fail_reason", fail_reason);
+            createProjectDao.updateProjectMain(mainMap);
 
             responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         } catch (Exception e) {

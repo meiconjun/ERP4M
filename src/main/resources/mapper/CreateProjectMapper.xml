@@ -41,6 +41,9 @@
         <if test="countersign_n != '' and countersign_n != null">
             countersign_n = #{countersign_n},
         </if>
+        <if test="stage_num != '' and stage_num != null">
+            stage_num = #{stage_num},
+        </if>
         create_state = #{create_state},
         project_state = #{project_state}, fail_reason = #{fail_reason}
         where project_no = #{project_no}

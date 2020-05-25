@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.ProjectManageDao">
+
+    <select id="selectProjectInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select * from project_main_tb
+        where 1 = 1
+        <if test="project_name != null and project_name != ''">
+            and project_name like concat('%', #{project_name}, '%')
+        </if>
+        <if test="chn_name != null and chn_name != ''">
+            and chn_name like concat('%', #{chn_name}, '%')
+        </if>
+        <if test="principal != null and principal != ''">
+            and principal like concat('%', #{principal}, '%')
+        </if>
+    </select>
+</mapper>
