@@ -4,6 +4,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.meiconjun.erp4m.util.PropertiesUtil;
@@ -45,7 +47,7 @@ public class FileDownLoadController {
 		logger.info("文件名称：" + fileName + "，文件下载路径：" + filePath);
 		response.setCharacterEncoding("utf-8");
 	    response.setContentType("application/x-download;charset=utf-8");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	    response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
 		InputStream inputStream = null;
 		OutputStream os = null;
 		try {

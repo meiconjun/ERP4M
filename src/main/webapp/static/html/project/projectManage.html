@@ -39,7 +39,7 @@
 
 <!-- 注意表单字段要用name做标识 -->
 <div hidden="hidden" class="comm-dialog" id="projectManage_detailDiv">
-    <form class="layui-form layui-form" lay-filter="projectManage_detailFrm" id="projectManage_detailFrm" action="">
+    <form class="layui-form layui-form-pane" lay-filter="projectManage_detailFrm" id="projectManage_detailFrm" action="">
         <div class="layui-form-item">
             <div class="layui-inline">
                 <label class="layui-form-label">项目名称</label>
@@ -64,7 +64,7 @@
             <div class="layui-inline">
                 <label class="layui-form-label">产品规格书</label>
                 <div class="layui-input-inline">
-                    <button type="button" id="projectManage_specificationsDownload_dialog" class="layui-btn layui-btn-primary">下载文档</button>
+                    <button style="margin-left: 50px" type="button" name="projectManage_specificationsDownload_dialog" id="projectManage_specificationsDownload_dialog" class="layui-btn layui-btn-normal">下载文档</button>
                 </div>
             </div>
         </div>
@@ -89,40 +89,7 @@
             </div>
         </div>
         <!-- 下方动态拼接阶段信息 -->
-        <fieldset class="layui-elem-field">
-            <legend>阶段1,负责人：XXX</legend>
-            <div class="layui-field-box">
-                <div class="layui-form-item">
-                    <div class="layui-inline">
-                        <label class="layui-form-label">阶段类型</label>
-                        <div class="layui-input-inline">
-                            <input type="text" name="projectManage_stage1_dialog" id="projectManage_stage1_dialog" disabled autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-                    <div class="layui-inline">
-                        <label class="layui-form-label">开始日期</label>
-                        <div class="layui-input-inline">
-                            <input type="text" name="projectManage_beginDate1_dialog" id="projectManage_beginDate1_dialog" disabled autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <div class="layui-inline">
-                        <label class="layui-form-label">结束日期</label>
-                        <div class="layui-input-inline">
-                            <input type="text" name="projectManage_endDate1_dialog" id="projectManage_endDate1_dialog" disabled autocomplete="off" class="layui-input">
-                        </div>
-                    </div>
-                    <div class="layui-inline">
-                        <label class="layui-form-label">文档详情</label>
-                        <div class="layui-input-inline">
-                            <button type="button" id="projectManage_uploadFile_dialog" hidden="hidden" class="layui-btn layui-btn-primary">上传文档</button>
-                            <button type="button" id="projectManage_docDetail_dialog" hidden="hidden" class="layui-btn layui-btn-primary">文档详情</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </fieldset>
+
     </form>
 </div>
 

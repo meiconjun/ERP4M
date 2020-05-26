@@ -12,7 +12,7 @@ function distributionMessage(msgStr) {
     } else if (FIELD_MSG_TYPE_COUNTERSIGN_RESULT == msgBean.msg_type) {
         showNotificationKeep("立项结果", msgBean.msg_content, msgBean.msg_no);
     } else if (FIELD_MSG_TYPE_BOSS_CHECK == msgBean.msg_type) {
-        showNotificationKeep("立项审核", msgBean.msg_content, showProjectBossCheckDig(msgStr));
+        showProjectBossCheckDig("立项审核", msgBean.msg_content, msgStr);
     } else if (FIELD_MSG_TYPE_PROJECT_STAGE == msgBean.msg_type) {
         showNotificationKeep("项目阶段提醒", msgBean.msg_content, msgBean.msg_no);
     }
@@ -161,7 +161,7 @@ function showProjectCountersignDialog(title, content, msgStr) {
                         });
                         $("#projectCountersign_produceDoc_download").click(function () {
                             // 下载文件
-                            commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.file_path);
+                            commonFileDownload(msgBean.msg_param.project_name + "产品规格说明书.doc", msgBean.msg_param.file_path);
                         });
                     }
                 });
@@ -175,7 +175,7 @@ function showProjectCountersignDialog(title, content, msgStr) {
     })
 }
 
-function showProjectBossCheckDig(msgStr) {
+function showProjectBossCheckDig(title, content, msgStr) {
     let msgBean = JSON.parse(msgStr);
     let html = "<div class=\"comm-dialog\" id=\"projectCreate_bossCheckDiv\">\n" +
         "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
@@ -222,57 +222,75 @@ function showProjectBossCheckDig(msgStr) {
         "        </div>\n" +
         "    </form>\n" +
         "</div>";
-        layui.layer.open({
-            type : '1',
-            title: '项目立项审批',
-            area: ['500px', '700px'],// 宽高
-            content: html,
-            btn: ['同意', '拒绝'],
-            yes: function(index, layero) {// 同意按钮回调
-                let retData = commonAjax("createProject.do", JSON.stringify({
-                    "beanList": [],
-                    "operType": "bossCheck",
-                    "paramMap": {
-                        "state": "1",//1-同意 2-拒绝
-                        "msg_no": msgBean.msg_no,
-                        "project_no": msgBean.msg_param.project_no
+
+    naranja()['log']({
+        title: title,
+        text: content,
+        timeout: 'keep',// 一直存在
+        buttons: [{
+            text: '查看详情',
+            click: function (e) {
+                // 执行函数,
+                e.closeNotification()
+                layui.layer.open({
+                    type : '1',
+                    title: '项目立项审批',
+                    area: ['500px', '700px'],// 宽高
+                    content: html,
+                    btn: ['同意', '拒绝'],
+                    yes: function(index, layero) {// 同意按钮回调
+                        let retData = commonAjax("createProject.do", JSON.stringify({
+                            "beanList": [],
+                            "operType": "bossCheck",
+                            "paramMap": {
+                                "state": "1",//1-同意 2-拒绝
+                                "msg_no": msgBean.msg_no,
+                                "project_no": msgBean.msg_param.project_no
+                            }
+                        }));
+                        if (retData.retCode == HANDLE_SUCCESS) {
+                            commonOk("操作成功");
+                            layui.layer.close(index);
+                        }
+                    },
+                    btn2: function(index, layero) {//拒绝按钮回调
+                        let retData = commonAjax("createProject.do", JSON.stringify({
+                            "beanList": [],
+                            "operType": "bossCheck",
+                            "paramMap": {
+                                "state": "2",//1-同意 2-拒绝
+                                "msg_no": msgBean.msg_no,
+                                "project_no": msgBean.msg_param.project_no
+                            }
+                        }));
+                        if (retData.retCode == HANDLE_SUCCESS) {
+                            commonOk("操作成功");
+                            layui.layer.close(index);
+                        }
+                    },
+                    success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                        $("#projectCreate_bossCheck_projectName").val(msgBean.msg_param.project_name);
+                        $("#projectCreate_bossCheck_chnName").val(msgBean.msg_param.chn_name);
+                        $("#projectCreate_bossCheck_produceDoc").val(msgBean.msg_param.project_name);
+                        $("#projectCreate_bossCheck_principal").val(msgBean.msg_param.principal);
+                        $("#projectCreate_bossCheck_members").val(msgBean.msg_param.project_menbers);
+                        layui.laydate.render({
+                            elem: '#projectCreate_bossCheck_beginDate',
+                            value : commonFormatDate(msgBean.msg_param.begin_date)
+                        });
+                        $("#projectCreate_bossCheck_download").click(function () {
+                            // 下载文件
+                            commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.specifications);
+                            return false;
+                        });
                     }
-                }));
-                if (retData.retCode == HANDLE_SUCCESS) {
-                    commonOk("操作成功");
-                    layui.layer.close(index);
-                }
-            },
-            btn2: function(index, layero) {//拒绝按钮回调
-                let retData = commonAjax("createProject.do", JSON.stringify({
-                    "beanList": [],
-                    "operType": "bossCheck",
-                    "paramMap": {
-                        "state": "2",//1-同意 2-拒绝
-                        "msg_no": msgBean.msg_no,
-                        "project_no": msgBean.msg_param.project_no
-                    }
-                }));
-                if (retData.retCode == HANDLE_SUCCESS) {
-                    commonOk("操作成功");
-                    layui.layer.close(index);
-                }
-            },
-            success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-                $("#projectCreate_bossCheck_projectName").val(msgBean.msg_param.project_name);
-                $("#projectCreate_bossCheck_chnName").val(msgBean.msg_param.chn_name);
-                $("#projectCreate_bossCheck_produceDoc").val(msgBean.msg_param.project_name);
-                $("#projectCreate_bossCheck_principal").val(msgBean.msg_param.principal);
-                $("#projectCreate_bossCheck_members").val(msgBean.msg_param.project_menbers);
-                layui.laydate.render({
-                    elem: '#projectCreate_bossCheck_beginDate',
-                    value : commonFormatDate(msgBean.msg_param.begin_date)
-                });
-                $("#projectCreate_bossCheck_download").click(function () {
-                    // 下载文件
-                    commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.specifications);
-                    return false;
                 });
             }
-        });
+        }, {
+            text: '关闭',
+            click: function (e) {
+                e.closeNotification()
+            }
+        }]
+    })
 }

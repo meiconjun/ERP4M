@@ -1697,9 +1697,16 @@ a cite {
 
 .layui-elem-field legend {
     margin-left: 20px;
-    padding: 0 10px;
-    font-size: 20px;
-    font-weight: 300
+    padding: 0 10px !important;
+    font-size: 16px !important;
+    font-weight: 300s;
+    display: initial !important;
+    width: initial !important;
+    margin-bottom: initial !important;
+    line-height: initial !important;
+    color: initial !important;
+    border: initial !important;
+    border-bottom: initial !important;
 }
 
 .layui-field-title {

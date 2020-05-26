@@ -331,7 +331,7 @@ function  commonFormatUserNo(value, onlyName) {
         if (onlyName) {
             retValue = tempObj[value];
         } else {
-            retValue = retValue + tempObj[value];
+            retValue = retValue + "-" + tempObj[value];
         }
 
     }

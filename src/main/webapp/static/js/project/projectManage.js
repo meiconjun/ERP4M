@@ -109,23 +109,28 @@ $(document).ready(function () {
                     }
                 }
                 , {
-                    field: 'current_stage',
+                    field: 'stage_num',
                     title: '当前阶段',
+                    sort: true ,
+                    align : 'center'
+                }
+                , {
+                    field: 'fail_reason',
+                    title: '失败原因',
                     sort: true ,
                     align : 'center',
                     templet : function (data) {
-                        //TODO 返回当前阶段
+                        return "<span style='color: red' title='" + data.fail_reason + "'>" + data.fail_reason + "</span>";
                     }
                 }
                 , {
                     field: 'edit',
                     title: '操作',
-                    width : 10,
+                    width: 80,
                     sort: true,
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {
-                        //TODO 详情展示
                         let html = "";
                         if (buttonStr.indexOf("projectManage_detailBtn") != -1) {
                             html += "<a class=\"layui-btn layui-btn-xs\" name='projectManage_detailBtn' onclick='projectManage_detailOperation(" + commonFormatObj(data) + ")'>详情</a>";
@@ -180,4 +185,148 @@ function projectManage_queryOperation(curPage, limit) {
             })
         }
     });
+}
+// 阶段详情
+function projectManage_detailOperation(data) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['720px', '700px'],// 宽高
+        title: '项目详情',// 标题
+        content: $("#projectManage_detailDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            projectManage_cleanForm();
+            layui.form.val("projectManage_detailFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                "projectManage_projectName_dialog": data.project_name, // "name": "value"
+                "projectManage_chnName_dialog": data.chn_name,
+                "projectManage_principal_dialog": data.principal,
+                "projectManage_beginDate_dialog": data.begin_date,
+                "projectManage_endDate_dialog": data.end_date,
+                "projectManage_menbers_dialog": data.project_menbers,
+                "projectManage_specificationsDownload_dialog": data.specifications
+            });
+
+            // 拼接阶段信息
+            let stageData = commonAjax("projectManage.do", JSON.stringify({
+                "beanList": [],
+                "operType": "getStageInfo",
+                "paramMap": {
+                    "project_no": data.project_no// 项目编号
+                }
+            }));
+            if (stageData.retCode == HANDLE_SUCCESS) {
+                let stageList = stageData.retMap.stageList
+                for (let i = 0;i < stageList.length; i++) {
+                    let tempHtml = "<fieldset name='projectManage_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n" +
+                        "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n" +
+                        "            <div class=\"layui-field-box\">\n" +
+                        "                <div class=\"layui-form-item\">\n" +
+                        "                    <div class=\"layui-inline\">\n" +
+                        "                        <label class=\"layui-form-label\">阶段类型</label>\n" +
+                        "                        <div class=\"layui-input-inline\">\n" +
+                        "                            <input type=\"text\" value='" + commonFormatValue(FIELD_STAGE, stageList[i].stage) + "' name=\"projectManage_stage_dialog" + (i + 1) + "\" id=\"projectManage_stage_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                    <div class=\"layui-inline\">\n" +
+                        "                        <label class=\"layui-form-label\">开始日期</label>\n" +
+                        "                        <div class=\"layui-input-inline\">\n" +
+                        "                            <input type=\"text\" value='" + commonFormatDate(stageList[i].begin_date) + "' name=\"projectManage_beginDate_dialog" + (i + 1) + "\" id=\"projectManage_beginDate_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                </div>\n" +
+                        "                <div class=\"layui-form-item\">\n" +
+                        "                    <div class=\"layui-inline\">\n" +
+                        "                        <label class=\"layui-form-label\">结束日期</label>\n" +
+                        "                        <div class=\"layui-input-inline\">\n" +
+                        "                            <input type=\"text\" value='" + commonFormatDate(stageList[i].end_date) + "' name=\"projectManage_endDate_dialog" + (i + 1) + "\" id=\"projectManage_endDate_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                        "                        </div>\n" +
+                        "                    </div>\n" +
+                        "                    <div class=\"layui-inline\">\n" +
+                        "                            <button type=\"button\" id=\"projectManage_uploadFile_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" >上传文档</button>\n" +//此处传参要加''，否则会被类型转换/*onclick=\"projectManage_uploadFile('" + data.project_no + "','" + (i+1) +  "')\"*/
+                        "                            <button type=\"button\" id=\"projectManage_docDetail_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\">文档详情</button>\n" +
+                        "                    </div>\n" +
+                        "                </div>\n" +
+                        "            </div>\n" +
+                        "        </fieldset>";
+                    $("#projectManage_detailFrm").append(tempHtml);
+                    // 查询阶段文档信息
+                    let stageDocData = commonAjax("projectManage.do", JSON.stringify({
+                        "beanList": [],
+                        "operType": "getStageDocVersion",
+                        "paramMap": {
+                            "project_no": data.project_no,
+                            "stage_num": data.stage_num
+                        }
+                    }));
+                    if (stageDocData.retCode == HANDLE_SUCCESS) {
+                        let doc_version = stageDocData.retMap.doc_version;
+                        //绑定上传组件到按钮
+                        let fileUploadInst = layui.upload.render({
+                            elem: '#projectManage_uploadFile_dialog' + (i + 1),
+                            url: 'projectStageDocUpload.do',//改成您自己的上传接口
+                            data: {
+                                "project_no": data.project_no,
+                                "stage_num": data.stage_num
+                            },
+                            accept: 'file',//只允许上传图片
+                            auto: false,// 选择文件后是否自动上传
+                            // bindAction: "#createProject_fileSubmit",
+                            multiple: false,// 是否允许多文件上传
+                            choose: function(obj) {
+                                //预读本地文件,如果是多文件，则会遍历
+                                obj.preview(function (index, file, result) {
+                                    let confirmStr = commonBlank(doc_version) ? "是否确认提交文件[" + file.name + "]？当前阶段文档未定版，上传后将覆盖原先文件" : "是否确认提交文件[" + file.name + "]？当前阶段文档最新版本为[" + doc_version + "]";
+                                    layui.layer.confirm(confirmStr, function(index) {
+                                        fileUploadInst.upload();
+                                    });
+                                });
+                            },
+                            done: function(res, index, upload){
+                                if (res.code == '0') {
+                                    commonOk("上传阶段文档成功");
+                                } else {
+                                    commonError("上传阶段文档失败:" + res.msg)
+                                }
+                            },
+                            error: function (index, upload) {
+                                commonError("上传阶段文档失败，请稍后重试");
+                            }
+                        });
+                    } else {
+                        commonError("获取阶段文档信息失败：" + stageDocData.retMsg);
+                        return;
+                    }
+
+                }
+
+                layui.form.render();
+                // 绑定规格书下载事件
+                $("#projectManage_specificationsDownload_dialog").click(function () {
+                    commonFileDownload(data.project_name + "产品规格说明书.doc", $("#projectManage_specificationsDownload_dialog").val());
+                });
+            } else {
+                commonError("加载项目阶段信息失败：" + stageData.retMsg);
+            }
+
+        }
+    });
+
+}
+
+function projectManage_cleanForm() {
+    layui.form.val("projectManage_detailFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+        "projectManage_projectName_dialog": "", // "name": "value"
+        "projectManage_chnName_dialog": "",
+        "projectManage_principal_dialog": '',
+        "projectManage_beginDate_dialog": '',
+        "projectManage_endDate_dialog": '',
+        "projectManage_menbers_dialog": "",
+        "projectManage_specificationsDownload_dialog": ""
+    });
+    // 清除阶段信息
+    $("fieldset[name='projectManage_stageFieldSet']").remove();
 }

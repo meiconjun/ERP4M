@@ -83,4 +83,29 @@ public class FileUploadController {
         retMap.put("data", dataMap);
         return CommonUtil.objToJson(retMap);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/projectStageDocUpload.do", method = RequestMethod.POST)
+    public String projectStageDocUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
+        String imgRootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String filePath = "";
+        filePath += "project" + File.separator + CommonUtil.getCurrentDateStr() + File.separator;
+        filePath = filePath + request.getParameter("projectName") + File.separator + "productDescDoc";
+        String orgName = img.getOriginalFilename();
+        filePath += File.separator + request.getParameter("projectName") + "_" + SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
+
+        File file = new File(imgRootPath, filePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        img.transferTo(file);
+        HashMap<String, String> dataMap = new HashMap<String, String>();
+        dataMap.put("filePath", filePath);
+        dataMap.put("docName", orgName.substring(0, orgName.lastIndexOf(".") + 1));
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("code", SystemContants.HANDLE_SUCCESS);
+        retMap.put("msg", "上传成功");
+        retMap.put("data", dataMap);
+        return CommonUtil.objToJson(retMap);
+    }
 }

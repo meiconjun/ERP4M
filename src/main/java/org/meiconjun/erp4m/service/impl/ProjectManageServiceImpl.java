@@ -39,8 +39,66 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         ResponseBean responseBean = new ResponseBean();
         if ("query".equals(operType)) {
             queryOperation(requestBean, responseBean);
+        } else if ("getStageInfo".equals(operType)) {
+            getStageInfoOperation(requestBean, responseBean);
+        } else if ("getStageDocInfo".equals(operType)) {
+            getStageDocInfoOperation(requestBean, responseBean);
+        } else if ("getStageDocVersion".equals(operType)) {
+            getStageDocVersionOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 查询阶段文档版本
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getStageDocVersionOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String stage_num = (String) paramMap.get("stage_num");
+
+        String doc_version = projectManageDao.selectStageDocLastVersion(project_no, stage_num);
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("doc_version", doc_version);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    /**
+     * 查询阶段文档信息
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getStageDocInfoOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String stage_num = (String) paramMap.get("stage_num");
+
+        List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
+
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("docList", docList);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    /**
+     * 查询项目阶段信息
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getStageInfoOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+
+        List<HashMap<String, String>> stageList = projectManageDao.selectStageOfProject(project_no);
+
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("stageList", stageList);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
