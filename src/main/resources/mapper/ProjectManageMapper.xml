@@ -32,6 +32,6 @@
     <select id="selectStageDocLastVersion" parameterType="java.lang.String" resultType="java.lang.String">
         select max(c.doc_version) from project_stage_tb b, project_stage_doc_tb c
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
-        and c.file_path is not null and c.file_path != ''
+        and c.file_path is not null and c.file_path != '' and b.is_end = '1'
     </select>
 </mapper>
