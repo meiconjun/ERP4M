@@ -15,6 +15,7 @@ $(document).ready(function () {
         //获取登录用户信息
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
+            sessionStorage.setItem("user_no", user_info.user_name);
         } else {
             commonError("您未登录或登录已失效！",function () {
                 window.location.href = 'login.html';

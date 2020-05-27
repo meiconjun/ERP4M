@@ -23,9 +23,9 @@
     </select>
 
     <select id="selectStageDocInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select c.* from project_stage_tb b, project_stage_doc_tb c
+        select c.*, d.department  from project_stage_tb b, project_stage_doc_tb c, pd_doc_defined_tb d
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
-        and c.file_path is not null and c.file_path != ''
+        and c.file_path is not null and c.file_path != '' and c.doc_no = d.doc_no
         order by doc_version desc
     </select>
 
@@ -34,4 +34,16 @@
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
         and c.file_path is not null and c.file_path != '' and b.is_end = '1'
     </select>
+
+    <update id="updateStageDoc" parameterType="java.lang.String">
+        update project_stage_doc_tb
+        set upload_date = #{upload_date}, file_path = #{file_path}
+        where serial_no = #{doc_serial} and doc_version = '1.0'
+    </update>
+    
+    <insert id="insertStageDocInfo" parameterType="java.util.HashMap">
+        insert into project_stage_doc_tb (serial_no, doc_no, doc_name, doc_writer, doc_version, upload_date, file_path)
+        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_writer}, #{doc_version}, #{upload_date}, #{file_path})
+
+    </insert>
 </mapper>

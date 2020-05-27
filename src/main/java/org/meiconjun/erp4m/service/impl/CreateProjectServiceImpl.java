@@ -280,6 +280,8 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         String begin_date = (String) paramMap.get("begin_date");
         // 成员列表
         String project_menbers = (String) paramMap.get("member");
+        // 项目文件根路径
+        String file_root_path = (String) paramMap.get("file_root_path");
         // 项目状态 1-立项中
         String project_state = "1";
 
@@ -292,6 +294,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         condMap.put("begin_date", begin_date);
         condMap.put("project_menbers", project_menbers);
         condMap.put("project_state", project_state);
+        condMap.put("file_root_path", file_root_path);
         condMap.put("create_state", "1");
         int effect = createProjectDao.insertNewProjectMain(condMap);
         if (effect == 0) {

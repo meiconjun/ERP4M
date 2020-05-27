@@ -57,9 +57,13 @@ public class Test {
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());
         System.out.println(se.generaterNextNumber());*/
-        List<String> list = new ArrayList<String>();
+        /*List<String> list = new ArrayList<String>();
         list.add("aa");
         list.add("bb");
-        System.out.println(list.contains("aa"));
+        System.out.println(list.contains("aa"));*/
+        String s = "1.1";
+        double f = Double.valueOf(s);
+        f = f + 0.01;
+        System.out.println(String.valueOf(f));
     }
 }

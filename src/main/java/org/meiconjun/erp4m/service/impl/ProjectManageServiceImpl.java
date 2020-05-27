@@ -7,6 +7,7 @@ import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.ProjectManageDao;
 import org.meiconjun.erp4m.service.ProjectManageService;
+import org.meiconjun.erp4m.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,48 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             getStageDocInfoOperation(requestBean, responseBean);
         } else if ("getStageDocVersion".equals(operType)) {
             getStageDocVersionOperation(requestBean, responseBean);
+        } else if ("uploadStageFile".equals(operType)) {
+            uploadStageFileOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 更新阶段文档信息
+     * @param requestBean
+     * @param responseBean
+     */
+    private void uploadStageFileOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String stage_num = (String) paramMap.get("stage_num");
+        String doc_version = (String) paramMap.get("doc_version");
+        String doc_serial = (String) paramMap.get("doc_serial");
+        String filePath = (String) paramMap.get("filePath");
+        if ("1.0".equals(doc_version)) {
+            //更新1.0
+            logger.info("更新阶段文档，阶段未结束，直接覆盖原文档");
+            projectManageDao.updateStageDoc(CommonUtil.getCurrentDateStr(), filePath, doc_serial);
+        } else {
+            //新增版本
+            logger.info("更新阶段文档，版本已结束，版本迭代为[" + doc_version + "]");
+            List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
+            HashMap<String, String> docInfo = docList.get(0);
+            String doc_no = docInfo.get("doc_no");
+            String doc_name = docInfo.get("doc_name");
+            String doc_writer = docInfo.get("doc_writer");
+
+            HashMap<String, Object> condMap = new HashMap<String, Object>();
+            condMap.put("serial_no", doc_serial);
+            condMap.put("doc_no", doc_no);
+            condMap.put("doc_name", doc_name);
+            condMap.put("doc_writer", doc_writer);
+            condMap.put("doc_version", doc_version);
+            condMap.put("upload_date", CommonUtil.getCurrentDateStr());
+            condMap.put("file_path", filePath);
+            projectManageDao.insertStageDocInfo(condMap);
+        }
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -79,7 +120,8 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
 
         HashMap<String, Object> retMap = new HashMap<String, Object>();
-        retMap.put("docList", docList);
+        retMap.put("list", docList);
+        retMap.put("total", Long.valueOf(docList.size()));
         responseBean.setRetMap(retMap);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }

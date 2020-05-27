@@ -18,9 +18,9 @@
 
     <insert id="insertNewProjectMain" parameterType="java.util.HashMap">
         insert into project_main_tb (project_no, project_name, chn_name, principal, specifications, begin_date,
-        project_menbers, project_state, create_state)
+        project_menbers, project_state, create_state, file_root_path)
         values(#{project_no}, #{project_name}, #{chn_name}, #{principal}, #{specifications}, #{begin_date},
-        #{project_menbers}, #{project_state}, #{create_state})
+        #{project_menbers}, #{project_state}, #{create_state}, #{file_root_path})
     </insert>
 
     <insert id="insertNewProjectStage" parameterType="java.util.HashMap">

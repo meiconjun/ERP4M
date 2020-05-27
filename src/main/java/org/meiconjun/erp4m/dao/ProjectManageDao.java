@@ -29,4 +29,12 @@ public interface ProjectManageDao {
      * 查询阶段文档版本
      */
     String selectStageDocLastVersion(@Param("project_no") String project_no, @Param("stage_num") String stage_num);
+    /**
+     * 更新阶段文档 1.0
+     */
+    int updateStageDoc(@Param("upload_date") String upload_date, @Param("file_path") String file_path, @Param("doc_serial") String doc_serial);
+    /**
+     * 新增阶段文档
+     */
+    int insertStageDocInfo(HashMap<String, Object> condMap);
 }

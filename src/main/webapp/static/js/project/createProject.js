@@ -66,6 +66,7 @@ $(document).ready(function () {
                             "project_name": $("#createProject_name").val(),
                             "chn_name": $("#createProject_chnName").val(),
                             "product_doc_path": res.data.filePath,
+                            "file_root_path": res.data.file_root_path,
                             "begin_date": $("#createProject_beginDate").val().replace(/-/g, ""),
                             "member": $("#createProject_members").val(),
                             "stageList": stageList
