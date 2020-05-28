@@ -122,9 +122,9 @@ function initData() {
                 if (fieldData.retMap.fieldMap.hasOwnProperty(key)) { //否则会把原型链的属性都循环进去
                     localStorage.setItem(key, JSON.stringify(fieldData.retMap.fieldMap[key]));
                 }
-                console.log("初始化数据字典成功");
             }
             localStorage.setItem("fieldDate", commonCurrentDateStr());
+            console.log("初始化数据字典成功");
         } else {
             commonError("加载数据字典失败");
         }

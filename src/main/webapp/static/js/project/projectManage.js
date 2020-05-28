@@ -417,7 +417,7 @@ function projectManage_docDetail(project_no, stage_num) {
                         templet : function (data) {
                             let html = "";
                             if (rightFlag) {
-                                html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"commonFileDownload('" + (data.doc_name + "_" + data.doc_version + ".doc") + "','" + data.file_path +  "')\">下载</a>";
+                                html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"projectManage_downloadStageDoc(" + commonFormatObj(data) + ")\">下载</a>";
                             }
                             return html;
                         }}
@@ -439,4 +439,8 @@ function projectManage_cleanForm() {
     });
     // 清除阶段信息
     $("fieldset[name='projectManage_stageFieldSet']").remove();
+}
+
+function projectManage_downloadStageDoc(data) {
+    commonFileDownload((data.doc_name + "_" + data.doc_version + ".doc"), data.file_path);
 }
