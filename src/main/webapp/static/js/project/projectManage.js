@@ -31,6 +31,7 @@ $(document).ready(function () {
             loading : true,
             skin : 'row',
             done : function(res, curr, count){
+
                 // 分页初始化
                 layui.laypage.render({
                     elem : 'projectManage_page',
@@ -68,13 +69,11 @@ $(document).ready(function () {
                 {
                     field: 'project_name',
                     title: '项目名称',
-                    sort: true,
                     align : 'center'
                 },
                 {
                     field: 'chn_name',
                     title: '中文名称',
-                    sort: true,
                     align : 'center'
                 }
                 , { field: 'principal',
@@ -87,6 +86,7 @@ $(document).ready(function () {
                     field: 'begin_date',
                     title: '开始日期',
                     align : 'center',
+                    sort: true,
                     templet : function (data) {
                         return commonFormatDate(data.begin_date);
                     }
@@ -95,6 +95,7 @@ $(document).ready(function () {
                     field: 'end_date',
                     title: '结束日期',
                     align : 'center',
+                    sort: true,
                     templet : function (data) {
                         return "";
                     }
@@ -102,7 +103,6 @@ $(document).ready(function () {
                 , {
                     field: 'project_state',
                     title: '项目状态',
-                    sort: true ,
                     align : 'center',
                     templet : function (data) {
                         return commonFormatValue(FIELD_PROJECT_STATE, data.project_state, false)
@@ -117,7 +117,6 @@ $(document).ready(function () {
                 , {
                     field: 'fail_reason',
                     title: '失败原因',
-                    sort: true ,
                     align : 'center',
                     templet : function (data) {
                         return "<span style='color: red' title='" + data.fail_reason + "'>" + data.fail_reason + "</span>";
@@ -127,7 +126,6 @@ $(document).ready(function () {
                     field: 'edit',
                     title: '操作',
                     width: 80,
-                    sort: true,
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {
@@ -145,16 +143,17 @@ $(document).ready(function () {
             projectManage_queryOperation('1', FIELD_EACH_PAGE_NUM);
         });
         //进入下阶段
-        $("#projectManage_nextStage").click(function () {
+        /*$("#projectManage_nextStage").click(function () {
             projectManage_nextStageOperation();
-        });
+        });*/
         // 权限控制
         if (buttonStr.indexOf("projectManage_query") == -1) {
             $("#projectManage_query").hide();
         }
-        if (buttonStr.indexOf("projectManage_nextStage") == -1) {
+
+        /*if (buttonStr.indexOf("projectManage_nextStage") == -1) {
             $("#projectManage_nextStage").hide();
-        }
+        }*/
         // 绑定重置表格事件
         commonResizeTable('projectManage_tableObj');
     } catch (e) {
@@ -193,10 +192,30 @@ function projectManage_detailOperation(data) {
         area: ['720px', '700px'],// 宽高
         title: '项目详情',// 标题
         content: $("#projectManage_detailDiv"),//内容，直接取dom对象
-        // btn: ['确定'],
-        // yes: function (index, layero) {
-        //     //确认按钮的回调，提交表单
-        // },
+        btn: ['进入下阶段'],
+        yes: function (index, layero) {
+            let curPrincipal = data.principal;
+            // 项目负责人可以确认项目进入下一阶段
+            if (sessionStorage.getItem("user_no") != curPrincipal) {
+                commonInfo("只有项目负责人可以进行此操作！");
+                return false;
+            }
+            layui.layer.confirm("确认进入下一阶段？", function(index) {
+                let retData = commonAjax("projectManage.do", JSON.stringify({
+                    "beanList" : [],
+                    "operType" : "nextStage",
+                    "paramMap" : {
+                        "project_no": data.project_no,
+                        "stage_num": data.stage_num
+                    }
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    commonOk("操作成功");
+                } else {
+                    commonError(retData.retMsg);
+                }
+            });
+        },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
             // 渲染弹框元素
             projectManage_cleanForm();
@@ -221,9 +240,14 @@ function projectManage_detailOperation(data) {
             if (stageData.retCode == HANDLE_SUCCESS) {
                 let stageList = stageData.retMap.stageList
                 for (let i = 0;i < stageList.length; i++) {
-                    let tempHtml = "<fieldset name='projectManage_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n" +
-                        "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n" +
-                        "            <div class=\"layui-field-box\">\n" +
+                    let tempHtml = "<fieldset name='projectManage_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n";
+                    if ((data.stage_num == (i + 1))) {
+                        tempHtml += "            <legend style='color: forestgreen'>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                    } else {
+                        tempHtml += "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                    }
+
+                    html +=    "            <div class=\"layui-field-box\">\n" +
                         "                <div class=\"layui-form-item\">\n" +
                         "                    <div class=\"layui-inline\">\n" +
                         "                        <label class=\"layui-form-label\">阶段类型</label>\n" +
@@ -245,10 +269,17 @@ function projectManage_detailOperation(data) {
                         "                            <input type=\"text\" value='" + commonFormatDate(stageList[i].end_date) + "' name=\"projectManage_endDate_dialog" + (i + 1) + "\" id=\"projectManage_endDate_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
                         "                        </div>\n" +
                         "                    </div>\n" +
-                        "                    <div class=\"layui-inline\">\n" +
-                        "                            <button type=\"button\" id=\"projectManage_uploadFile_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" >上传文档</button>\n" +//此处传参要加''，否则会被类型转换/*onclick=\"projectManage_uploadFile('" + data.project_no + "','" + (i+1) +  "')\"*/
-                        "                            <button type=\"button\" id=\"projectManage_docDetail_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" onclick=\"projectManage_docDetail('" + data.project_no + "','" + data.stage_num +  "')\">文档详情</button>\n" +
-                        "                    </div>\n" +
+                        "                    <div class=\"layui-inline\">\n";
+                    //上传文档，需要是处于当前阶段并且当前用户是负责人
+                    if ((data.stage_num == (i + 1)) && stageList[i].principal == sessionStorage.getItem("user_no")) {
+                        html += "                            <button type=\"button\" id=\"projectManage_uploadFile_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" >上传文档</button>\n";//此处传参要加''，否则会被类型转换/*onclick=\"projectManage_uploadFile('" + data.project_no + "','" + (i+1) +  "')\"*/
+                    }
+                    if (buttonStr.indexOf("projectManage_docDetail_dialog") != -1) {
+                        html += "                            <button type=\"button\" id=\"projectManage_docDetail_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" onclick=\"projectManage_docDetail('" + data.project_no + "','" + data.stage_num +  "')\">文档详情</button>\n";
+                    }
+
+
+                    html += "                    </div>\n" +
                         "                </div>\n" +
                         "            </div>\n" +
                         "        </fieldset>";
@@ -379,7 +410,6 @@ function projectManage_docDetail(project_no, stage_num) {
                     {
                         field: 'doc_name',
                         title: '文档名称',
-                        sort: true,
                         align : 'center'
                     },
                     {
@@ -402,6 +432,7 @@ function projectManage_docDetail(project_no, stage_num) {
                     , {
                         field: 'upload_date',
                         title: '上传日期',
+                        sort: true,
                         align : 'center',
                         templet : function (data) {
                             return commonFormatDate(data.upload_date);
@@ -411,7 +442,7 @@ function projectManage_docDetail(project_no, stage_num) {
                         field: 'edit',
                         title: '操作',
                         width: 80,
-                        sort: true,
+                        sort: false,
                         fixed: 'right',
                         align : 'center',
                         templet : function (data) {

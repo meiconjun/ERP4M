@@ -37,4 +37,16 @@ public interface ProjectManageDao {
      * 新增阶段文档
      */
     int insertStageDocInfo(HashMap<String, Object> condMap);
+    /**
+     * 查询阶段信息
+     */
+    HashMap<String, String> selectStageInfo(@Param("project_no") String project_no, @Param("stage_num") String stage_num);
+    /**
+     * 更新阶段信息
+     */
+    int updateStageInfo(HashMap<String, Object> condMap);
+    /**
+     * 更新项目主表信息
+     */
+    int updateProjectMainInfo(HashMap<String, Object> condMap);
 }

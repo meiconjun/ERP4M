@@ -31,7 +31,7 @@
     <div>
         <div id="projectManage_page" class="table-footer-left"></div>
         <div class="table-footer-right">
-            <a class="layui-btn layui-btn-sm layui-btn-normal" id="projectManage_nextStage">进入下阶段</a>
+            <!--<a class="layui-btn layui-btn-sm layui-btn-normal" id="projectManage_nextStage">进入下阶段</a>-->
             <a class="layui-btn layui-btn-sm layui-btn-normal" id="projectManage_applyExtension">申请延期</a>
         </div>
     </div>
@@ -85,7 +85,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">项目成员</label>
             <div class="layui-input-block">
-                <input type="text" name="projectManage_menbers_dialog" id="projectManage_menbers_dialog" disabled autocomplete="off" class="layui-input">
+                <input type="text" name="projectManage_menbers_dialog" style="width: 513px" id="projectManage_menbers_dialog" disabled autocomplete="off" class="layui-input">
             </div>
         </div>
         <!-- 下方动态拼接阶段信息 -->
@@ -94,7 +94,7 @@
 </div>
 
 <!-- 文档详情表格弹窗 -->
-<div id="projectManage_docDetail_dialogDiv">
+<div hidden="hidden" id="projectManage_docDetail_dialogDiv">
     <table id="projectManage_docDetail_table">
 
     </table>

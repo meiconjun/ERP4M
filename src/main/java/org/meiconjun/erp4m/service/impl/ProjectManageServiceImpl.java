@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,56 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             getStageDocVersionOperation(requestBean, responseBean);
         } else if ("uploadStageFile".equals(operType)) {
             uploadStageFileOperation(requestBean, responseBean);
+        } else if ("nextStage".equals(operType)) {
+            nextStageOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 项目进入下一阶段
+     * @param requestBean
+     * @param responseBean
+     */
+    private void nextStageOperation(RequestBean requestBean, ResponseBean responseBean) throws ParseException {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String stage_num = (String) paramMap.get("stage_num");
+
+        //当前阶段标记为已结束,若结束时间与预计不符，后面的都顺延或提前
+        String cur_date = CommonUtil.getCurrentDateStr();
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("project_no", project_no);
+        condMap.put("stage_num", stage_num);
+        condMap.put("end_date", cur_date);
+        condMap.put("is_end", "1");
+        projectManageDao.updateStageInfo(condMap);
+        // 获取当前阶段结束日期,计算提前时间或延后时间
+        HashMap<String, String> stageInfo = projectManageDao.selectStageInfo(project_no, stage_num);
+        String end_date = stageInfo.get("end_date");
+
+        long betweenDay = CommonUtil.getBetweenDays(end_date, cur_date);
+
+        if (betweenDay != 0) {//与预期有偏差
+            List<HashMap<String, String>> stageList = projectManageDao.selectStageOfProject(project_no);
+            HashMap<String, Object> condMap2 = new HashMap<String, Object>();
+            condMap2.put("project_no", project_no);
+            condMap2.put("stage_num", stage_num);
+            for (HashMap<String, String> m : stageList) {
+                String stage_num_cur = m.get("stage_num");
+                if (Integer.valueOf(stage_num_cur) > Integer.valueOf(stage_num)) {// 当前阶段后的阶段
+                    String begin_date_cur = m.get("begin_date");
+                    String end_date_cur = m.get("end_date");
+                    begin_date_cur = CommonUtil.getDateAfterDays(begin_date_cur, new Long(betweenDay).intValue());
+                    end_date_cur = CommonUtil.getDateAfterDays(end_date_cur, new Long(betweenDay).intValue());
+                    condMap2.put("begin_date", begin_date_cur);
+                    condMap2.put("end_date", end_date_cur);
+                    projectManageDao.updateStageInfo(condMap2);
+                }
+            }
+        }
+        //TODO 项目主表阶段计数+1,如果是已经是最后阶段结束，则更新项目为结项，并通知到相关人员
+        //TODO 推送消息给下一阶段负责人
     }
 
     /**

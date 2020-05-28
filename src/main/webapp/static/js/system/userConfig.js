@@ -76,7 +76,6 @@ $(document).ready(function () {
                 {
                     field: 'user_name',
                     title: '用户名称',
-                    sort: true,
                     align : 'center'
                 }
                 , { field: 'role_no',
@@ -106,7 +105,6 @@ $(document).ready(function () {
                     field: 'edit',
                     title: '操作',
                     width : 170,
-                    sort: true,
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {

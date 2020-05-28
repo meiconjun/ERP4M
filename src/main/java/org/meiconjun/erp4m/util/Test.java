@@ -7,10 +7,9 @@ import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.User;
 import sun.misc.Request;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Lch
@@ -21,7 +20,14 @@ import java.util.Map;
  */
 public class Test {
 
-    public static void main(String[] args) {
+    public static long getBetweenDays(String begin_date, String end_date) throws ParseException {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMMdd");
+        Date beginDate = sd.parse(begin_date);
+        Date endDate = sd.parse(end_date);
+
+        return (endDate.getTime() - beginDate.getTime()) / (1000*60*60*24);
+    }
+    public static void main(String[] args) throws ParseException {
         /*RequestBean<User> requestBean = new RequestBean<User>();
         User m = new User();
         m.setUser_no("AaaAss");
@@ -59,11 +65,10 @@ public class Test {
         System.out.println(se.generaterNextNumber());*/
         /*List<String> list = new ArrayList<String>();
         list.add("aa");
-        list.add("bb");
+        list.add("bb");s
         System.out.println(list.contains("aa"));*/
-        String s = "1.1";
-        double f = Double.valueOf(s);
-        f = f + 0.01;
-        System.out.println(String.valueOf(f));
+        System.out.println(getBetweenDays("20200411", "20200528"));
+        long l = 2;
+        System.out.println(l == 2);
     }
 }

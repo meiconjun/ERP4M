@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -301,6 +302,21 @@ public class CommonUtil {
     }
 
     /**
+     * 获取传入天数afterNum天后日期
+     * @param date
+     * @param afterNum
+     * @return
+     */
+    public static String getDateAfterDays(String date, int afterNum) throws ParseException {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMMdd");
+        Date thisDate = sd.parse(date);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(thisDate);
+        calendar.add(Calendar.DATE, afterNum);
+        thisDate = calendar.getTime();
+        return sd.format(thisDate);
+    }
+    /**
      * 更新消息的处理状态，更新成功返回空，更新失败返回错误信息
      * @param msg_no
      * @return
@@ -359,5 +375,19 @@ public class CommonUtil {
     public static String getFieldName(String parent_field, String field_value) {
         String retValue = commonDao.selectFieldName(field_value, parent_field);
         return retValue;
+    }
+
+    /**
+     * 计算两个日期之间间隔天数
+     * @param begin_date
+     * @param end_date
+     * @return
+     */
+    public static long getBetweenDays(String begin_date, String end_date) throws ParseException {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMMdd");
+        Date beginDate = sd.parse(begin_date);
+        Date endDate = sd.parse(end_date);
+
+        return (endDate.getTime() - beginDate.getTime()) / (1000*60*60*24);
     }
 }
