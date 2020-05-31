@@ -49,4 +49,12 @@ public interface ProjectManageDao {
      * 更新项目主表信息
      */
     int updateProjectMainInfo(HashMap<String, Object> condMap);
+    /**
+     * 查询项目最后阶段编号
+     */
+    String selectMaxStageNumOfProject(@Param("project_no") String project_no);
+    /**
+     * 查询用户的所属部门部门经理
+     */
+    String selectStagePrincipalManager(@Param("principal") String principal);
 }

@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.meiconjun.erp4m.dao.CommonDao">
     <select id="selectBossAccount" resultType="org.meiconjun.erp4m.bean.User">
-        select a.* from sys_user_tb a, sys_user_role_tb b
-        where a.user_no = b.user_no and b.role_no = 'BOSS'
+        select a.* from sys_user_tb a, sys_user_role_tb b, sys_role_tb c
+        where a.user_no = b.user_no and b.role_no = c.role_no and c.position = '5' /*5-老板*/
     </select>
 
     <select id="selectFieldName" parameterType="java.lang.String" resultType="java.lang.String">
@@ -13,5 +13,14 @@
 
     <select id="selectAllUserNoAndName" resultType="java.util.HashMap">
         select user_no, user_name from sys_user_tb
+    </select>
+
+    <select id="selectAllUserNo" resultType="java.lang.String">
+        select user_no from sys_user_tb
+    </select>
+    
+    <select id="selectUserRoleInfo" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.RoleBean">
+        select r.* from sys_user_role_tb u, sys_role_tb r
+        where u.user_no = #{user_no} and u.role_no = r.role_no
     </select>
 </mapper>

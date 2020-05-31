@@ -69,6 +69,7 @@ $(document).ready(function () {
                             "file_root_path": res.data.file_root_path,
                             "begin_date": $("#createProject_beginDate").val().replace(/-/g, ""),
                             "member": $("#createProject_members").val(),
+                            "desc": $("#createProject_desc").val(),
                             "stageList": stageList
                         }
                     };

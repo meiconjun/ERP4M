@@ -197,9 +197,11 @@
         'naranja-parragraph'
       ])
 
-      var $tx = document.createTextNode(this.text)
-      $title.appendChild($tx)
+      // var $tx = document.createTextNode(this.text)
 
+      // $title.appendChild($tx)
+      /** 原来的写法无法使文本内的html标签起作用*/
+      $($title).append(this.text);
       return $title
     },
     createButtons: function ($notification, $body) {

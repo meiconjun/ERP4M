@@ -34,5 +34,5 @@ public interface MessageDao {
     /**
      * 查询用户未读消息
      */
-    List<HashMap<String, Object>> selectUnReadMsg(@Param("user_no") String user_no);
+    List<HashMap<String, Object>> selectUnReadMsg(@Param("user_no") String user_no, @Param("role_no") String role_no);
 }

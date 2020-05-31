@@ -77,8 +77,9 @@ public class CommonServiceImpl implements CommonService {
         Map<String, Object> retMap = new HashMap<String, Object>();
         Map<String, Object> paramMap = requestBean.getParamMap();
         String user_no = (String) paramMap.get("user_no");
+        String role_no = (String) paramMap.get("role_no");
         List<MessageBean> msgBeanList = new ArrayList<MessageBean>();
-        List<HashMap<String, Object>> msgList = messageDao.selectUnReadMsg(user_no);
+        List<HashMap<String, Object>> msgList = messageDao.selectUnReadMsg(user_no, role_no);
         for (HashMap<String, Object> msgMap : msgList) {
             MessageBean msgBean = new MessageBean();
             msgBean.setMsg_no((String) msgMap.get("msg_no"));

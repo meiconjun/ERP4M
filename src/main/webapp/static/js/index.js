@@ -15,7 +15,20 @@ $(document).ready(function () {
         //获取登录用户信息
         if (!commonBlank(sessionStorage.getItem("user_info"))) {
             user_info = JSON.parse(sessionStorage.getItem("user_info"));
-            sessionStorage.setItem("user_no", user_info.user_name);
+            sessionStorage.setItem("user_no", user_info.user_no);
+            // 头像回显
+            if (!commonBlank(user_info.picture)) {
+                $("#user_picture_min").attr("src", "data:image/jpg;base64," + user_info.picture);
+                $("#user_picture_main").attr("src", "data:image/jpg;base64," + user_info.picture);
+                $("#user_picture_sidebar").attr("src", "data:image/jpg;base64," + user_info.picture);
+            }
+            if (sessionStorage.getItem("changePsw") == "true") {
+                // TODO 强制要求修改密码
+
+                sessionStorage.removeItem("changePsw");
+            } else {
+                sessionStorage.removeItem("changePsw");
+            }
         } else {
             commonError("您未登录或登录已失效！",function () {
                 window.location.href = 'login.html';
@@ -30,7 +43,7 @@ $(document).ready(function () {
         initData();
         initAllUser();
         initFilePath();
-        initUnReadMessage(user_info.user_no);
+        initUnReadMessage(user_info.user_no, user_info.role_no);
         /*============初始化操作 end===============*/
 
 
@@ -152,12 +165,13 @@ function initFilePath() {
  * 查询未读消息并弹出
  * @param user_no
  */
-function initUnReadMessage(user_no) {
+function initUnReadMessage(user_no, role_no) {
     let retData = commonAjax("common.do", JSON.stringify({
         "beanList": [],
         "operType": "initUnReadMessage",
         "paramMap": {
-            "user_no": user_no
+            "user_no": user_no,
+            "role_no": role_no
         }
     }));
     if (retData.retCode == HANDLE_SUCCESS) {
@@ -186,4 +200,162 @@ function initAllUser() {
     } else {
         commonError("初始化用户数据失败");
     }
+}
+
+function userFileChange() {
+    let html = "<div class=\"comm-dialog\" id=\"userFile_modifyDiv\">\n" +
+        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"userFile_modifyFrm\" id=\"userFile_modifyFrm\" action=\"\">\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <div class=\"layui-upload-drag\" id=\"userFile_modify_uploadHeader\">\n" +
+        "                <div id=\"userFile_modify_uploadHeaderPrev\">\n" +
+        "                    <img src=\"\" alt=\"上传成功后渲染\" style=\"max-width: 196px\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">用户号</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"text\" name=\"userFile_modify_userNo\" disabled maxlength=\"50\" id=\"userFile_modify_userNo\" lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">用户名</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"text\" name=\"userFile_modify_userName\" id=\"userFile_modify_userName\" lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">邮箱</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"text\" name=\"userFile_modify_email\" id=\"userFile_modify_email\" lay-verify=\"email\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">手机</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"tel\" name=\"userFile_modify_phone\" id=\"userFile_modify_phone\" lay-verify=\"phone\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">密码</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"password\" name=\"userFile_modify_password\" id=\"userFile_modify_password\" lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "            <div class=\"layui-inline\">\n" +
+        "                <label class=\"layui-form-label\">密码确认</label>\n" +
+        "                <div class=\"layui-input-inline\">\n" +
+        "                    <input type=\"password\" name=\"userFile_modify_passwordConfirm\" id=\"userFile_modify_passwordConfirm\" lay-verify=\"required|confirmPassword\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "                </div>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\" hidden=\"hidden\">\n" +
+        "            <label class=\"layui-form-label\">头像路径</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"userFile_modify_filePath\" id=\"userFile_modify_filePath\"  autocomplete=\"off\" class=\"layui-input\">\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+/*        "        <div class=\"layui-form-item comm-dialog-button\">\n" +
+        "            <button id=\"userFile_modifySubmit\" class=\"layui-btn\" lay-submit lay-filter=\"userFile_modifySubmit\">确定</button>\n" +
+        "        </div>\n" +*/
+        "    </form>\n" +
+        "</div>";
+    let pswChange = false;
+    layui.layer.open({
+        type: 1,
+        area: ['720px', '550px'],// 宽高
+        title: '用户资料修改',
+        content: html,
+        btn: ['提交修改'],
+        yes: function (index, layero) {
+            layui.layer.confirm("是否确认提交？", function(index) {
+                if ($("#userFile_modify_password").val() != $("#userFile_modify_passwordConfirm").val()) {
+                    commonInfo("密码和确认密码不一致！");
+                    return;
+                }
+                if (commonBlank($("#userFile_modify_password").val()) || commonBlank($("#userFile_modify_userName").val())) {
+                    commonInfo("密码和用户名不能为空！");
+                    return;
+                }
+                let retData = commonAjax("userConfig.do", JSON.stringify({
+                    "beanList" : [{
+                        "user_no" : $("#userFile_modify_userNo").val(),
+                        "user_name" : $("#userFile_modify_userName").val(),
+                        "pass_word" : pswChange ? $("#userFile_modify_password").val() : "",
+                        "picture" : $("#userFile_modify_filePath").val(),
+                        "email" : $("#userFile_modify_email").val(),
+                        "phone" : $("#userFile_modify_phone").val()
+                    }],
+                    "operType" : "modify",
+                    "paramMap" : {
+                    }
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    if (!commonBlank(retData.retMap.base64)) {
+                        // 更新回显头像
+                        let user_info = JSON.parse(sessionStorage.getItem("user_info"));
+                        user_info.picture = retData.retMap.base64;
+                        $("#user_picture_min").attr("src", "data:image/jpg;base64," + user_info.picture);
+                        $("#user_picture_main").attr("src", "data:image/jpg;base64," + user_info.picture);
+                        $("#user_picture_sidebar").attr("src", "data:image/jpg;base64," + user_info.picture);
+                        sessionStorage.setItem("user_info", JSON.stringify(user_info));
+                    }
+                    commonOk("修改成功");
+                    layui.layer.close(dialogIndex);
+                    userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
+                } else {
+                    commonError(retData.retMsg);
+                }
+            });
+            return false;
+        },
+        success: function (layero, index) {
+            let user_info = JSON.parse(sessionStorage.getItem("user_info"));
+            $("#userFile_modify_uploadHeaderPrev").find('img').attr('src', $("#user_picture_min").attr("src"));
+            $("#userFile_modify_userNo").val(user_info.user_no);
+            $("#userFile_modify_userName").val(user_info.user_name);
+            $("#userFile_modify_email").val(user_info.email);
+            $("#userFile_modify_phone").val(user_info.phone);
+            $("#userFile_modify_password").val("123456");
+            $("#userFile_modify_passwordConfirm").val("123456");
+            $("#userFile_modify_filePath").val("");
+            $("#userFile_modify_password").change(function () {
+                pswChange = true;
+            });
+            layui.upload.render({
+                elem: '#userFile_modify_uploadHeader',
+                url: 'uploadHeaderImg.do',//改成您自己的上传接口
+                data: {
+                    "user_no": function () {
+                        return user_info.user_no;
+                    }
+                },
+                accept: 'images',//只允许上传图片
+                acceptMime: 'images',// 规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
+                exts: 'jpg|png|gif|bmp|jpeg',
+                auto: true,// 选择文件后是否自动上传
+                multiple: false,// 是否允许多文件上传
+                choose: function(obj) {
+                    //预读本地文件,如果是多文件，则会遍历
+                    obj.preview(function (index, file, result) {
+                        // layui.$('#userConfig_uploadHeaderPrev').prev().hide();
+                        // layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
+                        layui.$('#userFile_modify_uploadHeaderPrev').find('img').attr('src', result);
+                    });
+                },
+                done: function(res, index, upload){
+                    // 将头像地址赋值给表单
+                    $("#userFile_modify_filePath").val(res.data.filePath)
+                },
+                error: function (index, upload) {
+                    commonError("上传头像失败");
+                }
+            });
+        }
+    });
 }

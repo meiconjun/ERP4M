@@ -114,7 +114,7 @@ public class UserConfigServiceImpl implements UserConfigService {
      * @param requestBean
      * @param responseBean
      */
-    private void modifyOperation(RequestBean requestBean, ResponseBean responseBean) {
+    private void modifyOperation(RequestBean requestBean, ResponseBean responseBean) throws IOException {
         User bean = (User) requestBean.getBeanList().get(0);
         Map<String, Object> paramMap = (Map<String, Object>) requestBean.getParamMap();
         bean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
@@ -124,11 +124,20 @@ public class UserConfigServiceImpl implements UserConfigService {
         condMap.put("role_no", paramMap.get("role_no"));
         //修改用户信息
         userConfigDao.updateUser(bean);
-        //删除旧的用户角色信息
-        userConfigDao.deleteUserRoleOld(bean.getUser_no());
-        //更新用户角色信息
-        userConfigDao.inserUserRole(condMap);
-
+        if (!CommonUtil.isStrBlank((String) paramMap.get("role_no"))) {
+            //删除旧的用户角色信息
+            userConfigDao.deleteUserRoleOld(bean.getUser_no());
+            //更新用户角色信息
+            userConfigDao.inserUserRole(condMap);
+        }
+        if (!CommonUtil.isStrBlank(bean.getPicture())) {
+            String url = PropertiesUtil.getProperty("fileSavePath") + bean.getPicture();
+            File file = new File(url);
+            String imgBase64 = CommonUtil.fileToBase64(file);
+            Map<String, Object> retMap = new HashMap<String, Object>();
+            retMap.put("base64", imgBase64);
+            responseBean.setRetMap(retMap);
+        }
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
@@ -154,7 +163,10 @@ public class UserConfigServiceImpl implements UserConfigService {
         userConfigDao.insertUser(condMap);
         userConfigDao.inserUserRole(condMap);
 
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("defaultPsw", defaultPsw);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
     }
 
     /**

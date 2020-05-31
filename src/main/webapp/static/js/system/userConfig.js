@@ -330,7 +330,12 @@ function userConfig_digSubmit(dialogIndex, operType) {
                 }
             }));
             if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("操作成功");
+                if (operType == "add") {
+                    commonInfo("新增成功，初始密码为" + retData.retMap.defaultPsw);
+                } else {
+                    commonOk("修改成功");
+                }
+
                 layui.layer.close(dialogIndex);
                 userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
             } else {

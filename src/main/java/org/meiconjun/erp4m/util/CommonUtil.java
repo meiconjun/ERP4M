@@ -230,6 +230,19 @@ public class CommonUtil {
     }
 
     /**
+     * 格式化日期字符串
+     * @param date
+     * @param targetFormat
+     * @return
+     * @throws ParseException
+     */
+    public static String formatDateString(String date, String orgFormat, String targetFormat) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat(orgFormat);
+        Date d = sdf.parse(date);
+        SimpleDateFormat sdf2 = new SimpleDateFormat(targetFormat);
+        return  sdf2.format(d);
+    }
+    /**
      * 将文件转为Base64
      * @param file
      * @return

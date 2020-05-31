@@ -27,7 +27,7 @@
 
     <select id="selectUnReadMsg" parameterType="java.lang.String" resultType="java.util.HashMap">
         select * from sys_message_tb
-        where concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%')
+        where (concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%') or concat(',', receive_role, ',') like concat('%,', #{role_no}, ',%'))
         and concat(',', read_user, ',') not like concat('%,', #{user_no}, ',%')
     </select>
 </mapper>

@@ -27,6 +27,12 @@ public class Test {
 
         return (endDate.getTime() - beginDate.getTime()) / (1000*60*60*24);
     }
+    public static String formatDateString(String date, String format) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date d = sdf.parse(date);
+        SimpleDateFormat sdf2 = new SimpleDateFormat(format);
+        return  sdf2.format(d);
+    }
     public static void main(String[] args) throws ParseException {
         /*RequestBean<User> requestBean = new RequestBean<User>();
         User m = new User();
@@ -67,8 +73,7 @@ public class Test {
         list.add("aa");
         list.add("bb");s
         System.out.println(list.contains("aa"));*/
-        System.out.println(getBetweenDays("20200411", "20200528"));
-        long l = 2;
-        System.out.println(l == 2);
+        String date = "20200531";
+        System.out.println(formatDateString(date, "yyyy-MM-dd HH:mm:ss"));
     }
 }

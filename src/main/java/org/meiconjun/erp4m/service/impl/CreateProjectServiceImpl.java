@@ -69,6 +69,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
             String state = (String) paramMap.get("state");//1-同意 2-拒绝
             String msg_no = (String) paramMap.get("msg_no");// 消息编号
             String project_no = (String) paramMap.get("project_no");
+            String failReason = (String) paramMap.get("fail_reason");// 拒绝原因
             // 消息更新为已处理
             String retStr = CommonUtil.updateMsgStatus(msg_no);
             if (!CommonUtil.isStrBlank(retStr)) {
@@ -87,7 +88,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 create_state = "3";//立项结束
                 project_state = "2";//立项失败
                 //添加立项失败原因
-                fail_reason = CommonUtil.addStringSplitByStr(fail_reason, "老板拒绝：" + user_no, ";");
+                fail_reason = CommonUtil.addStringSplitByStr(fail_reason, "老板拒绝,原因：" + failReason, ";\n");
             // 推送消息给立项人，立项失败
                 MessageBean messageBean = new MessageBean();
                 messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
@@ -155,7 +156,9 @@ public class CreateProjectServiceImpl implements CreateProjectService {
      */
     private void countersignOperation(RequestBean requestBean, ResponseBean responseBean) {
         String user_no = CommonUtil.getLoginUser().getUser_no();
+        String user_name = CommonUtil.getLoginUser().getUser_name();
         Map<String, Object> paramMap = requestBean.getParamMap();
+        String failReason = (String) paramMap.get("fail_reason");
         String state = (String) paramMap.get("state");//1-同意 2-拒绝
         String msg_no = (String) paramMap.get("msg_no");// 消息编号
         String status = "0";//处理状态
@@ -197,7 +200,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 countersign_n += "," + user_no;
             }
             //添加立项失败原因
-            fail_reason = CommonUtil.addStringSplitByStr(fail_reason, "会签拒绝：" + user_no, ";");
+            fail_reason = CommonUtil.addStringSplitByStr(fail_reason, "会签拒绝, 用户：" + user_name + ",原因：" + failReason, ";\n");
             // 推送消息给立项人，立项失败
             MessageBean messageBean = new MessageBean();
             messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
@@ -237,6 +240,9 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                 messageBean.setMsg_param(msg_param);
                 // 获取老板账号
                 List<User> users = commonDao.selectBossAccount();
+                if (users.isEmpty()) {
+                    throw new RuntimeException("未能查询到老板的账号！");
+                }
                 List<String> userList = new ArrayList<String>();
                 for (User u : users) {
                     userList.add(u.getUser_no());
@@ -282,6 +288,8 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         String project_menbers = (String) paramMap.get("member");
         // 项目文件根路径
         String file_root_path = (String) paramMap.get("file_root_path");
+        // 项目描述
+        String desc = (String) paramMap.get("desc");
         // 项目状态 1-立项中
         String project_state = "1";
 
@@ -296,6 +304,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         condMap.put("project_state", project_state);
         condMap.put("file_root_path", file_root_path);
         condMap.put("create_state", "1");
+        condMap.put("desc", desc);
         int effect = createProjectDao.insertNewProjectMain(condMap);
         if (effect == 0) {
             throw new RuntimeException("新增项目主表信息失败");
@@ -346,6 +355,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         msg_param.put("chn_name", chn_name);
         msg_param.put("begin_date", begin_date);
         msg_param.put("file_path", specifications);
+        msg_param.put("desc", desc);
         messageBean.setMsg_param(msg_param);
         List<String> userList = Arrays.asList((project_menbers.split(",")));
         String deal_type = "2";

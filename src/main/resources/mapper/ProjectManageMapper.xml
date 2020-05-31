@@ -17,9 +17,9 @@
     </select>
 
     <select id="selectStageOfProject" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select * from project_stage_tb
-        where project_no = #{project_no}
-        order by stage_num asc
+        select a.*, b.* from project_stage_tb a, project_stage_doc_tb b
+        where a.project_no = #{project_no} and a.doc_serial = b.serial_no and b. doc_version = '1.0'
+        order by a.stage_num asc
     </select>
 
     <select id="selectStageDocInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -48,12 +48,12 @@
     </insert>
     
     <select id="selectStageInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select * from project_doc_tb
+        select * from project_stage_tb
         where project_no = #{project_no} and stage_num = #{stage_num}
     </select>
 
     <update id="updateStageInfo" parameterType="java.util.HashMap">
-        update project_doc_tb
+        update project_stage_tb
         <set>
             <if test="begin_date != null and begin_date != ''">
                 begin_date = #{begin_date},
@@ -85,13 +85,13 @@
                 begin_date = #{begin_date},
             </if>
             <if test="project_state != null and project_state != ''">
-                principal = #{principal},
+                project_state = #{project_state},
             </if>
             <if test="create_state != null and create_state != ''">
                 create_state = #{create_state},
             </if>
             <if test="fail_reason != null and fail_reason != ''">
-                principal = #{principal},
+                fail_reason = #{fail_reason},
             </if>
             <if test="stage_num != null and stage_num != ''">
                 stage_num = #{stage_num},
@@ -105,4 +105,15 @@
         </set>
         where project_no = #{project_no}
     </update>
+    
+    <select id="selectMaxStageNumOfProject" parameterType="java.lang.String" resultType="java.lang.String">
+        select max(stage_num) from project_stage_tb
+        where project_no = #{project_no}
+    </select>
+
+    <select id="selectStagePrincipalManager" parameterType="java.lang.String" resultType="java.lang.String">
+        select a.user_no from sys_user_role_tb a, sys_role_tb b
+        where  a.role_no = b.role_no and b.department = (select d.department from sys_user_role_tb c, sys_role_tb d
+        where c.role_no = d.role_no and c.user_no = #{principal}) and b.position = '2'
+    </select>
 </mapper>

@@ -5,7 +5,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">项目名称</label>
             <div class="layui-input-block">
-                <input type="text" placeholder="4码命名" name="createProject_name" id="createProject_name" required  lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="text" placeholder="4码命名" maxlength="4" name="createProject_name" id="createProject_name" required  lay-verify="required" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -30,6 +30,12 @@
             <label class="layui-form-label">项目成员</label>
             <div class="layui-input-block">
                 <input type="text" disabled="disabled" placeholder="选择各阶段人员后自动填写" name="createProject_members" id="createProject_members" autocomplete="off" class="layui-input layui-disabled">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">项目描述</label>
+            <div class="layui-input-block">
+                <textarea name="createProject_desc" id="createProject_desc" placeholder="项目描述" class="layui-textarea"></textarea>
             </div>
         </div>
         <div stageCount="1">

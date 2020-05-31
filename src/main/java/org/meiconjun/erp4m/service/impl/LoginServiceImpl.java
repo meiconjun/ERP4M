@@ -6,12 +6,16 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.LoginDao;
 import org.meiconjun.erp4m.service.LoginService;
+import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +35,7 @@ public class LoginServiceImpl implements LoginService {
     private LoginDao loginDao;
 
     @Override
-    public ResponseBean excute(RequestBean requestBean) {
+    public ResponseBean excute(RequestBean requestBean) throws IOException {
         ResponseBean responseBean = new ResponseBean();
         String operType = requestBean.getOperType();
         if ("login".equals(operType)) {
@@ -45,7 +49,7 @@ public class LoginServiceImpl implements LoginService {
      * @param requestBean
      * @param responseBean
      */
-        private void loginOper(RequestBean requestBean, ResponseBean responseBean) {
+        private void loginOper(RequestBean requestBean, ResponseBean responseBean) throws IOException {
             User user = (User) requestBean.getBeanList().get(0);
             HashMap<String, Object> condMap = new HashMap<String, Object>();
             condMap.put("user_no", user.getUser_no());
@@ -66,7 +70,14 @@ public class LoginServiceImpl implements LoginService {
                 user2.setEmail((String) userMap.get("email"));
                 user2.setPhone((String) userMap.get("phone"));
 //                user2.setPass_word((String) userMap.get("pass_word"));
-                user2.setPicture((String) userMap.get("picture"));
+                // 图片转Base64
+                if (!CommonUtil.isStrBlank((String) userMap.get("picture"))) {
+                    String url = PropertiesUtil.getProperty("fileSavePath") + (String) userMap.get("picture");
+                    File file = new File(url);
+                    String imgBase64 = CommonUtil.fileToBase64(file);
+                    user2.setPicture(imgBase64);
+                }
+
                 user2.setStatus((String) userMap.get("status"));
 
                 Map retMap = new HashMap();
@@ -75,6 +86,11 @@ public class LoginServiceImpl implements LoginService {
                     responseBean.setRetCode(SystemContants.HANDLE_FAIL);
                     responseBean.setRetMsg("该用户已被停用，请联系管理员！");
                 } else {
+                    // 判断是否是初始密码
+                    String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
+                    if (defaultPsw.equals(userMap.get("password"))) {
+                        retMap.put("changePsw", true);
+                    }
                     retMap.put("user", user2);
                     responseBean.setRetMap(retMap);
                     responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);

@@ -1,6 +1,7 @@
 package org.meiconjun.erp4m.dao;
 
 import org.apache.ibatis.annotations.Param;
+import org.meiconjun.erp4m.bean.RoleBean;
 import org.meiconjun.erp4m.bean.User;
 
 import java.util.HashMap;
@@ -27,4 +28,12 @@ public interface CommonDao {
      * 查询用户号和用户名
      */
     List<HashMap<String, String>> selectAllUserNoAndName();
+    /**
+     * 获取所有用户的用户号
+     */
+    List<String> selectAllUserNo();
+    /**
+     * 查询目标用户的角色的信息
+     */
+    RoleBean selectUserRoleInfo(@Param("user_no") String user_no);
 }

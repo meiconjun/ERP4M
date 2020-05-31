@@ -15,6 +15,8 @@ function distributionMessage(msgStr) {
         showProjectBossCheckDig("立项审核", msgBean.msg_content, msgStr);
     } else if (FIELD_MSG_TYPE_PROJECT_STAGE == msgBean.msg_type) {
         showNotificationKeep("项目阶段提醒", msgBean.msg_content, msgBean.msg_no);
+    } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
+        showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no);
     }
 }
 
@@ -77,20 +79,20 @@ function showProjectCountersignDialog(title, content, msgStr) {
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目名称</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCountersign_projectName\" id=\"projectCountersign_projectName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_projectName\" id=\"projectCountersign_projectName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input\">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">中文名称</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCountersign_chnName\" id=\"projectCountersign_chnName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_chnName\" id=\"projectCountersign_chnName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input\">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <div class=\"layui-inline\">\n" +
         "                <label class=\"layui-form-label\">产品规格书</label>\n" +
         "                <div class=\"layui-input-inline\">\n" +
-        "                    <input type=\"text\" name=\"projectCountersign_produceDoc\" id=\"projectCountersign_produceDoc\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                    <input type=\"text\" name=\"projectCountersign_produceDoc\" id=\"projectCountersign_produceDoc\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input\">\n" +
         "                </div>\n" +
         "            </div>\n" +
         "            <div class=\"layui-inline\">\n" +
@@ -100,9 +102,26 @@ function showProjectCountersignDialog(title, content, msgStr) {
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目开始日期</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCountersign_beginDate\" id=\"projectCountersign_beginDate\" lay-verify=\"date\" placeholder=\"yyyy-MM-dd\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_beginDate\" id=\"projectCountersign_beginDate\" lay-verify=\"date\" placeholder=\"yyyy-MM-dd\" autocomplete=\"off\" class=\"layui-input\">\n" +
         "            </div>\n" +
         "        </div>\n" +
+        "        <div class=\"layui-form-item layui-form-text\">\n" +
+        "            <label class=\"layui-form-label\">项目描述</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <textarea name=\"projectCountersign_desc\" id=\"projectCountersign_desc\" disabled placeholder=\"项目描述\" class=\"layui-textarea\"></textarea>\n" +
+        "            </div>\n" +
+        "        </div>" +
+        /*"<fieldset name='projectManage_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n" +
+        "    <legend>负责阶段</legend>" +
+        "    <div class=\"layui-field-box\">\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">阶段名称</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"projectCountersign_projectName\" id=\"projectCountersign_projectName\" disabled  lay-verify=\"\" autocomplete=\"off\" class=\"layui-input\">\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "    </div>" +
+        "</fieldset>" +*/
         "    </form>\n" +
         "</div>";
 
@@ -137,24 +156,53 @@ function showProjectCountersignDialog(title, content, msgStr) {
                         }
                     },
                     btn2: function (index, layero) {//拒绝按钮回调
-                        let retData = commonAjax("createProject.do", JSON.stringify({
-                            "beanList": [],
-                            "operType": "countersign",
-                            "paramMap": {
-                                "state": "2",//1-同意 2-拒绝
-                                "msg_no": msgBean.msg_no,
-                                "project_no": msgBean.msg_param.project_no
+                        let failHtml = "<div class=\"comm-dialog\" id=\"projectCreate_failDiv\">\n" +
+                            "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
+                            "        <div class=\"layui-form-item layui-form-text\">\n" +
+                            "            <label class=\"layui-form-label\">拒绝原因</label>\n" +
+                            "            <div class=\"layui-input-block\">\n" +
+                            "                <textarea name=\"projectCountersign_failReason\" id=\"projectCountersign_failReason\" placeholder=\"拒绝原因\" class=\"layui-textarea\"></textarea>\n" +
+                            "            </div>\n" +
+                            "        </div>" +
+                            "    </form>" +
+                            "</div>";
+                        layui.layer.open({
+                            type : '1',
+                            title: '拒绝原因',
+                            area: ['300px', '300px'],// 宽高
+                            content: failHtml,
+                            btn: ['提交'],
+                            yes: function(index, layero) {// 同意按钮回调
+                                let failReason = $("#projectCountersign_failReason").val();
+                                if (commonBlank(failReason)) {
+                                    commonInfo("请输入拒绝原因！");
+                                    return;
+                                }
+                                let retData = commonAjax("createProject.do", JSON.stringify({
+                                    "beanList": [],
+                                    "operType": "countersign",
+                                    "paramMap": {
+                                        "state": "2",//1-同意 2-拒绝
+                                        "msg_no": msgBean.msg_no,
+                                        "project_no": msgBean.msg_param.project_no,
+                                        "fail_reason": failReason
+                                    }
+                                }));
+                                if (retData.retCode == HANDLE_SUCCESS) {
+                                    commonOk("操作成功");
+                                    layui.layer.close(index);
+                                }
+                            },
+                            success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
                             }
-                        }));
-                        if (retData.retCode == HANDLE_SUCCESS) {
-                            commonOk("操作成功");
-                            layui.layer.close(index);
-                        }
+                        });
+
                     },
                     success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
                         $("#projectCountersign_projectName").val(msgBean.msg_param.project_name);
                         $("#projectCountersign_chnName").val(msgBean.msg_param.chn_name);
                         $("#projectCountersign_produceDoc").val(msgBean.msg_param.project_name);
+                        $("#projectCountersign_desc").val(msgBean.msg_param.desc);
                         layui.laydate.render({
                             elem: '#projectCountersign_beginDate',
                             value: commonFormatDate(msgBean.msg_param.begin_date)
@@ -178,30 +226,30 @@ function showProjectCountersignDialog(title, content, msgStr) {
 function showProjectBossCheckDig(title, content, msgStr) {
     let msgBean = JSON.parse(msgStr);
     let html = "<div class=\"comm-dialog\" id=\"projectCreate_bossCheckDiv\">\n" +
-        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
+        "    <form class=\"layui-form layui-form-pane\" id=\"projectCreate_bossCheckFrm\" lay-filter=\"\" action=\"\">\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目名称</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_projectName\" id=\"projectCreate_bossCheck_projectName\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCreate_bossCheck_projectName\" id=\"projectCreate_bossCheck_projectName\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">中文名称</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_chnName\" id=\"projectCreate_bossCheck_chnName\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCreate_bossCheck_chnName\" id=\"projectCreate_bossCheck_chnName\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目开始日期</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_beginDate\" id=\"projectCreate_bossCheck_beginDate\" disabled lay-verify=\"date\" placeholder=\"yyyy-MM-dd\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCreate_bossCheck_beginDate\" id=\"projectCreate_bossCheck_beginDate\" disabled lay-verify=\"date\" placeholder=\"yyyy-MM-dd\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <div class=\"layui-inline\">\n" +
         "                <label class=\"layui-form-label\">产品规格书</label>\n" +
         "                <div class=\"layui-input-inline\">\n" +
-        "                    <input type=\"text\" name=\"projectCreate_bossCheck_produceDoc\" id=\"projectCreate_bossCheck_produceDoc\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                    <input type=\"text\" name=\"projectCreate_bossCheck_produceDoc\" id=\"projectCreate_bossCheck_produceDoc\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "                </div>\n" +
         "            </div>\n" +
         "            <div class=\"layui-inline\">\n" +
@@ -211,15 +259,21 @@ function showProjectBossCheckDig(title, content, msgStr) {
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">负责人</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_principal\" id=\"projectCreate_bossCheck_principal\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCreate_bossCheck_principal\" id=\"projectCreate_bossCheck_principal\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目成员</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_members\" id=\"projectCreate_bossCheck_members\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input layui-disabled\">\n" +
+        "                <input type=\"text\" name=\"projectCreate_bossCheck_members\" id=\"projectCreate_bossCheck_members\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
+        "        <div class=\"layui-form-item layui-form-text\">\n" +
+        "            <label class=\"layui-form-label\">项目描述</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <textarea name=\"projectCreate_bossCheck__desc\" id=\"projectCreate_bossCheck__desc\" disabled placeholder=\"项目描述\" class=\"layui-textarea\"></textarea>\n" +
+        "            </div>\n" +
+        "        </div>" +
         "    </form>\n" +
         "</div>";
 
@@ -235,7 +289,7 @@ function showProjectBossCheckDig(title, content, msgStr) {
                 layui.layer.open({
                     type : '1',
                     title: '项目立项审批',
-                    area: ['500px', '700px'],// 宽高
+                    area: ['720px', '700px'],// 宽高
                     content: html,
                     btn: ['同意', '拒绝'],
                     yes: function(index, layero) {// 同意按钮回调
@@ -251,29 +305,67 @@ function showProjectBossCheckDig(title, content, msgStr) {
                         if (retData.retCode == HANDLE_SUCCESS) {
                             commonOk("操作成功");
                             layui.layer.close(index);
+                        } else {
+                            commonError("操作失败！:" + retData.retMsg);
                         }
                     },
                     btn2: function(index, layero) {//拒绝按钮回调
-                        let retData = commonAjax("createProject.do", JSON.stringify({
-                            "beanList": [],
-                            "operType": "bossCheck",
-                            "paramMap": {
-                                "state": "2",//1-同意 2-拒绝
-                                "msg_no": msgBean.msg_no,
-                                "project_no": msgBean.msg_param.project_no
+                        let failHtml = "<div class=\"comm-dialog\" id=\"projectCreate_failDiv\">\n" +
+                                        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
+                                        "        <div class=\"layui-form-item layui-form-text\">\n" +
+                                        "            <label class=\"layui-form-label\">拒绝原因</label>\n" +
+                                        "            <div class=\"layui-input-block\">\n" +
+                                        "                <textarea name=\"projectCreate_bossCheck_failReason\" id=\"projectCreate_bossCheck_failReason\" placeholder=\"拒绝原因\" class=\"layui-textarea\"></textarea>\n" +
+                                        "            </div>\n" +
+                                        "        </div>" +
+                                        "    </form>" +
+                                        "</div>";
+                        layui.layer.open({
+                            type : '1',
+                            title: '拒绝原因',
+                            area: ['300px', '300px'],// 宽高
+                            content: failHtml,
+                            btn: ['提交'],
+                            yes: function(index, layero) {// 同意按钮回调
+                                let failReason = $("#projectCreate_bossCheck_failReason").val();
+                                if (commonBlank(failReason)) {
+                                    commonInfo("请输入拒绝原因！");
+                                    return;
+                                }
+                                let retData = commonAjax("createProject.do", JSON.stringify({
+                                    "beanList": [],
+                                    "operType": "bossCheck",
+                                    "paramMap": {
+                                        "state": "2",//1-同意 2-拒绝
+                                        "msg_no": msgBean.msg_no,
+                                        "project_no": msgBean.msg_param.project_no,
+                                        "fail_reason" : failReason
+                                    }
+                                }));
+                                if (retData.retCode == HANDLE_SUCCESS) {
+                                    commonOk("操作成功");
+                                    layui.layer.close(index);
+                                } else {
+                                    commonError("操作失败！:" + retData.retMsg);
+                                }
+                            },
+                            success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
                             }
-                        }));
-                        if (retData.retCode == HANDLE_SUCCESS) {
-                            commonOk("操作成功");
-                            layui.layer.close(index);
-                        }
+                        });
+
                     },
                     success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
                         $("#projectCreate_bossCheck_projectName").val(msgBean.msg_param.project_name);
                         $("#projectCreate_bossCheck_chnName").val(msgBean.msg_param.chn_name);
                         $("#projectCreate_bossCheck_produceDoc").val(msgBean.msg_param.project_name);
                         $("#projectCreate_bossCheck_principal").val(msgBean.msg_param.principal);
-                        $("#projectCreate_bossCheck_members").val(msgBean.msg_param.project_menbers);
+                        let menbers = msgBean.msg_param.project_menbers.split(",");
+                        let menber = "";
+                        for (let t = 0; t < menbers.length; t++) {
+                            menber += "," + commonFormatUserNo(menbers[t], true);
+                        }
+                        menber = menber.substring(1, menber.length);
+                        $("#projectCreate_bossCheck_members").val(menber);
                         layui.laydate.render({
                             elem: '#projectCreate_bossCheck_beginDate',
                             value : commonFormatDate(msgBean.msg_param.begin_date)
@@ -283,6 +375,72 @@ function showProjectBossCheckDig(title, content, msgStr) {
                             commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.specifications);
                             return false;
                         });
+
+                        // 拼接阶段信息
+                        let stageData = commonAjax("projectManage.do", JSON.stringify({
+                            "beanList": [],
+                            "operType": "getStageInfo",
+                            "paramMap": {
+                                "project_no": msgBean.msg_param.project_no// 项目编号
+                            }
+                        }));
+                        if (stageData.retCode == HANDLE_SUCCESS) {
+                            let stageList = stageData.retMap.stageList
+                            for (let i = 0;i < stageList.length; i++) {
+                                let tempHtml = "<fieldset name='projectCreate_bossCheck_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n";
+                                tempHtml += "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                                tempHtml +=    "            <div class=\"layui-field-box\">\n" +
+                                    "                <div class=\"layui-form-item\">\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                        <label class=\"layui-form-label\">阶段类型</label>\n" +
+                                    "                        <div class=\"layui-input-inline\">\n" +
+                                    "                            <input type=\"text\" value='" + commonFormatValue(FIELD_STAGE, stageList[i].stage) + "' name=\"projectCreate_bossCheck_stage_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_stage_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                        </div>\n" +
+                                    "                    </div>\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                        <label class=\"layui-form-label\">开始日期</label>\n" +
+                                    "                        <div class=\"layui-input-inline\">\n" +
+                                    "                            <input type=\"text\" value='" + commonFormatDate(stageList[i].begin_date) + "' name=\"projectCreate_bossCheck_beginDate_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_beginDate_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                        </div>\n" +
+                                    "                    </div>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"layui-form-item\">\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                        <label class=\"layui-form-label\">结束日期</label>\n" +
+                                    "                        <div class=\"layui-input-inline\">\n" +
+                                    "                            <input type=\"text\" value='" + commonFormatDate(stageList[i].end_date) + "' name=\"projectCreate_bossCheck_endDate_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_endDate_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                        </div>\n" +
+                                    "                    </div>\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                        <label class=\"layui-form-label\">阶段文档</label>\n" +
+                                    "                        <div class=\"layui-input-inline\">\n" +
+                                    "                            <input type=\"text\" value='" + stageList[i].doc_name + "' name=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                        </div>\n" +
+                                    "                    </div>\n" +
+                                    "                </div>\n" +
+                                    "                <div class=\"layui-form-item\">\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                        <label class=\"layui-form-label\">文档作者</label>\n" +
+                                    "                        <div class=\"layui-input-inline\">\n" +
+                                    "                            <input type=\"text\" value='" + stageList[i].doc_writer + "' name=\"projectCreate_bossCheck_docWriter_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docWriter_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                        </div>\n" +
+                                    "                    </div>\n" +
+                                    "                    <div class=\"layui-inline\">\n" +
+                                    "                    </div>\n" +
+                                    "                </div>\n" +
+                                    "            </div>\n" +
+                                    "        </fieldset>";
+                                $("#projectCreate_bossCheckFrm").append(tempHtml);
+                            }
+
+                            layui.form.render();
+                            // 绑定规格书下载事件
+                            $("#projectManage_specificationsDownload_dialog").click(function () {
+                                commonFileDownload(data.project_name + "产品规格说明书.doc", $("#projectManage_specificationsDownload_dialog").val());
+                            });
+                        } else {
+                            commonError("加载项目阶段信息失败：" + stageData.retMsg);
+                        }
                     }
                 });
             }
