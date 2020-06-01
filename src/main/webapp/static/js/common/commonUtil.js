@@ -154,6 +154,7 @@ function commonGetAuthField(menu_id) {
 function commonPutNormalSelectOpts(optList, objName, defaultVal, isRequired, onlyName, tips) {
     let thisOpts;
     if (commonBlank(optList)) {
+        $("#" + objName).html("<option value='' selected>-无数据-</option>");
         return [];
     }
     if (typeof optList == 'string') {// 字符串-字典码

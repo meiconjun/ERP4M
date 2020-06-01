@@ -234,7 +234,7 @@ function projectManage_detailOperation(data) {
             layui.form.val("projectManage_detailFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
                 "projectManage_projectName_dialog": data.project_name, // "name": "value"
                 "projectManage_chnName_dialog": data.chn_name,
-                "projectManage_principal_dialog": data.principal,
+                "projectManage_principal_dialog": commonFormatUserNo(data.principal, true),
                 "projectManage_beginDate_dialog": data.begin_date,
                 "projectManage_endDate_dialog": data.end_date,
                 "projectManage_menbers_dialog": menber,

@@ -101,10 +101,12 @@ function initMenuLeft(user_no) {
         };
         //注册TAB删除事件，若全部tab都删除了，隐藏TAb div，展示主页
         layui.element.on('tabDelete(main-tab)', function(data){
-            if (data.index == 0) {// 关闭了最后一个标签
+            let length = $("div[lay-filter=main-tab] ul:first-child li").length;
+            if (length == 0) {// 关闭了最后一个标签
                 $("div[lay-filter='main-tab']").attr("hidden", "hidden");
+                $("#main-page").removeAttr("hidden");
             }
-            $("#main-page").removeAttr("hidden");
+
         });
         createMenu(menuList, $sidebar_menu);
 
@@ -358,4 +360,21 @@ function userFileChange() {
             });
         }
     });
+}
+/** 登出 */
+function logout() {
+    //断开websocket
+    disconnectWebSocket(ws);
+    // 移除后台session
+    commonAjax("logout.do", JSON.stringify({
+        "beanList": [],
+        "operType": "",
+        "paramMap": {
+            "user_no": sessionStorage.getItem("user_no")
+        }
+    }));
+    // 移除前台session
+    sessionStorage.removeItem("user_info");
+    // 调到登录页
+    window.location.href = 'login.html';
 }
