@@ -31,6 +31,10 @@ public class MessageBean {
      */
     String msg_content;
     /**
+     * 是否为任务
+     */
+    String is_task;
+    /**
      * 消息参数
      */
     Map<String, Object> msg_param;
@@ -81,5 +85,13 @@ public class MessageBean {
 
     public void setMsg_param(Map<String, Object> msg_param) {
         this.msg_param = msg_param;
+    }
+
+    public String getIs_task() {
+        return is_task;
+    }
+
+    public void setIs_task(String is_task) {
+        this.is_task = is_task;
     }
 }

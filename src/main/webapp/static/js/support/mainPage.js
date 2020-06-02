@@ -3,24 +3,84 @@ function showMainPage() {
     $("div[lay-filter='main-tab']").attr("hidden", "hidden");
     $("#main-page").removeAttr("hidden");
 }
+
+
 /** 初始化未读消息列表*/
 function initUnReadMsg() {
-    let html = "<li>\n" +
-        "                                <!-- drag handle -->\n" +
-        "                                <span class=\"handle\">\n" +
-        "                        <i class=\"fa fa-ellipsis-v\"></i>\n" +
-        "                        <i class=\"fa fa-ellipsis-v\"></i>\n" +
-        "                      </span>\n" +
-        "                                <!-- checkbox -->\n" +
-        "                                <input type=\"checkbox\" value=\"\">\n" +
-        "                                <!-- todo text -->\n" +
-        "                                <span class=\"text\">设计一个不错的主题</span>\n" +
-        "                                <!-- Emphasis label -->\n" +
-        "                                <small class=\"label label-danger\"><i class=\"fa fa-clock-o\"></i> 2 分钟前</small>\n" +
-        "                                <!-- General tools such as edit or delete-->\n" +
-        "                                <div class=\"tools\">\n" +
-        "                                    <i class=\"fa fa-edit\"></i>\n" +
-        "                                    <i class=\"fa fa-trash-o\"></i>\n" +
-        "                                </div>\n" +
-        "                            </li>";
+    let unReadMsgData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initUnReadMessage",
+        "paramMap": {
+            "user_no": sessionStorage.getItem("user_no"),
+            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+        }
+    }));
+    if (unReadMsgData.retCode == HANDLE_SUCCESS) {
+        let unReadMsgList = unReadMsgData.retMap.msgBeanList;
+        let html = "";
+        for (let i = 0; i < unReadMsgList.length; i++) {
+            let days = getDaysBetween(unReadMsgList[i].create_date, commonCurrentDateTimeStr());
+            let label = "";
+            if (days <= 1) {
+                label = "label label-success";
+            } else if (days > 1 && days <= 3) {
+                label = "label label-warning";
+            } else {
+                label = "label label-danger";
+            }
+            html += "<li>\n" +
+                "         <span class=\"handle\">\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "         </span>\n" +
+                "         <input type=\"checkbox\" value=\"\">\n" +
+                "         <a class=\"text\" href='#' onclick=\"showMainPageMsgFunction1(" +  commonFormatObj(unReadMsgList[i]) + ")\">" + commonFormatValue(FIELD_MSG_TYPE, unReadMsgList[i].msg_type, true) + "</a>\n" +
+                "         <small class='" + label + "'><i class=\"fa fa-clock-o\"></i>" + commonFormatDate(unReadMsgList[i].create_time) + "创建" +"</small>\n" +
+                "    </li>";
+        }
+        $("#mainPage-todo-list").empty();
+        $("#mainPage-todo-list").append(html);
+    } else {
+        commonError("初始化未读消息失败");
+    }
+}
+
+/** 初始化未读消息列表*/
+function initReadMsg() {
+    let readMsgData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initReadMessage",
+        "paramMap": {
+            "user_no": sessionStorage.getItem("user_no"),
+            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+        }
+    }));
+    if (readMsgData.retCode == HANDLE_SUCCESS) {
+        let readMsgList = readMsgData.retMap.msgBeanList;
+        let html = "";
+        for (let i = 0; i < readMsgList.length; i++) {
+            // let days = getDaysBetween(readMsgList[i].create_date, commonCurrentDateTimeStr());
+            let label = "label label-default";
+            html += "<li>\n" +
+                "         <span class=\"handle\">\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "         </span>\n" +
+                "         <input type=\"checkbox\" value=\"\">\n" +
+                "         <a class=\"text\" href='#' onclick=\"showMainPageMsgFunction2(" +  commonFormatObj(readMsgList[i]) + ")\">" + commonFormatValue(FIELD_MSG_TYPE, readMsgList[i].msg_type, true) + "</a>\n" +
+                "         <small class='" + label + "'><i class=\"fa fa-clock-o\"></i>" + commonFormatDate(readMsgList[i].create_time) + "创建" +"</small>\n" +
+                "    </li>";
+        }
+        $("#mainPage-todo-list").empty();
+        $("#mainPage-todo-list").append(html);
+    } else {
+        commonError("初始化未读消息失败");
+    }
+}
+
+function showMainPageMsgFunction1(data) {
+    showMainPageMsg(JSON.stringify(data), true);
+}
+function showMainPageMsgFunction2(data) {
+    showMainPageMsg(JSON.stringify(data), false);
 }

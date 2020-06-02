@@ -5,4 +5,9 @@
         select * from sys_user_tb
         where user_no = #{user_no} and pass_word = #{pass_word}
     </select>
+
+    <select id="selectRoleNo" parameterType="java.lang.String" resultType="java.lang.String">
+        select role_no from sys_user_role_tb
+        where user_no = #{user_no}
+    </select>
 </mapper>

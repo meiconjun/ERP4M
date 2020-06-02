@@ -281,6 +281,9 @@ public class CommonUtil {
             receive_user = receive_user.substring(1);
         }
         String msg_no = SerialNumberGenerater.getInstance().generaterNextNumber();
+        if (CommonUtil.isStrBlank(messageBean.getIs_task())) {
+            messageBean.setIs_task("0");
+        }
         condMap.put("msg_no", msg_no);
         condMap.put("msg_type", messageBean.getMsg_type());
         condMap.put("create_user", messageBean.getCreate_user());
@@ -293,6 +296,7 @@ public class CommonUtil {
         condMap.put("status", "");
         condMap.put("end_time", end_time);
         condMap.put("deal_type", deal_type);
+        condMap.put("is_task", messageBean.getIs_task());
         messageDao.insertNewMessage(condMap);
 
         return msg_no;

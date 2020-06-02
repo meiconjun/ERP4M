@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,5 +18,7 @@ public interface LoginDao {
      * @param condMap
      * @return
      */
-    public List<HashMap<String, Object>> selectUser(HashMap<String, Object> condMap);
+    List<HashMap<String, Object>> selectUser(HashMap<String, Object> condMap);
+
+    String selectRoleNo(@Param("user_no") String user_no);
 }

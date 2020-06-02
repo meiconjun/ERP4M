@@ -338,3 +338,13 @@ function  commonFormatUserNo(value, onlyName) {
     }
     return retValue;
 }
+
+/**
+ * 获取两个日期相差天数
+ */
+function getDaysBetween(begin_date, end_date) {
+    let startDate = Date.parse(begin_date);
+    let endDate = Date.parse(end_date);
+
+    return (endDate - startDate) / (24 * 60 * 60 * 1000);
+}

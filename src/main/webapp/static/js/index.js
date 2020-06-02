@@ -23,8 +23,9 @@ $(document).ready(function () {
                 $("#user_picture_sidebar").attr("src", "data:image/jpg;base64," + user_info.picture);
             }
             if (sessionStorage.getItem("changePsw") == "true") {
-                // TODO 强制要求修改密码
-
+                console.log("111111111");
+                // 强制要求修改密码
+                commonInfo("您的密码还是初始密码，请修改！", userFileChange());
                 sessionStorage.removeItem("changePsw");
             } else {
                 sessionStorage.removeItem("changePsw");
@@ -37,13 +38,14 @@ $(document).ready(function () {
         }
 
         $("#user_name_min").text(user_info.user_name);
-        $("#user_name_main").text(user_info.user_name + ' - 普通员工');
+        $("#user_name_main").text(user_info.user_name);
         $("#user_name_sidebar").text(user_info.user_name);
         /*============初始化操作 begin===============*/
         initData();
         initAllUser();
         initFilePath();
         initUnReadMessage(user_info.user_no, user_info.role_no);
+        initUnReadMsg();
         /*============初始化操作 end===============*/
 
 

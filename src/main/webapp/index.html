@@ -347,10 +347,10 @@ BODY 标签选项：
                 <div class="box box-primary"  >
                     <div class="box-header">
                         <i class="ion ion-clipboard" style="color: red"></i>
-                        <a href="#" class="box-title">未读消息</a>
+                        <a href="#" onclick="initUnReadMsg()" class="box-title">未读消息</a>
                         |
                         <i class="ion ion-clipboard"></i>
-                        <a href="#" class="box-title">已读消息</a>
+                        <a href="#" onclick="initReadMsg()" class="box-title">已读消息</a>
                         <div class="box-tools pull-right">
                             <!--<ul class="pagination pagination-sm inline">
                                 <li><a href="#">&laquo;</a></li>
@@ -365,115 +365,24 @@ BODY 标签选项：
                     <div class="box-body" style="height: 300px; overflow: auto;">
                         <!-- See dist/js/pages/dashboard.js to activate the todoList plugin -->
                         <ul id="mainPage-todo-list" class="todo-list">
-                            <li>
-                                <!-- drag handle -->
+                            <!--<li>
+                                &lt;!&ndash; drag handle &ndash;&gt;
                                 <span class="handle">
                         <i class="fa fa-ellipsis-v"></i>
                         <i class="fa fa-ellipsis-v"></i>
                       </span>
-                                <!-- checkbox -->
-                                <input type="checkbox" value="">
-                                <!-- todo text -->
+                                &lt;!&ndash; checkbox &ndash;&gt;
+                                &lt;!&ndash;<input type="checkbox" value="">&ndash;&gt;
+                                &lt;!&ndash; todo text &ndash;&gt;
                                 <span class="text">设计一个不错的主题</span>
-                                <!-- Emphasis label -->
+                                &lt;!&ndash; Emphasis label &ndash;&gt;
                                 <small class="label label-danger"><i class="fa fa-clock-o"></i> 2 分钟前</small>
-                                <!-- General tools such as edit or delete-->
+                                &lt;!&ndash; General tools such as edit or delete&ndash;&gt;&lt;!&ndash;
                                 <div class="tools">
                                     <i class="fa fa-edit"></i>
                                     <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">使响应式主题</span>
-                                <small class="label label-info"><i class="fa fa-clock-o"></i> 4 小时前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">让主题像星星般闪耀</span>
-                                <small class="label label-warning"><i class="fa fa-clock-o"></i> 1 天前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">让主题像星星般闪耀</span>
-                                <small class="label label-success"><i class="fa fa-clock-o"></i> 3 天前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">检查你的邮件和通知</span>
-                                <small class="label label-primary"><i class="fa fa-clock-o"></i> 1 周前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">让主题像星星般闪耀</span>
-                                <small class="label label-default"><i class="fa fa-clock-o"></i> 1 月前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">让主题像星星般闪耀</span>
-                                <small class="label label-default"><i class="fa fa-clock-o"></i> 1 月前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
-                            <li>
-                      <span class="handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-                                <input type="checkbox" value="">
-                                <span class="text">让主题像星星般闪耀</span>
-                                <small class="label label-default"><i class="fa fa-clock-o"></i> 1 月前</small>
-                                <div class="tools">
-                                    <i class="fa fa-edit"></i>
-                                    <i class="fa fa-trash-o"></i>
-                                </div>
-                            </li>
+                                </div>&ndash;&gt;
+                            </li>-->
                         </ul>
                     </div>
                     <!-- /.box-body -->

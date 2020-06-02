@@ -41,6 +41,10 @@ public class User implements Serializable {
      */
     private String auth_user;
     /**
+     * 角色号
+     */
+    private String role_no;
+    /**
      * 用户状态
      */
     private String status;
@@ -115,5 +119,12 @@ public class User implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public String getRole_no() {
+        return role_no;
+    }
+
+    public void setRole_no(String role_no) {
+        this.role_no = role_no;
     }
 }

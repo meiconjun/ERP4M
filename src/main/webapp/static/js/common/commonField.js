@@ -18,14 +18,15 @@ const FIELD_STAGE = "P010100";
 const FIELD_STAGE_DETAIL = "P010200";
 /** 项目状态*/
 const FIELD_PROJECT_STATE = "P020100";
-
+/** 消息类型数据字典*/
+const FIELD_MSG_TYPE = "S030100";
 
 /*=================== 消息相关 ============================*/
 /** 消息类型-立项会签 */
 const FIELD_MSG_TYPE_COUNTERSIGN = "1";
 /** 消息类型-立项结果 */
 const FIELD_MSG_TYPE_COUNTERSIGN_RESULT = "2";
-/** 消息类型-立项-老板审核 */
+/** 消息类型-立项-(老板)审核 */
 const FIELD_MSG_TYPE_BOSS_CHECK = "3";
 /** 消息类型-项目阶段提醒 */
 const FIELD_MSG_TYPE_PROJECT_STAGE = "4";

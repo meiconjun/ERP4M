@@ -8,44 +8,66 @@
 function distributionMessage(msgStr) {
     let msgBean = JSON.parse(msgStr);
     if (FIELD_MSG_TYPE_COUNTERSIGN == msgBean.msg_type) {
-        showProjectCountersignDialog("项目立项会签", msgBean.msg_content, msgStr);
+        showProjectCountersignDialog("项目立项会签", msgBean.msg_content, msgStr, true);
     } else if (FIELD_MSG_TYPE_COUNTERSIGN_RESULT == msgBean.msg_type) {
-        showNotificationKeep("立项结果", msgBean.msg_content, msgBean.msg_no);
+        showNotificationKeep("立项结果", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_BOSS_CHECK == msgBean.msg_type) {
-        showProjectBossCheckDig("立项审核", msgBean.msg_content, msgStr);
+        showProjectBossCheckDig("立项审核", msgBean.msg_content, msgStr, true);
     } else if (FIELD_MSG_TYPE_PROJECT_STAGE == msgBean.msg_type) {
-        showNotificationKeep("项目阶段提醒", msgBean.msg_content, msgBean.msg_no);
+        showNotificationKeep("项目负责阶段提醒", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
-        showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no);
+        showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, true);
     }
 }
 
-
+/**
+ * 用于主页已读/未读消息点击事件
+ * @param msgStr
+ */
+function showMainPageMsg(msgStr, showButton) {
+    let msgBean = JSON.parse(msgStr);
+    if (FIELD_MSG_TYPE_COUNTERSIGN == msgBean.msg_type) {
+        showProjectCountersignDialog("项目立项会签", msgBean.msg_content, msgStr, showButton);
+    } else if (FIELD_MSG_TYPE_COUNTERSIGN_RESULT == msgBean.msg_type) {
+        showNotificationKeep("立项结果", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_BOSS_CHECK == msgBean.msg_type) {
+        showProjectBossCheckDig("立项审核", msgBean.msg_content, msgStr, showButton);
+    } else if (FIELD_MSG_TYPE_PROJECT_STAGE == msgBean.msg_type) {
+        showNotificationKeep("项目负责阶段提醒", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
+        showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, showButton);
+    }
+}
 /*=========================================================================*/
 /**
  * 右下角消息弹框,多条消息叠加展示
  */
-function showNotificationKeep(title, content, msg_no) {
+function showNotificationKeep(title, content, msg_no, button) {
     let config;
+    let buttons = [];
+    if (button) {
+        buttons = [{
+            text: '确定',
+            click: function (e) {
+                e.closeNotification();
+                //更新为已读
+                commonAjax("common.do", JSON.stringify({
+                    "beanList": [],
+                    "operType": "updateMessage",
+                    "paramMap": {
+                        'msg_no': msg_no
+                    }
+                }));
+                initUnReadMsg();
+            }
+        }];
+    }
     // if (typeof func == 'string') {
         config = {
             title: title,
             text: content,
             timeout: 'keep',// 一直存在
-            buttons: [{
-                text: '确定',
-                click: function (e) {
-                    e.closeNotification();
-                    //更新为已读
-                    commonAjax("common.do", JSON.stringify({
-                        "beanList": [],
-                        "operType": "updateMessage",
-                        "paramMap": {
-                            'msg_no': msg_no
-                        }
-                    }));
-                }
-            }]
+            buttons: buttons
         };
     /*} else {
         config = {
@@ -72,7 +94,7 @@ function showNotificationKeep(title, content, msg_no) {
 /**
  * 项目立项会签消息
  */
-function showProjectCountersignDialog(title, content, msgStr) {
+function showProjectCountersignDialog(title, content, msgStr, button) {
     let msgBean = JSON.parse(msgStr);
     let html = "<div class=\"comm-dialog\" id=\"projectCountersign_dialogDiv\">\n" +
         "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
@@ -124,12 +146,9 @@ function showProjectCountersignDialog(title, content, msgStr) {
         "</fieldset>" +*/
         "    </form>\n" +
         "</div>";
-
-    naranja()['log']({
-        title: title,
-        text: content,
-        timeout: 'keep',// 一直存在
-        buttons: [{
+    let buttons = [];
+    if (button) {
+        buttons = [{
             text: '查看详情',
             click: function (e) {
                 // 执行函数,
@@ -153,6 +172,7 @@ function showProjectCountersignDialog(title, content, msgStr) {
                         if (retData.retCode == HANDLE_SUCCESS) {
                             commonOk("操作成功");
                             layui.layer.close(index);
+                            initUnReadMsg();
                         }
                     },
                     btn2: function (index, layero) {//拒绝按钮回调
@@ -191,6 +211,7 @@ function showProjectCountersignDialog(title, content, msgStr) {
                                 if (retData.retCode == HANDLE_SUCCESS) {
                                     commonOk("操作成功");
                                     layui.layer.close(index);
+                                    initUnReadMsg();
                                 }
                             },
                             success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
@@ -219,7 +240,13 @@ function showProjectCountersignDialog(title, content, msgStr) {
             click: function (e) {
                 e.closeNotification()
             }
-        }]
+        }];
+    }
+    naranja()['log']({
+        title: title,
+        text: content,
+        timeout: 'keep',// 一直存在
+        buttons: buttons
     })
 }
 
@@ -276,12 +303,9 @@ function showProjectBossCheckDig(title, content, msgStr) {
         "        </div>" +
         "    </form>\n" +
         "</div>";
-
-    naranja()['log']({
-        title: title,
-        text: content,
-        timeout: 'keep',// 一直存在
-        buttons: [{
+    let buttons = [];
+    if (button) {
+        buttons = [{
             text: '查看详情',
             click: function (e) {
                 // 执行函数,
@@ -305,21 +329,22 @@ function showProjectBossCheckDig(title, content, msgStr) {
                         if (retData.retCode == HANDLE_SUCCESS) {
                             commonOk("操作成功");
                             layui.layer.close(index);
+                            initUnReadMsg();
                         } else {
                             commonError("操作失败！:" + retData.retMsg);
                         }
                     },
                     btn2: function(index, layero) {//拒绝按钮回调
                         let failHtml = "<div class=\"comm-dialog\" id=\"projectCreate_failDiv\">\n" +
-                                        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
-                                        "        <div class=\"layui-form-item layui-form-text\">\n" +
-                                        "            <label class=\"layui-form-label\">拒绝原因</label>\n" +
-                                        "            <div class=\"layui-input-block\">\n" +
-                                        "                <textarea name=\"projectCreate_bossCheck_failReason\" id=\"projectCreate_bossCheck_failReason\" placeholder=\"拒绝原因\" class=\"layui-textarea\"></textarea>\n" +
-                                        "            </div>\n" +
-                                        "        </div>" +
-                                        "    </form>" +
-                                        "</div>";
+                            "    <form class=\"layui-form layui-form-pane\" lay-filter=\"\" action=\"\">\n" +
+                            "        <div class=\"layui-form-item layui-form-text\">\n" +
+                            "            <label class=\"layui-form-label\">拒绝原因</label>\n" +
+                            "            <div class=\"layui-input-block\">\n" +
+                            "                <textarea name=\"projectCreate_bossCheck_failReason\" id=\"projectCreate_bossCheck_failReason\" placeholder=\"拒绝原因\" class=\"layui-textarea\"></textarea>\n" +
+                            "            </div>\n" +
+                            "        </div>" +
+                            "    </form>" +
+                            "</div>";
                         layui.layer.open({
                             type : '1',
                             title: '拒绝原因',
@@ -345,6 +370,7 @@ function showProjectBossCheckDig(title, content, msgStr) {
                                 if (retData.retCode == HANDLE_SUCCESS) {
                                     commonOk("操作成功");
                                     layui.layer.close(index);
+                                    initUnReadMsg();
                                 } else {
                                     commonError("操作失败！:" + retData.retMsg);
                                 }
@@ -449,6 +475,12 @@ function showProjectBossCheckDig(title, content, msgStr) {
             click: function (e) {
                 e.closeNotification()
             }
-        }]
+        }];
+    }
+    naranja()['log']({
+        title: title,
+        text: content,
+        timeout: 'keep',// 一直存在
+        buttons: buttons
     })
 }

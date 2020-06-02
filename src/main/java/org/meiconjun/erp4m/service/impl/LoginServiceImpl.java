@@ -69,6 +69,8 @@ public class LoginServiceImpl implements LoginService {
                 user2.setAuth_user((String) userMap.get("auth_user"));
                 user2.setEmail((String) userMap.get("email"));
                 user2.setPhone((String) userMap.get("phone"));
+                String role_no = loginDao.selectRoleNo(user.getUser_no());
+                user2.setRole_no(role_no);
 //                user2.setPass_word((String) userMap.get("pass_word"));
                 // 图片转Base64
                 if (!CommonUtil.isStrBlank((String) userMap.get("picture"))) {
@@ -88,7 +90,7 @@ public class LoginServiceImpl implements LoginService {
                 } else {
                     // 判断是否是初始密码
                     String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
-                    if (defaultPsw.equals(userMap.get("password"))) {
+                    if (defaultPsw.equals(user.getPass_word())) {
                         retMap.put("changePsw", true);
                     }
                     retMap.put("user", user2);
