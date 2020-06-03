@@ -312,7 +312,7 @@ function userFileChange() {
                         sessionStorage.setItem("user_info", JSON.stringify(user_info));
                     }
                     commonOk("修改成功");
-                    layui.layer.close(dialogIndex);
+                    layui.layer.close(index);
                     userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
                 } else {
                     commonError(retData.retMsg);
