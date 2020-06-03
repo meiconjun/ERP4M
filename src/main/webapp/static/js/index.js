@@ -300,7 +300,7 @@ function userFileChange() {
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
-                    if (!commonBlank(retData.retMap.base64)) {
+                    if (!commonBlank(retData.retMap)) {
                         // 更新回显头像
                         let user_info = JSON.parse(sessionStorage.getItem("user_info"));
                         user_info.picture = retData.retMap.base64;
