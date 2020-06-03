@@ -313,7 +313,6 @@ function userFileChange() {
                     }
                     commonOk("修改成功");
                     layui.layer.close(index);
-                    userConfig_queryOperation('1', FIELD_EACH_PAGE_NUM);
                 } else {
                     commonError(retData.retMsg);
                 }
