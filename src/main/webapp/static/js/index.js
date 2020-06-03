@@ -278,7 +278,7 @@ function userFileChange() {
         title: '用户资料修改',
         content: html,
         btn: ['提交修改'],
-        yes: function (index, layero) {
+        yes: function (index1, layero) {
             layui.layer.confirm("是否确认提交？", function(index) {
                 if ($("#userFile_modify_password").val() != $("#userFile_modify_passwordConfirm").val()) {
                     commonInfo("密码和确认密码不一致！");
@@ -312,7 +312,7 @@ function userFileChange() {
                         sessionStorage.setItem("user_info", JSON.stringify(user_info));
                     }
                     commonOk("修改成功");
-                    layui.layer.close(index);
+                    layui.layer.close(index1);
                 } else {
                     commonError(retData.retMsg);
                 }
