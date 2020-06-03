@@ -1,11 +1,13 @@
 package org.meiconjun.erp4m.service.impl;
 
+import org.meiconjun.erp4m.bean.FieldBean;
 import org.meiconjun.erp4m.bean.ProjectDocBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
 import org.meiconjun.erp4m.service.ProjectDocDefindService;
+import org.meiconjun.erp4m.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -83,7 +85,33 @@ public class ProjectDocDefindServiceImpl implements ProjectDocDefindService {
         List<ProjectDocBean> beanList = projectDocDefindDao.selectProjectDoc();
 
         List<HashMap<String, Object>> dataList = new ArrayList<HashMap<String, Object>>();
-        HashMap<String, Object> yuyanTree = new HashMap<String, Object>();
+        // 根据项目阶段数据字典构造一级树
+        List<FieldBean> fieldBeans = CommonUtil.getFieldChildList(SystemContants.FIELD_STAGE);
+
+        for (FieldBean fieldBean: fieldBeans) {
+            HashMap<String, Object> stageTree = new HashMap<String, Object>();
+            stageTree.put("name", fieldBean.getField_name());
+            stageTree.put("type", fieldBean.getField_value());
+            stageTree.put("open", false);
+            stageTree.put("children", new ArrayList());
+
+            for (ProjectDocBean bean : beanList) {
+                HashMap<String, Object> tempMap = new HashMap<String, Object>();
+                tempMap.put("name", bean.getDoc_name());
+                tempMap.put("doc_no", bean.getDoc_no());
+                tempMap.put("secret_level", bean.getSecret_level());
+                tempMap.put("stage", bean.getStage());
+                tempMap.put("department", bean.getDepartment());
+                tempMap.put("description", bean.getDescription());
+                if (fieldBean.getField_value().equals(bean.getStage())) {
+                    List tempList = (List) stageTree.get("children");
+                    tempList.add(tempMap);
+                    stageTree.put("children", tempList);
+                }
+            }
+            dataList.add(stageTree);
+        }
+        /*HashMap<String, Object> yuyanTree = new HashMap<String, Object>();
         yuyanTree.put("name", "预研阶段");
         yuyanTree.put("type", "1");
         yuyanTree.put("open", true);
@@ -124,7 +152,7 @@ public class ProjectDocDefindServiceImpl implements ProjectDocDefindService {
 
         dataList.add(yuyanTree);
         dataList.add(yanfaTree);
-        dataList.add(liangchanTree);
+        dataList.add(liangchanTree);*/
 
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         retMap.put("dataList", dataList);

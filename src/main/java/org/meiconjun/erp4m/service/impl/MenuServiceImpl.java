@@ -59,12 +59,12 @@ public class MenuServiceImpl implements MenuService {
         // 获取用户角色的有权菜单和用户的有权菜单
         List<MenuBean> menuListRole = menuDao.selectRoleAuthMenu(condMap);
         List<MenuBean> menuListUser = menuDao.selectUserAuthMenu(condMap);
-        if (menuListRole.isEmpty()) {
+        /*if (menuListRole.isEmpty()) {
             logger.error("登录用户[" + user_no + "]没有设定角色或角色未分配权限");
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);
             responseBean.setRetMsg("登录用户没有设定角色或角色未分配权限");
             return;
-        }
+        }*/
         // 获取角色和用户的有权菜单结构树
         List<HashMap<String, Object>> menuList = getMenu("", menuListRole, menuListUser, user_no);
 //        List<HashMap<String, Object>> userMenuList = getMenu("", menuListUser);

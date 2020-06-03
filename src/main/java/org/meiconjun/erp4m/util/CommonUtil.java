@@ -23,6 +23,7 @@ import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
 import info.monitorenter.cpdetector.io.JChardetFacade;
 import info.monitorenter.cpdetector.io.ParsingDetector;
 import info.monitorenter.cpdetector.io.UnicodeDetector;
+import org.meiconjun.erp4m.bean.FieldBean;
 import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.dao.CommonDao;
@@ -406,5 +407,15 @@ public class CommonUtil {
         Date endDate = sd.parse(end_date);
 
         return (endDate.getTime() - beginDate.getTime()) / (1000*60*60*24);
+    }
+
+    /**
+     * 根据数据字典码获取其子节点列表
+     * @param parent_field
+     * @return
+     */
+    public static List<FieldBean> getFieldChildList(String parent_field) {
+        List<FieldBean> fieldList = commonDao.selectChildFieldList(parent_field);
+        return fieldList;
     }
 }

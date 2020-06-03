@@ -15,6 +15,13 @@ $(document).ready(function () {
         $("#login_submit").click(function () {
             login();
         });
+        // 回车事件触发登录
+        document.onkeyup = function (e) {
+            let ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                login();
+            }
+        }
     } catch (err) {
         alert("加载登录页异常：" + err.message);
         console.error(err.message);

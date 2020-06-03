@@ -23,4 +23,9 @@
         select r.* from sys_user_role_tb u, sys_role_tb r
         where u.user_no = #{user_no} and u.role_no = r.role_no
     </select>
+
+    <select id="selectChildFieldList" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.FieldBean">
+        select * from sys_field_tb
+        where parent_field = #{parent_field}
+    </select>
 </mapper>

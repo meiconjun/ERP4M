@@ -41,11 +41,13 @@ $(document).ready(function () {
         $("#user_name_main").text(user_info.user_name);
         $("#user_name_sidebar").text(user_info.user_name);
         /*============初始化操作 begin===============*/
+        layui.layer.load();//loading
         initData();
         initAllUser();
         initFilePath();
         initUnReadMessage(user_info.user_no, user_info.role_no);
         initUnReadMsg();
+        layui.layer.closeAll('loading');
         /*============初始化操作 end===============*/
 
 

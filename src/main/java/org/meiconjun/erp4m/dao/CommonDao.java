@@ -1,6 +1,7 @@
 package org.meiconjun.erp4m.dao;
 
 import org.apache.ibatis.annotations.Param;
+import org.meiconjun.erp4m.bean.FieldBean;
 import org.meiconjun.erp4m.bean.RoleBean;
 import org.meiconjun.erp4m.bean.User;
 
@@ -36,4 +37,8 @@ public interface CommonDao {
      * 查询目标用户的角色的信息
      */
     RoleBean selectUserRoleInfo(@Param("user_no") String user_no);
+    /**
+     * 根据数据字典号查询其子节点列表
+     */
+    List<FieldBean> selectChildFieldList(@Param("parent_field") String parent_field);
 }
