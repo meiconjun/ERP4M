@@ -57,4 +57,8 @@ public interface ProjectManageDao {
      * 查询用户的所属部门部门经理
      */
     String selectStagePrincipalManager(@Param("principal") String principal);
+    /**
+     * 查询所有项目所处阶段信息
+     */
+    List<HashMap<String, Object>> selectProjectCurStage();
 }

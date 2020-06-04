@@ -116,4 +116,10 @@
         where  a.role_no = b.role_no and b.department = (select d.department from sys_user_role_tb c, sys_role_tb d
         where c.role_no = d.role_no and c.user_no = #{principal}) and b.position = '2'
     </select>
+
+    <select id="selectProjectCurStage" resultType="java.util.HashMap">
+        select a.project_name, b.*, c.* from project_main_tb a, project_stage_tb b, project_stage_doc_tb c
+        where a.project_no = b.project_no and a.stage_num = b.stage_num and b.doc_serial = c.serial_no
+        and c.doc_version = '1.0' and b.is_end != '1'
+    </select>
 </mapper>

@@ -183,7 +183,7 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             MessageBean messageBean = new MessageBean();
             messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
             messageBean.setCreate_user("system");
-            messageBean.setMsg_content("项目[" + project_name + "]阶段[" + nextStageName + "]开始<br>请在结束日期[" + nextStageEnd + "]" +
+            messageBean.setMsg_content("项目[" + project_name + "]阶段[" + nextStageName + "]开始<br>请在结束日期[" + CommonUtil.formatDateString(nextStageEnd, "yyyyMMdd", "yyyy-MM-dd") + "]" +
                     "前上传阶段文档<br>[" + nextDocName + ",作者：" + nextDocWriter + "]");
             messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_PROJECT_STAGE);//项目阶段提醒
             messageBean.setMsg_param(new HashMap<>());
