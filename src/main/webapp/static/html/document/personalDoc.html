@@ -1,0 +1,95 @@
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            文档编号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="personalDoc_docNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            文档名称：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="personalDoc_docName" autocomplete="off">
+        </div>
+        <div class="row-label">
+            上传者：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="personalDoc_uploadUser" autocomplete="off">
+        </div>
+        <div class="row-label">
+            文档类别：
+        </div>
+        <div class="row-input">
+            <select  id="personalDoc_docType" >
+            </select>
+        </div>
+
+        <button class="layui-btn" id="personalDoc_queryBtn" data-type="reload">查询</button>
+    </div>
+    <table id="personalDoc_table">
+
+    </table>
+    <div>
+        <div id="personalDoc_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="personalDoc_Submitpreview">提交评审</a>
+            <a class="layui-btn layui-btn-sm layui-btn-primaty" id="personalDoc_addBtn">创建文档</a>
+            <a class="layui-btn layui-btn-sm layui-btn-primaty" id="personalDoc_modifyBtn">修改文档</a>
+            <a class="layui-btn layui-btn-sm layui-btn-danger" id="personalDoc_deleteBtn">删除文档</a>
+        </div>
+    </div>
+</div>
+
+<!-- 注意表单字段要用name做标识 -->
+<div hidden="hidden" class="comm-dialog" id="roleConfig_addDiv">
+    <form class="layui-form layui-form-pane" lay-filter="roleConfig_addFrm" id="roleConfig_addFrm" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色编号</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleConfig_roleNo_addTxt" maxlength="10" id="roleConfig_roleNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="roleConfig_roleName_addTxt" id="roleConfig_roleName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">职位</label>
+            <div class="layui-input-block">
+                <select name="roleConfig_position_addTxt" id="roleConfig_position_addTxt" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">级别</label>
+            <div class="layui-input-block">
+                <select name="roleConfig_level_addTxt" id="roleConfig_level_addTxt" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属部门</label>
+            <div class="layui-input-block">
+                <select name="roleConfig_department_addTxt" id="roleConfig_department_addTxt" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">备注</label>
+            <div class="layui-input-block">
+                <textarea name="roleConfig_desc_addTxt" id="roleConfig_desc_addTxt" placeholder="请输入内容" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item comm-dialog-button">
+            <!--            <div class="layui-input-block">-->
+            <button class="layui-btn" lay-submit lay-filter="roleConfig_addSubmit">确定</button>
+            <!--            </div>-->
+        </div>
+    </form>
+</div>
+
+<script src="static/js/document/personalDoc.js"></script>
