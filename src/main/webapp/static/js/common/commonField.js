@@ -32,3 +32,13 @@ const FIELD_MSG_TYPE_BOSS_CHECK = "3";
 const FIELD_MSG_TYPE_PROJECT_STAGE = "4";
 /** 消息类型-项目结项提醒 */
 const FIELD_MSG_TYPE_PROJECT_END = "5";
+
+/*===================文档管理相关==============================*/
+/** 文档类型*/
+const FIELD_DOC_TYPE = "D010100";
+/** 密级*/
+const FIELD_DOC_SECRET = "D010200";
+/** 文档语言*/
+const FIELD_DOC_LANGUAGE = "D010300";
+/** 文档状态*/
+const FIELD_DOC_STATE = "D010400";

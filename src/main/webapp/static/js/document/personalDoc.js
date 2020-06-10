@@ -68,69 +68,128 @@ $(document).ready(function () {
                     fixed: 'left'
                 },
                 {
-                    field: 'role_no',
-                    title: '角色编号',
+                    field: 'doc_no',
+                    title: '文档编号',
                     sort: true,
                     align : 'center'
                 },
                 {
-                    field: 'role_name',
-                    title: '角色名称',
-                    sort: true,
+                    field: 'doc_name',
+                    title: '文档名称',
                     align : 'center'
                 }
-                , { field: 'position',
-                    title: '职位',
+                , { field: 'upload_user',
+                    title: '上传用户',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatValue(FIELD_POSITION, data.position, false);
+                        return commonFormatUserNo(data.upload_user, false);
                     }}
                 , {
-                    field: 'level',
-                    title: '级别',
+                    field: 'upload_time',
+                    title: '上传时间',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatValue(FIELD_ROLELEVEL, data.level, false);
+                        return commonFormatDate(data.upload_date);
                     }
                 }
                 , {
-                    field: 'department',
-                    title: '部门',
+                    field: 'doc_type',
+                    title: '文档类别',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatValue(FIELD_DEPARTMENT, data.department, false);
+                        return commonFormatValue(FIELD_DOC_TYPE, data.doc_type, false);
                     }
                 }
                 , {
-                    field: 'last_modi_time',
-                    title: '最后修改时间',
+                    field: 'doc_version',
+                    title: '最新版本',
                     sort: true ,
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatDate(data.last_modi_time);
+                        let html = "";
+                        if (buttonStr.indexOf("personalDoc_versionHis") != -1) {
+                            html += "<a id='personalDoc_versionHis' onclick='personalDoc_versionHis(" + commonFormatObj(data) + ")'>" + data.doc_version + "</a>"
+                        }
+                        return html;
                     }
                 }
                 , {
                     field: 'edit',
                     title: '操作',
-                    width : 170,
-                    sort: true,
+                    width : 80,
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {
-                        let html = "";
-                        if (buttonStr.indexOf("roleConfig_rightBtn") != -1) {
-                            html += "<a class=\"layui-btn layui-btn-xs\" name='roleConfig_rightBtn' onclick='roleConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>";
-                        }
-                        if (buttonStr.indexOf("roleConfig_modifyBtn") != -1) {
-                            html += "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='roleConfig_modifyBtn' onclick='roleConfig_modifyOperation(" + commonFormatObj(data) + ")'>修改信息</a>";
-                        }
+                        let html = "<a id='personalDoc_detail' onclick='personalDoc_detail(" + commonFormatObj(data) + ")'>" + data.doc_version + "</a>";
                         return html;
                     }}
             ]]
         });
+
+        commonPutNormalSelectOpts(FIELD_DOC_TYPE, "personalDoc_docType", "", false);
+
+        layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
+
+        //查询
+        $("#personalDoc_queryBtn").click(function () {
+            personalDoc_queryOperation('1', FIELD_EACH_PAGE_NUM);
+        });
+        //新增
+        $("#personalDoc_addBtn").click(function () {
+            personalDoc_addOperation();
+        });
+        // 修改
+        $("#personalDoc_modifyBtn").click(function () {
+            personalDoc_modifyOperation();
+        });
+        //删除
+        $("#personalDoc_deleteBtn").click(function () {
+            personalDoc_deleteOperation();
+        });
+        //提交评审
+        $("#personalDoc_Submitpreview").click(function () {
+            personalDoc_SubmitpreviewOperation();
+        });
+
+        // 权限控制
+        if (buttonStr.indexOf("personalDoc_queryBtn") == -1) {
+            $("#personalDoc_queryBtn").hide();
+        }
+        if (buttonStr.indexOf("personalDoc_addBtn") == -1) {
+            $("#personalDoc_addBtn").hide();
+        }
+        if (buttonStr.indexOf("personalDoc_modifyBtn") == -1) {
+            $("#personalDoc_modifyBtn").hide();
+        }
+        if (buttonStr.indexOf("personalDoc_deleteBtn") == -1) {
+            $("#personalDoc_deleteBtn").hide();
+        }
+        if (buttonStr.indexOf("personalDoc_Submitpreview") == -1) {
+            $("#personalDoc_Submitpreview").hide();
+        }
+        // 绑定重置表格事件
+        commonResizeTable('personalDoc_tableObj');
     } catch (e) {
         console.error(e.message, e);
         commonError(e.message);
     }
 });
+
+function personalDoc_queryOperation(curPage, limit) {
+
+}
+/**
+ * 版本历史
+ * @param data
+ */
+function personalDoc_versionHis(data) {
+
+}
+
+/**
+ * 文档详情
+ * @param data
+ */
+function personalDoc_detail(data) {
+
+}
