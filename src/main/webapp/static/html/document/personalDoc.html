@@ -43,51 +43,55 @@
 </div>
 
 <!-- 注意表单字段要用name做标识 -->
-<div hidden="hidden" class="comm-dialog" id="roleConfig_addDiv">
-    <form class="layui-form layui-form-pane" lay-filter="roleConfig_addFrm" id="roleConfig_addFrm" action="">
+<div hidden="hidden" class="comm-dialog" id="personalDoc_addDiv">
+    <form class="layui-form layui-form-pane" lay-filter="personalDoc_addFrm" id="personalDoc_addFrm" action="">
         <div class="layui-form-item">
-            <label class="layui-form-label">角色编号</label>
+            <label class="layui-form-label">文档编号</label>
             <div class="layui-input-block">
-                <input type="text" name="roleConfig_roleNo_addTxt" maxlength="10" id="roleConfig_roleNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="text" name="personalDoc_docNo_addTxt" maxlength="10" id="personalDoc_docNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">角色名称</label>
+            <button class="layui-btn" id="personalDoc_selectFile">选择文档</button>
             <div class="layui-input-block">
-                <input type="text" name="roleConfig_roleName_addTxt" id="roleConfig_roleName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="text" name="personalDoc_fileNameTxt" id="personalDoc_fileNameTxt" disabled class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item" hidden="hidden">
+            <label class="layui-form-label">文档名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="personalDoc_docName_addTxt" id="personalDoc_docName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">职位</label>
+            <label class="layui-form-label">文档语言</label>
             <div class="layui-input-block">
-                <select name="roleConfig_position_addTxt" id="roleConfig_position_addTxt" required lay-verify="required">
+                <select name="personalDoc_docLanguage_addTxt" id="personalDoc_docLanguage_addTxt" required lay-verify="required">
                 </select>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">级别</label>
+            <label class="layui-form-label">文档类型</label>
             <div class="layui-input-block">
-                <select name="roleConfig_level_addTxt" id="roleConfig_level_addTxt" required lay-verify="required">
+                <select name="personalDoc_docType_addTxt" id="personalDoc_docType_addTxt" required lay-verify="required">
                 </select>
             </div>
         </div>
         <div class="layui-form-item">
-            <label class="layui-form-label">所属部门</label>
+            <label class="layui-form-label">文档作者</label>
             <div class="layui-input-block">
-                <select name="roleConfig_department_addTxt" id="roleConfig_department_addTxt" required lay-verify="required">
-                </select>
+                <input type="text" name="personalDoc_docWriter_addTxt" id="personalDoc_docWriter_addTxt"  autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item layui-form-text">
-            <label class="layui-form-label">备注</label>
+            <label class="layui-form-label">文档摘要</label>
             <div class="layui-input-block">
-                <textarea name="roleConfig_desc_addTxt" id="roleConfig_desc_addTxt" placeholder="请输入内容" class="layui-textarea"></textarea>
+                <textarea name="personalDoc_docDesc_addTxt" id="personalDoc_docDesc_addTxt" placeholder="请输入文档摘要" class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item comm-dialog-button">
-            <!--            <div class="layui-input-block">-->
-            <button class="layui-btn" lay-submit lay-filter="roleConfig_addSubmit">确定</button>
-            <!--            </div>-->
+            <button class="layui-btn" lay-submit lay-filter="personalDoc_submitBtn">确定</button>
+            <button class="layui-btn"  id="personalDoc_downLoad" hidden="hidden">下载文档</button>
         </div>
     </form>
 </div>
