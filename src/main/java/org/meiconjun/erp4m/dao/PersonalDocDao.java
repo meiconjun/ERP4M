@@ -19,4 +19,20 @@ public interface PersonalDocDao {
      * @return
      */
     List<DocBean> selectPersonalDocInfo(HashMap<String, Object> condMap);
+    /**
+     * 新增文档
+     */
+    int insertPersonalDocInfo(HashMap<String, Object> condMap);
+    /**
+     * 新增审批信息
+     */
+    int insertDocReviewInfo(HashMap<String, Object> condMap);
+    /**
+     * 新增版本信息
+     */
+    int insertDocVersionInfo(HashMap<String, Object> condMap);
+    /**
+     * 更新文档信息
+     */
+    int updatePersonalDocInfo(HashMap<String, Object> condMap);
 }

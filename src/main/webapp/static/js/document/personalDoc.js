@@ -2,6 +2,7 @@ var personalDoc_curr = 1;
 var personalDoc_count = 0;
 var personalDoc_tableIns;
 var personalDoc_fileUploadInst;
+var personalDoc_fileUploadFlag = false;
 $(document).ready(function () {
     try {
         // 获取按钮权限
@@ -104,6 +105,7 @@ $(document).ready(function () {
                 , {
                     field: 'doc_version',
                     title: '最新版本',
+                    width : 80,
                     sort: true ,
                     align : 'center',
                     templet : function (data) {
@@ -121,7 +123,7 @@ $(document).ready(function () {
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {
-                        let html = "<a id='personalDoc_detail' onclick='personalDoc_detail(" + commonFormatObj(data) + ")'>" + data.doc_version + "</a>";
+                        let html = "<a id='personalDoc_detail' onclick='personalDoc_detail(" + commonFormatObj(data) + ")'>详情</a>";
                         return html;
                     }}
             ]]
@@ -179,7 +181,7 @@ $(document).ready(function () {
 function personalDoc_queryOperation(curPage, limit) {
     let doc_no = $("#personalDoc_docNo").val();
     let doc_name = $("#personalDoc_docName").val();
-    let upload_user = $("#personalDoc_uploadUser").val();
+    let upload_user = sessionStorage.getItem("user_no");
     let doc_type = $("#personalDoc_docType").val();
 
     personalDoc_curr = curPage;
@@ -216,43 +218,107 @@ function personalDoc_addOperation() {
         //     //确认按钮的回调，提交表单
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            personalDoc_fileUploadFlag = false;
             // 渲染弹框元素
             personalDoc_cleanForm();
-            let dialogIndex = index;// 弹框层索引
+            $("#personalDoc_downLoad").hide();
             commonPutNormalSelectOpts(FIELD_DOC_LANGUAGE, "personalDoc_docLanguage_addTxt", "", true);
             commonPutNormalSelectOpts(FIELD_DOC_TYPE, "personalDoc_docType_addTxt", "", true);
 
-            personalDoc_digSubmit(dialogIndex, "add");
-
+            personalDoc_initUploadInst({}, "add", index);
+            personalDoc_digSubmit({}, "add");
+            $("#personalDoc_submitBtn").show();
             layui.form.render();
 
         }
     });
 }
 
-function personalDoc_digSubmit(dialogIndex, operType) {
+function personalDoc_modifyOperation() {
+    let checkData = layui.table.checkStatus("personalDoc_tableObj").data;
+    if (checkData.data.length == 0) {
+        commonInfo("请选择需要修改的数据");
+    } else if (checkData.data.length < 1){
+        commonInfo("只能同时修改一条数据");
+    } else if (checkData.data.review_state != '0' && checkData.data.review_state != '4'){
+        commonInfo("只能修改状态为未提交评审或评审驳回的文档");
+    } else {
+        layui.layer.open({
+            type: 1,// 页面层
+            area: ['500px', '700px'],// 宽高
+            title: '修改文档',// 标题
+            content: $("#personalDoc_addDiv"),//内容，直接取dom对象
+            // btn: ['确定'],
+            // yes: function (index, layero) {
+            //     //确认按钮的回调，提交表单
+            // },
+            success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                personalDoc_fileUploadFlag = false;
+                let cusData = checkData.data[0];
+                let postFix = checkData.data[0].file_path.substring(checkData.data[0].file_path.lastIndexOf("."), checkData.data[0].file_path.length);
+                // 渲染弹框元素
+                personalDoc_cleanForm();
+                commonPutNormalSelectOpts(FIELD_DOC_LANGUAGE, "personalDoc_docLanguage_addTxt", cusData.doc_language, true);
+                commonPutNormalSelectOpts(FIELD_DOC_TYPE, "personalDoc_docType_addTxt", cusData.doc_type, true);
+                layui.form.val("personalDoc_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                    "personalDoc_docNo_addTxt": cusData.doc_no, // "name": "value"
+                    "personalDoc_docName_addTxt": cusData.doc_name,
+                    "personalDoc_fileNameTxt": cusData.doc_no + postFix,
+                    "personalDoc_docLanguage_addTxt": cusData.doc_language,
+                    "personalDoc_docType_addTxt": cusData.doc_type,
+                    "personalDoc_docWriter_addTxt": cusData.doc_writer,
+                    "personalDoc_docDesc_addTxt": cusData.doc_desc
+                });
+
+                $("#personalDoc_downLoad").show();
+                $("#personalDoc_docNo_addTxt").attr('disabled', 'disabled');
+                $("#personalDoc_docType_addTxt").attr('disabled', 'disabled');
+                personalDoc_initUploadInst(cusData, "modify", index);
+                personalDoc_digSubmit(cusData, "modify");
+                $("#personalDoc_submitBtn").show();
+                $("#personalDoc_downLoad").click(function () {
+                    commonFileDownload(cusData.doc_no + postFix, cusData.file_path);
+                });
+                layui.form.render();
+
+            }
+        });
+    }
+}
+function personalDoc_digSubmit(cusData, operType) {
+    if ("add" == operType && !personalDoc_fileUploadFlag) {
+        commonInfo("请选择需要上传的文档");
+        return;
+    }
     layui.form.on('submit(personalDoc_submitBtn)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
         layui.layer.confirm("是否确认提交？", function(index) {
-            let fieldObj = data.field;// 表单字段集合
-            let retData = commonAjax("personalDoc.do", JSON.stringify({
-                "beanList" : [{
-                    "doc_no" : fieldObj.personalDoc_docNo_addTxt,
-                    "doc_name" : fieldObj.personalDoc_docName_addTxt,
-                    "doc_language" : fieldObj.personalDoc_docLanguage_addTxt,
-                    "doc_type" : fieldObj.personalDoc_docType_addTxt,
-                    "doc_writer" : fieldObj.personalDoc_docWriter_addTxt,
-                    "doc_desc" : fieldObj.personalDoc_docDesc_addTxt
-                }],
-                "operType" : operType,
-                "paramMap" : {}
-            }));
-            if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("操作成功");
-                layui.layer.close(dialogIndex);
-                personalDoc_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            if (personalDoc_fileUploadFlag) {
+                personalDoc_fileUploadInst.upload();
             } else {
-                commonError(retData.retMsg);
+                let retData = commonAjax("personalDoc.do", JSON.stringify({
+                    "beanList": [{
+                        "doc_serial_no": cusData.doc_serial_no,
+                        "doc_no": $("#personalDoc_docNo_addTxt").val(),
+                        "doc_name": $("#personalDoc_docName_addTxt").val(),
+                        "doc_language": $("#personalDoc_docLanguage_addTxt").val(),
+                        "doc_type": $("#personalDoc_docType_addTxt").val(),
+                        "doc_writer": $("#personalDoc_docWriter_addTxt").val(),
+                        "doc_desc": $("#personalDoc_docDesc_addTxt").val(),
+                        "file_path": cusData.file_path,
+                        "doc_version": cusData.data.doc_version
+                    }],
+                    "operType": operType,
+                    "paramMap": {
+                        "file_root_path": cusData.file_root_path
+
+                    }
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    commonOk("操作成功！");
+                    layui.layer.close(digIndex);
+                }
             }
+
         });
         return false;
     });
@@ -270,7 +336,51 @@ function personalDoc_versionHis(data) {
  * @param data
  */
 function personalDoc_detail(data) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '700px'],// 宽高
+        title: '修改文档',// 标题
+        content: $("#personalDoc_addDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            let cusData = data;
+            let postFix = cusData.file_path.substring(cusData.file_path.lastIndexOf("."), cusData.file_path.length);
+            // 渲染弹框元素
+            commonPutNormalSelectOpts(FIELD_DOC_LANGUAGE, "personalDoc_docLanguage_addTxt", cusData.doc_language, true);
+            commonPutNormalSelectOpts(FIELD_DOC_TYPE, "personalDoc_docType_addTxt", cusData.doc_type, true);
+            layui.form.val("personalDoc_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                "personalDoc_docNo_addTxt": cusData.doc_no, // "name": "value"
+                "personalDoc_docName_addTxt": cusData.doc_name,
+                "personalDoc_fileNameTxt": cusData.doc_no + postFix,
+                "personalDoc_docLanguage_addTxt": cusData.doc_language,
+                "personalDoc_docType_addTxt": cusData.doc_type,
+                "personalDoc_docWriter_addTxt": cusData.doc_writer,
+                "personalDoc_docDesc_addTxt": cusData.doc_desc
+            });
+            $("#personalDoc_docNo_addTxt").attr('disabled', 'disabled');
+            $("#personalDoc_docName_addTxt").attr('disabled', 'disabled');
+            $("#personalDoc_docLanguage_addTxt").attr('disabled', 'disabled');
+            $("#personalDoc_docType_addTxt").attr('disabled', 'disabled');
+            $("#personalDoc_docWriter_addTxt").attr('disabled', 'disabled');
+            $("#personalDoc_docDesc_addTxt").attr('disabled', 'disabled');
+            if (buttonStr.indexOf("personalDoc_downloadBtn") != -1) {
+                $("#personalDoc_downLoad").show();
+            } else {
+                $("#personalDoc_downLoad").hide();
+            }
 
+            $("#personalDoc_submitBtn").hide();
+
+            $("#personalDoc_downLoad").click(function () {
+                commonFileDownload(cusData.doc_no + postFix, cusData.file_path);
+            });
+            layui.form.render();
+
+        }
+    });
 }
 
 function personalDoc_cleanForm() {
@@ -283,6 +393,7 @@ function personalDoc_cleanForm() {
     layui.form.val("personalDoc_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
         "personalDoc_docNo_addTxt": "", // "name": "value"
         "personalDoc_docName_addTxt": "",
+        "personalDoc_fileNameTxt": "",
         "personalDoc_docLanguage_addTxt": '',
         "personalDoc_docType_addTxt": '',
         "personalDoc_docWriter_addTxt": '',
@@ -290,7 +401,7 @@ function personalDoc_cleanForm() {
     });
 }
 
-function personalDoc_initUploadInst(data) {
+function personalDoc_initUploadInst(data, operType, digIndex) {
     personalDoc_fileUploadInst = layui.upload.render({
         elem: '#personalDoc_selectFile',
         url: 'docUpload.do',//改成您自己的上传接口
@@ -303,34 +414,59 @@ function personalDoc_initUploadInst(data) {
                 return $("#personalDoc_docNo_addTxt").val();
             },
             "file_root_path": data.file_root_path,
-            "doc_serial": stageList[i].doc_serial
+            "doc_serial_no": data.doc_serial_no,
+            "doc_version": data.doc_version
         },
-        accept: 'file',//只允许上传图片
+        accept: 'file',//
         auto: false,// 选择文件后是否自动上传
         // bindAction: "#createProject_fileSubmit",
         multiple: false,// 是否允许多文件上传
         choose: function(obj) {
+            personalDoc_fileUploadFlag = true;
             //预读本地文件,如果是多文件，则会遍历
             obj.preview(function (index, file, result) {
-                let confirmStr = commonBlank(doc_version) ? "是否确认提交文件[" + file.name + "]？当前阶段文档未定版，上传后将覆盖原先文件" : "是否确认提交文件[" + file.name + "]？当前阶段文档最新版本为[" + doc_version + "]";
-                layui.layer.confirm(confirmStr, function(index) {
-                    layui.layer.load();//loading
-                    fileUploadInst.upload();
+                obj.preview(function (index, file, result) {
+                    $("#personalDoc_docName_addTxt").val(file.name);
                 });
             });
         },
         done: function(res, index, upload){
+            layui.layer.closeAll('loading');
             if (res.code == '0') {
-                layui.layer.closeAll('loading');
-                commonOk("上传阶段文档成功");
+                // 提交表单
+                let retData = commonAjax("personalDoc.do", JSON.stringify({
+                    "beanList": [{
+                        "doc_serial_no": data.doc_serial_no,
+                        "doc_no": $("#personalDoc_docNo_addTxt").val(),
+                        "doc_name": $("#personalDoc_docName_addTxt").val(),
+                        "doc_language": $("#personalDoc_docLanguage_addTxt").val(),
+                        "doc_type": $("#personalDoc_docType_addTxt").val(),
+                        "doc_writer": $("#personalDoc_docWriter_addTxt").val(),
+                        "doc_desc": $("#personalDoc_docDesc_addTxt").val(),
+                        "file_path": res.data.file_path,
+                        "doc_version": res.data.doc_version
+                    }],
+                    "operType": operType,
+                    "paramMap": {
+                        "file_root_path": res.data.file_root_path
+
+                    }
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    commonOk("操作成功！");
+                    layui.layer.close(digIndex);
+                }
             } else {
-                layui.layer.closeAll('loading');
-                commonError("上传阶段文档失败:" + res.msg)
+                commonError("上传文档失败，请稍后重试");
             }
         },
         error: function (index, upload) {
             layui.layer.closeAll('loading');
-            commonError("上传阶段文档失败，请稍后重试");
+            commonError("上传文档失败，请稍后重试");
         }
     });
+}
+
+function personalDoc_submit2(msg) {
+
 }

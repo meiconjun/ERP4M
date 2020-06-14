@@ -8,6 +8,8 @@ import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.PersonalDocDao;
 import org.meiconjun.erp4m.service.PersonalDocService;
+import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ import java.util.Map;
  * @Description:
  * @date 2020/6/11 21:20
  */
-@Service
+@Service("personalDocService")
 @Transactional
 public class PersonalDocServiceImpl implements PersonalDocService {
 
@@ -40,8 +42,38 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         ResponseBean responseBean = new ResponseBean();
         if ("query".equals(operType)) {
             queryOperation(requestBean, responseBean);
+        } else if ("add".equals(operType)){
+            addOperation(requestBean, responseBean);
+        } else if ("modify".equals(operType)) {
+            modifyOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 修改操作
+     * @param requestBean
+     * @param responseBean
+     */
+    private void modifyOperation(RequestBean requestBean, ResponseBean responseBean) {
+        DocBean docBean = (DocBean) requestBean.getBeanList().get(0);
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String file_root_path = (String) paramMap.get("file_root_path");
+        String doc_serial_no = docBean.getDoc_serial_no();
+        String upload_user = CommonUtil.getLoginUser().getUser_no();
+        String upload_time = CommonUtil.getCurrentTimeStr();
+        String last_modi_time = upload_time;
+
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("docBean", docBean);
+        condMap.put("file_root_path", file_root_path);
+        condMap.put("doc_serial_no", doc_serial_no);
+        condMap.put("upload_user", upload_user);
+        condMap.put("upload_time", upload_time);
+        condMap.put("last_modi_time", last_modi_time);
+
+        personalDocDao.updatePersonalDocInfo(condMap);
+        personalDocDao.insertDocVersionInfo(condMap);
     }
 
     /**
@@ -73,5 +105,34 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         responseBean.setRetMap(retMap);
     }
 
+    /**
+     * 新增文档
+     * @param requestBean
+     * @param responseBean
+     */
+    private void addOperation(RequestBean requestBean, ResponseBean responseBean) {
+        DocBean docBean = (DocBean) requestBean.getBeanList().get(0);
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String file_root_path = (String) paramMap.get("file_root_path");
+        String doc_serial_no = SerialNumberGenerater.getInstance().generaterNextNumber();
+        String upload_user = CommonUtil.getLoginUser().getUser_no();
+        String upload_time = CommonUtil.getCurrentTimeStr();
+        String last_modi_time = upload_time;
 
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("docBean", docBean);
+        condMap.put("file_root_path", file_root_path);
+        condMap.put("doc_serial_no", doc_serial_no);
+        condMap.put("upload_user", upload_user);
+        condMap.put("upload_time", upload_time);
+        condMap.put("last_modi_time", last_modi_time);
+
+        personalDocDao.insertPersonalDocInfo(condMap);
+        // 审批表新增数据
+        personalDocDao.insertDocReviewInfo(condMap);
+        // 新增版本信息
+        personalDocDao.insertDocVersionInfo(condMap);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
 }

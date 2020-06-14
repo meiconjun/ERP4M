@@ -32,6 +32,8 @@ public class DocBean {
     private String last_modi_time;
     // 最新版本号
     private String doc_version;
+    // 文档存储根路径
+    private String file_root_path;
     // 文档状态
     private String review_state;
     // 审阅用户列表
@@ -197,5 +199,13 @@ public class DocBean {
 
     public void setFile_path(String file_path) {
         this.file_path = file_path;
+    }
+
+    public String getFile_root_path() {
+        return file_root_path;
+    }
+
+    public void setFile_root_path(String file_root_path) {
+        this.file_root_path = file_root_path;
     }
 }

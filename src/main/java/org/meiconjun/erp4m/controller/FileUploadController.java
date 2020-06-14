@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.Style;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @author Lch
  * @Title:
  * @Package
- * @Description: 头像上传Controller
+ * @Description: 文件上传Controller
  * @date 2020/5/7 21:15
  */
 @Controller
@@ -164,5 +165,65 @@ public class FileUploadController {
             retMap.put("msg", "上传失败：" + e.getMessage());
             return CommonUtil.objToJson(retMap);
         }
+    }
+
+    /**
+     * 文档管理-文档上传
+     * @param img
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value = "/projectStageDocUpload.do", method = RequestMethod.POST)
+    public String docFileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        String user_no = request.getParameter("user_no");
+        String doc_type = request.getParameter("doc_type");
+        String doc_no = request.getParameter("doc_no");
+        String file_root_path = request.getParameter("file_root_path");
+        String doc_serial_no = request.getParameter("doc_serial_no");
+        String doc_version = request.getParameter("doc_version");
+        String checkOut = request.getParameter("checkOut");
+
+        String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String orgName = img.getOriginalFilename();
+        if (CommonUtil.isStrBlank(file_root_path)) {
+            file_root_path = "docFile" + File.separator + doc_type + File.separator + doc_no + File.separator;
+        }
+        String file_path = file_root_path;
+        if (CommonUtil.isStrBlank(doc_version)) {
+            doc_version = "1.00";
+        } else {
+            if ("1".equals(checkOut)) {
+                // 检出时直接更新大版本
+                /*// 检出更新，更新大版本
+                double doc_version_n = Double.valueOf(doc_version);
+                doc_version_n = doc_version_n + 1;
+                doc_version = String.valueOf(doc_version_n);*/
+            } else {
+                // 更新小版本
+                double doc_version_n = Double.valueOf(doc_version);
+                doc_version_n = doc_version_n + 0.01;
+                doc_version = String.valueOf(doc_version_n);
+            }
+        }
+        file_path += doc_version + File.separator + doc_no + "_" + doc_version + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
+        logger.info("文档存放路径：" + file_path);
+        // 写入文件
+        File file = new File(rootPath, file_path);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        img.transferTo(file);
+        HashMap<String, String> dataMap = new HashMap<String, String>();
+        dataMap.put("file_root_path", file_root_path);
+        dataMap.put("file_path", file_path);
+        dataMap.put("doc_version", doc_version);
+
+        retMap.put("code", SystemContants.HANDLE_SUCCESS);
+        retMap.put("msg", "上传成功");
+        retMap.put("data", dataMap);
+        return CommonUtil.objToJson(retMap);
     }
 }

@@ -12,12 +12,12 @@
         <div class="row-input">
             <input class="layui-input" id="personalDoc_docName" autocomplete="off">
         </div>
-        <div class="row-label">
+        <!--<div class="row-label">
             上传者：
         </div>
         <div class="row-input">
             <input class="layui-input" id="personalDoc_uploadUser" autocomplete="off">
-        </div>
+        </div>-->
         <div class="row-label">
             文档类别：
         </div>
@@ -90,7 +90,7 @@
             </div>
         </div>
         <div class="layui-form-item comm-dialog-button">
-            <button class="layui-btn" lay-submit lay-filter="personalDoc_submitBtn">确定</button>
+            <button class="layui-btn" id="personalDoc_submitBtn" lay-submit lay-filter="personalDoc_submitBtn">确定</button>
             <button class="layui-btn"  id="personalDoc_downLoad" hidden="hidden">下载文档</button>
         </div>
     </form>

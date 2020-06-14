@@ -18,4 +18,30 @@
             and a.doc_type = #{doc_type}
         </if>
     </select>
+
+    <insert id="insertPersonalDocInfo" parameterType="java.util.HashMap">
+        insert into doc_personal_doc_tb (doc_serial_no, doc_no, doc_name, doc_language, doc_type, doc_writer, doc_desc, upload_user, upload_time,
+        last_modi_time, doc_version, file_root_path)
+        values(#{doc_serial_no}, #{docBean.doc_no}, #{docBean.doc_name}, #{docBean.doc_language}, #{docBean.doc_type}, #{docBean.doc_writer}, #{docBean.doc_desc}, #{upload_user},
+        #{upload_time}, #{last_modi_time}, #{docBean.doc_version}, #{file_root_path})
+    </insert>
+    
+    <insert id="insertDocReviewInfo" parameterType="java.util.HashMap">
+        insert into doc_review_tb (doc_serial_no, review_state, review_user, review_detail, judge_user, judge_reason,
+        judge_time)
+        values (#{doc_serial_no}, '0', '', '', '', '', '')
+    </insert>
+
+    <insert id="insertDocVersionInfo" parameterType="java.util.HashMap">
+        insert into doc_version_tb(doc_serial_no, doc_version, doc_writer, upload_user, upload_time, file_path)
+        values(#{doc_serial_no}, docBean.doc_version, docBean.doc_writer, #{upload_user}, #{upload_time}, #{docBean.file_path})
+    </insert>
+
+    <update id="updatePersonalDocInfo" parameterType="java.util.HashMap">
+        update doc_personal_doc_tb
+        set doc_name = #{docBean.doc_name}, doc_language = #{docBean.doc_language}, doc_writer = #{doc_writer}, doc_desc = #{doc_desc},
+        upload_user = #{upload_user}, upload_time = #{upload_time}, last_modi_time = #{last_modi_time}, doc_version = #{docBean.doc_version},
+        file_root_path = #{file_root_path}
+        where doc_serial_no = #{doc_serial_no}
+    </update>
 </mapper>
