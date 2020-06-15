@@ -34,7 +34,7 @@
 
     <insert id="insertDocVersionInfo" parameterType="java.util.HashMap">
         insert into doc_version_tb(doc_serial_no, doc_version, doc_writer, upload_user, upload_time, file_path)
-        values(#{doc_serial_no}, docBean.doc_version, docBean.doc_writer, #{upload_user}, #{upload_time}, #{docBean.file_path})
+        values(#{doc_serial_no}, #{docBean.doc_version}, #{docBean.doc_writer}, #{upload_user}, #{upload_time}, #{docBean.file_path})
     </insert>
 
     <update id="updatePersonalDocInfo" parameterType="java.util.HashMap">
@@ -44,4 +44,17 @@
         file_root_path = #{file_root_path}
         where doc_serial_no = #{doc_serial_no}
     </update>
+
+    <delete id="deletePersonalDocInfo" parameterType="java.lang.String">
+        delete from doc_personal_doc_tb
+        where doc_serial_no = #{doc_serial_no}
+    </delete>
+    
+    <insert id="insertRecycleInfo" parameterType="java.util.HashMap">
+        insert into doc_recycle_tb (doc_serial_no, doc_no, doc_name, doc_language, doc_type, doc_writer, doc_desc, upload_user, upload_time,
+        last_modi_time, doc_version, file_root_path, delete_time, expire_time, delete_state)
+        values(#{docBean.doc_serial_no}, #{docBean.doc_no}, #{docBean.doc_name}, #{docBean.doc_language}, #{docBean.doc_type}, #{docBean.doc_writer},
+        #{docBean.doc_desc}, #{docBean.upload_user}, #{docBean.upload_time}, #{docBean.last_modi_time}, #{docBean.doc_version}, #{docBean.file_root_path},
+        #{delete_time}, #{expire_time}, #{delete_state})
+    </insert>
 </mapper>

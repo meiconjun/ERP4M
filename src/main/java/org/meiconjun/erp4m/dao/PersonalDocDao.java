@@ -1,5 +1,6 @@
 package org.meiconjun.erp4m.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.meiconjun.erp4m.bean.DocBean;
 
 import java.util.HashMap;
@@ -35,4 +36,12 @@ public interface PersonalDocDao {
      * 更新文档信息
      */
     int updatePersonalDocInfo(HashMap<String, Object> condMap);
+    /**
+     * 删除个人文档信息
+     */
+    int deletePersonalDocInfo(@Param("doc_serial_no")String doc_serial_no);
+    /**
+     * 新增回收站表信息
+     */
+    int insertRecycleInfo(HashMap<String, Object> condMap);
 }

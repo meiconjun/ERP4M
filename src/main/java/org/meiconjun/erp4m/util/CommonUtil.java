@@ -333,6 +333,22 @@ public class CommonUtil {
         thisDate = calendar.getTime();
         return sd.format(thisDate);
     }
+
+    /**
+     * 获取传入时间afterNum天后时间
+     * @param time
+     * @param afterNum
+     * @return
+     */
+    public static String getTimeAfterDays(String time, int afterNum) throws ParseException {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date thisDate = sd.parse(time);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(thisDate);
+        calendar.add(Calendar.DATE, afterNum);
+        thisDate = calendar.getTime();
+        return sd.format(thisDate);
+    }
     /**
      * 更新消息的处理状态，更新成功返回空，更新失败返回错误信息
      * @param msg_no

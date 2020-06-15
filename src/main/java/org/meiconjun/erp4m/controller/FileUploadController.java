@@ -175,7 +175,7 @@ public class FileUploadController {
      * @throws IOException
      */
     @ResponseBody
-    @RequestMapping(value = "/projectStageDocUpload.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/docUpload.do", method = RequestMethod.POST)
     public String docFileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         String user_no = request.getParameter("user_no");
@@ -188,11 +188,11 @@ public class FileUploadController {
 
         String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
         String orgName = img.getOriginalFilename();
-        if (CommonUtil.isStrBlank(file_root_path)) {
+        if (CommonUtil.isStrBlank(file_root_path) || "undefined".equals(file_root_path)) {
             file_root_path = "docFile" + File.separator + doc_type + File.separator + doc_no + File.separator;
         }
         String file_path = file_root_path;
-        if (CommonUtil.isStrBlank(doc_version)) {
+        if (CommonUtil.isStrBlank(doc_version) || "undefined".equals(doc_version)) {
             doc_version = "1.00";
         } else {
             if ("1".equals(checkOut)) {

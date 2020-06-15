@@ -52,12 +52,14 @@
             </div>
         </div>
         <div class="layui-form-item">
-            <button class="layui-btn" id="personalDoc_selectFile">选择文档</button>
-            <div class="layui-input-block">
+<!--            <label class="layui-form-label">-->
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="personalDoc_selectFile"><i class="layui-icon layui-icon-upload"></i>选择文档</button>
+<!--            </label>-->
+<!--            <div class="layui-input-block">-->
                 <input type="text" name="personalDoc_fileNameTxt" id="personalDoc_fileNameTxt" disabled class="layui-input">
-            </div>
+<!--            </div>-->
         </div>
-        <div class="layui-form-item" hidden="hidden">
+        <div class="layui-form-item">
             <label class="layui-form-label">文档名称</label>
             <div class="layui-input-block">
                 <input type="text" name="personalDoc_docName_addTxt" id="personalDoc_docName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
@@ -91,7 +93,7 @@
         </div>
         <div class="layui-form-item comm-dialog-button">
             <button class="layui-btn" id="personalDoc_submitBtn" lay-submit lay-filter="personalDoc_submitBtn">确定</button>
-            <button class="layui-btn"  id="personalDoc_downLoad" hidden="hidden">下载文档</button>
+            <button class="layui-btn" type="button"  id="personalDoc_downLoad" hidden="hidden">下载文档</button>
         </div>
     </form>
 </div>

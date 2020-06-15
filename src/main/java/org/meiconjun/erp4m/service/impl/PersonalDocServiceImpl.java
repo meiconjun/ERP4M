@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,35 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             addOperation(requestBean, responseBean);
         } else if ("modify".equals(operType)) {
             modifyOperation(requestBean, responseBean);
+        } else if ("delete".equals(operType)) {
+            deleteOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 删除操作，将文档数据移到回收站表，保留90天
+     * @param requestBean
+     * @param responseBean
+     */
+    private void deleteOperation(RequestBean requestBean, ResponseBean responseBean) throws ParseException {
+        List<DocBean> docBeanList = requestBean.getBeanList();
+        String delete_time = CommonUtil.getCurrentTimeStr();
+        String expire_time = CommonUtil.getTimeAfterDays(delete_time, 90);
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        for (DocBean docBean : docBeanList) {
+            // 删除个人文档表数据
+            personalDocDao.deletePersonalDocInfo(docBean.getDoc_serial_no());
+            // 插入回收站表数据
+            condMap.put("docBean", docBean);
+            condMap.put("delete_time", delete_time);
+            condMap.put("expire_time", expire_time);
+            condMap.put("delete_state", "0");
+            personalDocDao.insertRecycleInfo(condMap);
+            logger.info("文档编号[" + docBean.getDoc_no() + "]移入回收站--------");
+        }
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -74,6 +102,8 @@ public class PersonalDocServiceImpl implements PersonalDocService {
 
         personalDocDao.updatePersonalDocInfo(condMap);
         personalDocDao.insertDocVersionInfo(condMap);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
