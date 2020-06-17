@@ -49,8 +49,28 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             modifyOperation(requestBean, responseBean);
         } else if ("delete".equals(operType)) {
             deleteOperation(requestBean, responseBean);
+        } else if ("getDocHistory".equals(operType)) {
+            getDocHistoryOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 查询文档版本历史
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getDocHistoryOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String doc_serial_no = (String) paramMap.get("doc_serial_no");
+
+        List<HashMap<String, Object>> docList = personalDocDao.selectDocHistory(doc_serial_no);
+
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("docList", docList);
+        retMap.put("total", docList.size());
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
     }
 
     /**

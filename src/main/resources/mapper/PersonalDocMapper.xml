@@ -57,4 +57,10 @@
         #{docBean.doc_desc}, #{docBean.upload_user}, #{docBean.upload_time}, #{docBean.last_modi_time}, #{docBean.doc_version}, #{docBean.file_root_path},
         #{delete_time}, #{expire_time}, #{delete_state})
     </insert>
+
+    <select id="selectDocHistory" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select a.doc_no, a.doc_name, b.* from doc_personal_doc_tb a, doc_version_tb b
+        where a.doc_serial_no = b.doc_serial_no and a.doc_serial_no = #{doc_serial_no}
+        order by b.doc_version desc
+    </select>
 </mapper>

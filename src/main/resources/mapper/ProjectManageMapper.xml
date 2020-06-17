@@ -26,7 +26,7 @@
         select c.*, d.department  from project_stage_tb b, project_stage_doc_tb c, pd_doc_defined_tb d
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
         and c.file_path is not null and c.file_path != '' and c.doc_no = d.doc_no
-        order by doc_version desc
+        order by c.doc_version desc
     </select>
 
     <select id="selectStageDocLastVersion" parameterType="java.lang.String" resultType="java.lang.String">

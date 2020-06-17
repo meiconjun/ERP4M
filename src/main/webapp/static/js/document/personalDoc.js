@@ -346,7 +346,104 @@ function personalDoc_digSubmit(cusData, operType) {
  * @param data
  */
 function personalDoc_versionHis(data) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['700px', '500px'],// 宽高
+        title: '文档版本历史',// 标题
+        content: $("#personalDoc_docDetail_dialogDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            layui.table.render({
+                id: 'personalDoc_docDetail_tableObj',
+                elem: '#personalDoc_docDetail_table',
+                height: 430,
+                url: 'personalDoc.do',
+                where: {
+                    message: JSON.stringify({
+                        "beanList": [{
 
+                        }],
+                        "operType": "getDocHistory",
+                        "paramMap": {
+                            "doc_serial_no": data.doc_serial_no
+
+                        }
+                    })
+                },
+                method : 'post',
+                even : true,
+                page: false,
+                loading : true,
+                skin : 'row',
+                done : function(res, curr, count){
+                    // 分页初始化
+
+                },
+                parseData: function(res){ //res 即为原始返回的数据
+                    return {
+                        "code": res.retCode, //解析接口状态
+                        "msg": res.retMsg, //解析提示文本
+                        "count": res.retMap.total, //解析数据长度
+                        "data": res.retMap.docList //解析数据列表
+                    };
+                },
+                cols : [[
+                    {
+                        field: 'doc_name',
+                        title: '文档名称',
+                        align : 'center'
+                    },
+                    {
+                        field: 'doc_version',
+                        title: '文档版本',
+                        sort: true,
+                        align : 'center'
+                    }
+                    , { field: 'doc_writer',
+                        title: '作者',
+                        align : 'center'
+                    }
+                    , { field: 'upload_user',
+                        title: '上传用户',
+                        align : 'center',
+                        templet : function (data) {
+                            return commonFormatUserNo(data.upload_user, false);
+                        }
+                    }
+                    , {
+                        field: 'upload_time',
+                        title: '上传时间',
+                        sort: true,
+                        align : 'center',
+                        templet : function (data) {
+                            return commonFormatDate(data.upload_time);
+                        }
+                    }
+                    , {
+                        field: 'update_desc',
+                        title: '更新备注',
+                        sort: true,
+                        align : 'center'
+                    }
+                    , {
+                        field: 'edit',
+                        title: '操作',
+                        width: 80,
+                        sort: false,
+                        fixed: 'right',
+                        align : 'center',
+                        templet : function (data) {
+                            let html = "";
+                                html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"personalDoc_downloadVersionDoc(" + commonFormatObj(data) + ")\">下载</a>";
+                            return html;
+                        }}
+                ]]
+            });
+        }
+    });
 }
 
 /**
@@ -577,4 +674,13 @@ function personalDoc_deleteOperation() {
  */
 function personalDoc_SubmitpreviewOperation() {
 
+}
+
+/**
+ * 历史版本下载
+ * @param data
+ */
+function personalDoc_downloadVersionDoc(data) {
+    let postFix = data.file_path.substring(data.file_path.lastIndexOf("."), data.file_path.length);
+    commonFileDownload((data.doc_name + "_" + data.doc_version + postFix), data.file_path);
 }

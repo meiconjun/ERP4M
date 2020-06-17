@@ -44,4 +44,9 @@ public interface PersonalDocDao {
      * 新增回收站表信息
      */
     int insertRecycleInfo(HashMap<String, Object> condMap);
+
+    /**
+     * 查询版本历史
+     */
+    List<HashMap<String, Object>> selectDocHistory(@Param("doc_serial_no")String doc_serial_no);
 }
