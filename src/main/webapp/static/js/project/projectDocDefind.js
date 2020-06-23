@@ -48,7 +48,7 @@ function projectDocDefind_treeNodeBeforeClick(treeId, treeNode) {
         callback: function (key, options) {
             layui.layer.open({
                 type: 1,// 页面层
-                area: ['500px', '500px'],// 宽高
+                area: ['500px', '650px'],// 宽高
                 title: '新增项目文档',// 标题
                 content: $("#projectDocDefind_addDiv"),//内容，直接取dom对象
                 // btn: ['确定'],
@@ -59,7 +59,16 @@ function projectDocDefind_treeNodeBeforeClick(treeId, treeNode) {
                     // 渲染弹框元素
                     projectDocDefind_cleanForm();
                     commonPutNormalSelectOpts(FIELD_DEPARTMENT, "projectDocDefind_add_department", "", true);
+                    /*commonPutNormalSelectOpts([{
+                        "name" : "请先选择负责部门",
+                        "value" : ""
+                    }], "projectDocDefind_add_dutyRole", "", true, true);*/
+                    projectDocDefind_updateRoleList($("#projectDocDefind_add_department").val());
+                    layui.form.on('select(projectDocDefind_add_department)', function(data){
+                        projectDocDefind_updateRoleList(data.value);
+                    });
                     commonPutNormalSelectOpts(FIELD_STAGE, "projectDocDefind_add_stage", "", true);
+
                     projectDocDefind_digSubmit(index, "add", treeNode);
                     layui.form.render();
                 }
@@ -73,7 +82,7 @@ function projectDocDefind_treeNodeBeforeClick(treeId, treeNode) {
         callback: function (key, options) {
             layui.layer.open({
                 type: 1,// 页面层
-                area: ['500px', '500px'],// 宽高
+                area: ['500px', '650px'],// 宽高
                 title: '修改项目文档',// 标题
                 content: $("#projectDocDefind_addDiv"),//内容，直接取dom对象
                 // btn: ['确定'],
@@ -86,7 +95,13 @@ function projectDocDefind_treeNodeBeforeClick(treeId, treeNode) {
                     $("#projectDocDefind_add_docNo").val(treeNode.doc_no).attr("disabled", "disabled").addClass("layui-disabled");
                     $("#projectDocDefind_add_docName").val(treeNode.name);
                     $("#projectDocDefind_add_desc").val(treeNode.description);
+                    $("#projectDocDefind_add_writer").val(treeNode.writer);
                     commonPutNormalSelectOpts(FIELD_DEPARTMENT, "projectDocDefind_add_department", treeNode.department, true);
+                    projectDocDefind_updateRoleList(treeNode.department);
+                    $("#projectDocDefind_add_dutyRole").val(treeNode.duty_role);
+                    layui.form.on('select(projectDocDefind_add_department)', function(data){
+                        projectDocDefind_updateRoleList(data.value);
+                    });
                     commonPutNormalSelectOpts(FIELD_STAGE, "projectDocDefind_add_stage", treeNode.stage, true);
                     $("#projectDocDefind_add_stage").attr("disabled", "disabled").addClass("layui-disabled");
                     projectDocDefind_digSubmit(index, "modify", treeNode);
@@ -142,7 +157,9 @@ function projectDocDefind_cleanForm() {
         "projectDocDefind_add_docName": "",
         "projectDocDefind_add_stage": '',
         "projectDocDefind_add_department": '',
-        "projectDocDefind_add_desc": ''
+        "projectDocDefind_add_desc": '',
+        "projectDocDefind_add_dutyRole": '',
+        "projectDocDefind_add_writer": ''
     });
 }
 
@@ -156,7 +173,9 @@ function projectDocDefind_digSubmit(dialogIndex, operType, parentNode) {
                     "doc_name" : fieldObj.projectDocDefind_add_docName,
                     "stage" : fieldObj.projectDocDefind_add_stage,
                     "department" : fieldObj.projectDocDefind_add_department,
-                    "description" : fieldObj.projectDocDefind_add_desc
+                    "description" : fieldObj.projectDocDefind_add_desc,
+                    "duty_role": fieldObj.projectDocDefind_add_dutyRole,
+                    "writer": fieldObj.projectDocDefind_add_writer
                 }],
                 "operType" : operType,
                 "paramMap" : {
@@ -174,13 +193,17 @@ function projectDocDefind_digSubmit(dialogIndex, operType, parentNode) {
                         "secret_level": "",
                         "stage": fieldObj.projectDocDefind_add_stage,
                         "department": fieldObj.projectDocDefind_add_department,
-                        "description": fieldObj.projectDocDefind_add_desc
+                        "description": fieldObj.projectDocDefind_add_desc,
+                        "duty_role": fieldObj.projectDocDefind_add_dutyRole,
+                        "writer": fieldObj.projectDocDefind_add_writer
                     }, true);
                 } else {
                     // 更新节点
                     parentNode.name = fieldObj.projectDocDefind_add_docName;
                     parentNode.department = fieldObj.projectDocDefind_add_department;
                     parentNode.description = fieldObj.projectDocDefind_add_desc;
+                    parentNode.duty_role = fieldObj.projectDocDefind_add_dutyRole;
+                    parentNode.writer = fieldObj.projectDocDefind_add_writer;
                     mainTreeInst.updateNode(parentNode, true);
                 }
 
@@ -190,4 +213,22 @@ function projectDocDefind_digSubmit(dialogIndex, operType, parentNode) {
         });
         return false;
     });
+}
+
+function projectDocDefind_updateRoleList(department) {
+    let retData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "getRoleList",
+        "paramMap": {
+            "position": "",
+            "level": "",
+            "department": department
+        }
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        commonPutNormalSelectOpts(retData.retMap.roleList, "projectDocDefind_add_dutyRole", "", true);
+        layui.form.render();
+    } else {
+        commonError("加载角色列表失败");
+    }
 }

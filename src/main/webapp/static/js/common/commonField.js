@@ -32,6 +32,8 @@ const FIELD_MSG_TYPE_BOSS_CHECK = "3";
 const FIELD_MSG_TYPE_PROJECT_STAGE = "4";
 /** 消息类型-项目结项提醒 */
 const FIELD_MSG_TYPE_PROJECT_END = "5";
+/** 消息类型-文档审阅提醒 */
+const FIELD_MSG_TYPE_DOC_REVIEW = "6";
 
 /*===================文档管理相关==============================*/
 /** 文档类型*/

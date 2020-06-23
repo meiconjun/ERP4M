@@ -103,6 +103,8 @@ public class ProjectDocDefindServiceImpl implements ProjectDocDefindService {
                 tempMap.put("stage", bean.getStage());
                 tempMap.put("department", bean.getDepartment());
                 tempMap.put("description", bean.getDescription());
+                tempMap.put("duty_role", bean.getDuty_role());
+                tempMap.put("writer", bean.getWriter());
                 if (fieldBean.getField_value().equals(bean.getStage())) {
                     List tempList = (List) stageTree.get("children");
                     tempList.add(tempMap);

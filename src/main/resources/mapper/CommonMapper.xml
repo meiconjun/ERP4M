@@ -28,4 +28,49 @@
         select * from sys_field_tb
         where parent_field = #{parent_field}
     </select>
+
+    <insert id="insertTaskInfo" parameterType="org.meiconjun.erp4m.bean.TaskBean">
+        insert into sys_task_tb (task_no, task_type, create_user, create_time, receive_role, receive_user,
+        deal_user, task_param, task_title, status, end_time, deal_type)
+        values(#{task_no}, #{task_type}, #{create_user}, #{create_time}, #{receive_role}, #{receive_user}, #{deal_user}, #{task_param},
+        #{task_title}, #{status}, #{end_time}, #{deal_type})
+    </insert>
+    
+    <select id="selectTaskInfo" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.TaskBean">
+        select * from sys_task_tb
+        where task_no = #{task_no}
+    </select>
+    
+    <update id="updateTaskInfo" parameterType="org.meiconjun.erp4m.bean.TaskBean">
+        update sys_task_tb 
+        <set>
+            <if test="deal_user != null and deal_user != ''">
+                deal_user = #{deal_user},
+            </if>
+            <if test="task_param != null and task_param != ''">
+                task_param = #{task_param},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="end_time != null and end_time != ''">
+                end_time = #{end_time},
+            </if>
+        </set>
+        where task_no = #{task_no}
+    </update>
+
+    <select id="selectRoleList" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select role_no as value, role_name as name from sys_role_tb
+        where 1 = 1
+        <if test="position != null and position != ''">
+            and position = #{position}
+        </if>
+        <if test="level != null and level != ''">
+            and level = #{level}
+        </if>
+        <if test="department != null and department != ''">
+            and department = #{department}
+        </if>
+    </select>
 </mapper>

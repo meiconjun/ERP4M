@@ -17,6 +17,8 @@ function distributionMessage(msgStr) {
         showNotificationKeep("项目负责阶段提醒", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
         showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, true);
+    } else if (FIELD_MSG_TYPE_DOC_REVIEW == msgBean.msg_type) {
+        showNotificationKeep("文档审阅", msgBean.msg_content, msgBean.msg_no, true);
     }
 }
 

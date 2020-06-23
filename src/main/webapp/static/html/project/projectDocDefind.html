@@ -17,6 +17,12 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">作者</label>
+            <div class="layui-input-block">
+                <input type="text" name="projectDocDefind_add_writer" id="projectDocDefind_add_writer" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">所属阶段</label>
             <div class="layui-input-block">
                 <select name="projectDocDefind_add_stage" id="projectDocDefind_add_stage" required lay-verify="required">
@@ -26,7 +32,14 @@
         <div class="layui-form-item">
             <label class="layui-form-label">负责部门</label>
             <div class="layui-input-block">
-                <select name="projectDocDefind_add_department" id="projectDocDefind_add_department" required lay-verify="required">
+                <select lay-filter="projectDocDefind_add_department" name="projectDocDefind_add_department" id="projectDocDefind_add_department" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责角色</label>
+            <div class="layui-input-block">
+                <select name="projectDocDefind_add_dutyRole" id="projectDocDefind_add_dutyRole" required lay-verify="required">
                 </select>
             </div>
         </div>

@@ -20,6 +20,11 @@ public class ProjectDocBean {
     private String department;
     /** 备注 */
     private String description;
+    /** 负责角色 */
+
+    private String duty_role;
+    /** 作者 */
+    private String writer;
 
     public String getDoc_no() {
         return doc_no;
@@ -67,5 +72,21 @@ public class ProjectDocBean {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDuty_role() {
+        return duty_role;
+    }
+
+    public void setDuty_role(String duty_role) {
+        this.duty_role = duty_role;
+    }
+
+    public String getWriter() {
+        return writer;
+    }
+
+    public void setWriter(String writer) {
+        this.writer = writer;
     }
 }

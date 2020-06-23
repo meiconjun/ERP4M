@@ -63,4 +63,59 @@
         where a.doc_serial_no = b.doc_serial_no and a.doc_serial_no = #{doc_serial_no}
         order by b.doc_version desc
     </select>
+
+    <update id="updateDocReviewState" parameterType="java.lang.String">
+        update doc_review_tb
+        <set>
+            <if test="review_state != null and review_state != ''">
+                review_state = #{review_state},
+            </if>
+            <if test="review_user != null and review_user != ''">
+                review_user = #{review_user},
+            </if>
+            <if test="review_detail != null and review_detail != ''">
+                review_detail = #{review_detail},
+            </if>
+            <if test="judge_user != null and judge_user != ''">
+                judge_user = #{judge_user},
+            </if>
+            <if test="judge_reason != null and judge_reason != ''">
+                review_state = #{review_state},
+            </if>
+            <if test="judge_time != null and judge_time != ''">
+                judge_time = #{judge_time},
+            </if>
+        </set>
+        where doc_serial_no = #{doc_serial_no}
+    </update>
+
+    <select id="selectDocReviewInfoBySerial" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from doc_review_tb
+        where doc_serial_no = #{doc_serial_no}
+    </select>
+
+    <update id="updateDocReviewInfo" parameterType="java.util.HashMap">
+        update doc_review_tb
+        <set>
+            <if test="review_state != null and review_state != ''">
+                review_state = #{review_state},
+            </if>
+            <if test="review_user != null and review_user != ''">
+                review_user = #{review_user},
+            </if>
+            <if test="review_detail != null and review_detail != ''">
+                review_detail = #{review_detail},
+            </if>
+            <if test="judge_user != null and judge_user != ''">
+                judge_user = #{judge_user},
+            </if>
+            <if test="judge_reason != null and judge_reason != ''">
+                judge_reason = #{judge_reason},
+            </if>
+            <if test="judge_time != null and judge_time != ''">
+                judge_time = #{judge_time},
+            </if>
+        </set>
+        where doc_serial_no = #{doc_serial_no}
+    </update>
 </mapper>

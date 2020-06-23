@@ -49,4 +49,16 @@ public interface PersonalDocDao {
      * 查询版本历史
      */
     List<HashMap<String, Object>> selectDocHistory(@Param("doc_serial_no")String doc_serial_no);
+    /**
+     * 更新文档状态
+     */
+    int updateDocReviewState(HashMap<String, Object> condMap);
+    /**
+     * 根据流水号查询文档审阅信息
+     */
+    HashMap<String, Object> selectDocReviewInfoBySerial(@Param("doc_serial_no") String doc_serial_no);
+    /**
+     * 更新文档审阅信息
+     */
+    int updateDocReviewInfo(HashMap<String, Object> condMap);
 }

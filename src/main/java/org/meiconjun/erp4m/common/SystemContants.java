@@ -28,8 +28,17 @@ public class SystemContants {
     public static final String FIELD_MSG_TYPE_PROJECT_STAGE = "4";
     /** 消息类型-项目结项提醒 */
     public static final String FIELD_MSG_TYPE_PROJECT_END = "5";
+    /** 消息类型-审阅文档消息提醒 */
+    public static final String FIELD_MSG_TYPE_DOC_REVIEW = "6";
+
+
+    /** 任务类型-审阅文档消息提醒 */
+    public static final String FIELD_TASK_TYPE_DOC_REVIEW = "1";
 
     /** 项目阶段*/
     public static final String FIELD_STAGE = "P010100";
 
+
+    /** 通用分隔符 */
+    public static final String DELIMITER = ",@,";
 }

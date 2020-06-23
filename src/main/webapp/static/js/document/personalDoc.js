@@ -673,7 +673,108 @@ function personalDoc_deleteOperation() {
  * 提交评审
  */
 function personalDoc_SubmitpreviewOperation() {
+    let checkData = layui.table.checkStatus("personalDoc_tableObj").data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要评审的文档");
+        return;
+    } else if (checkData.length > 1) {
+        commonInfo("只能同时提交一个文档");
+        return;
+    } else if (checkData[0].review_state != '0' && checkData[0].review_state != '4') {
+        commonInfo("只能提交状态为未提交评审或评审驳回的文档");
+        return;
+    }
+    $("personalDoc_reviewSubmit_reviewer").val("");
+    $("personalDoc_reviewSubmit_adjudicator").val("");
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['600px', '300px'],// 宽高
+        title: '提交评审',// 标题
+        content: $("#personalDoc_reviewSubmit_dialogDiv"),//内容，直接取dom对象
+        btn: ['确定'],
+        yes: function (index1, layero) {
+            //确认按钮的回调，提交表单
+            layui.layer.confirm("是否确认提交评审？", function(index) {
+                let retData = commonAjax("personalDoc.do", JSON.stringify({
+                    "beanList": [checkData[0]],
+                    "operType": "reviewSubmit",
+                    "paramMap": {
+                        "reviewer": $("personalDoc_reviewSubmit_reviewer").val(),
+                        "adjudicator": $("personalDoc_reviewSubmit_adjudicator").val()
 
+                    }
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    commonOk("操作成功！");
+                    layui.layer.close(index1);
+                }
+
+            });
+            return false;
+        },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 获取系统用户列表
+            let users = [];
+            let userListData = commonAjax("common.do", JSON.stringify({
+                "beanList": [{}],
+                "operType": "getAllUserNoAndName",
+                "paramMap": {}
+            }));
+            if (userListData.retCode == HANDLE_SUCCESS) {
+                let allUserMap = userListData.retMap.allUser;
+                for (let allUserMapKey in allUserMap) {
+                    users.push({
+                        "name" : allUserMapKey + "-" + allUserMap[allUserMapKey],
+                        "value" : allUserMapKey
+                    });
+                }
+            } else {
+                commonError("加载系统用户列表失败");
+            }
+            commonPutNormalSelectOpts(users, "personalDoc_reviewSubmit_adjudicator", "", true, false);
+            // 穿梭框
+            $("#personalDoc_reviewSubmit_selectReviewer").click(function () {
+                    layui.layer.open({
+                    type: 1,// 页面层
+                    area: ['500px', '500px'],// 宽高
+                    title: '选择审阅人',// 标题
+                    content: $("#personalDoc_transfer"),//内容，直接取dom对象
+                    btn: ['确定'],
+                    yes: function (index, layero) {
+                        let transferData = layui.transfer.getData("personalDoc_transfer");
+                        let selectTransferStr = "";
+                        for (let j = 0; j < transferData.length; j ++) {
+                            selectTransferStr += "," + transferData[j].value;
+                        }
+                        if (!commonBlank(selectTransferStr)) {
+                            selectTransferStr = selectTransferStr.substring(1, selectTransferStr.length);
+                        }
+                        $("#personalDoc_reviewSubmit_reviewer").val(selectTransferStr);
+                        layui.layer.close(index);
+                    },
+                    success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                        layui.transfer.render({
+                            elem: '#personalDoc_transfer',
+                            id: "personalDoc_transfer",
+                            title: ["可选", "已选"]
+                            ,data: users,
+                            value: $("#personalDoc_reviewSubmit_reviewer").val().split(",")
+                            ,parseData: function(res){
+                                return {
+                                    "value": res.value //数据值
+                                    ,"title": res.name //数据标题
+                                    ,"disabled": false  //是否禁用
+                                    ,"checked": res.checked //是否选中
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+            layui.form.render();
+        }
+    });
 }
 
 /**

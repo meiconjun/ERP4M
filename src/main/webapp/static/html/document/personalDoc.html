@@ -103,4 +103,29 @@
 
     </table>
 </div>
+
+<div hidden="hidden" class="comm-dialog" id="personalDoc_reviewSubmit_dialogDiv">
+    <form class="layui-form layui-form-pane" lay-filter="personalDoc_reviewSubmitFrm" id="personalDoc_reviewSubmitFrm" action="">
+        <div class="layui-form-item">
+            <!--            <label class="layui-form-label">-->
+            <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="personalDoc_reviewSubmit_selectReviewer">选择审阅者</button>
+            <!--            </label>-->
+            <!--            <div class="layui-input-block">-->
+            <input type="text" name="personalDoc_reviewSubmit_reviewer" id="personalDoc_reviewSubmit_reviewer" disabled class="layui-input">
+            <!--            </div>-->
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">裁决者</label>
+            <div class="layui-input-block">
+                <select name="personalDoc_reviewSubmit_adjudicator" id="personalDoc_reviewSubmit_adjudicator" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 穿梭框容器 -->
+<div hidden="hidden" id="personalDoc_transfer">
+
+</div>
 <script src="static/js/document/personalDoc.js"></script>

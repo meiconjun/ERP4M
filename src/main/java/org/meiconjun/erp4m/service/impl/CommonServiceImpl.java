@@ -49,8 +49,29 @@ public class CommonServiceImpl implements CommonService {
             getAllUserNoAndNameOperation(requestBean, responseBean);
         } else if ("initReadMessage".equals(operType)) {
             initReadMessageOperation(requestBean, responseBean);
+        } else if ("getRoleList".equals(operType)) {
+            getRoleListOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 获取系统角色列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getRoleListOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String position = (String) paramMap.get("position");
+        String level = (String) paramMap.get("level");
+        String department = (String) paramMap.get("department");
+
+        List<HashMap<String, String>> roleList = commonDao.selectRoleList(position, level, department);
+
+        HashMap<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("roleList", roleList);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
     }
 
     /**
