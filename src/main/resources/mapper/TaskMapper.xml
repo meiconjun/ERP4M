@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.TaskDao">
+
+    <select id="selectTaskInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from sys_task_tb
+        where task_no = #{task_no}
+    </select>
+
+    <update id="updateDealUserAndStatus" parameterType="java.util.HashMap" >
+        update sys_task_tb
+        set deal_user = #{deal_user}, status = #{status}
+        where task_no = #{task_no}
+    </update>
+
+    <!--<insert id="insertNewMessage" parameterType="java.util.HashMap">
+        insert into sys_message_tb (msg_no, msg_type, create_user, create_time, receive_role, receive_user,
+        read_user, msg_param, msg_content, status, end_time, deal_type)
+        values (#{msg_no}, #{msg_type}, #{create_user}, #{create_time}, #{receive_role}, #{receive_user},
+        #{read_user}, #{msg_param}, #{msg_content}, #{status}, #{end_time}, #{deal_type})
+    </insert>-->
+
+    <select id="selectTaskStatus" parameterType="java.lang.String" resultType="java.lang.String">
+        select status from sys_task_tb
+        where task_no = #{task_no}
+    </select>
+
+    <select id="selectTodoTask" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.TaskBean">
+        select * from sys_task_tb
+        where (concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%') or concat(',', receive_role, ',') like concat('%,', #{role_no}, ',%'))
+        and concat(',', deal_user, ',') not like concat('%,', #{user_no}, ',%') and status = '0'
+    </select>
+
+    <select id="selectDoneTask" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.TaskBean">
+        select * from sys_task_tb
+        where (concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%') or concat(',', receive_role, ',') like concat('%,', #{role_no}, ',%'))
+        and (concat(',', deal_user, ',') like concat('%,', #{user_no}, ',%') or status = '1')
+    </select>
+</mapper>

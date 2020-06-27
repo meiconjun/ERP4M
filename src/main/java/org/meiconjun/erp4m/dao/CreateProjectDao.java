@@ -57,4 +57,8 @@ public interface CreateProjectDao {
      * 查询阶段文档信息
      */
     HashMap<String, Object> selectStageDocInfo(@Param("serial_no") String serial_no);
+    /**
+     *
+     */
+    List<String> selectStageDocDutyUser(HashMap<String, Object> condMap);
 }

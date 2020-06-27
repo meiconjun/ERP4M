@@ -28,6 +28,7 @@ import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.MessageDao;
+import org.meiconjun.erp4m.dao.TaskDao;
 import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
@@ -49,10 +50,11 @@ public class CommonUtil {
 
     private static MessageDao messageDao;
     private static CommonDao commonDao;
-
+    private static TaskDao taskDao;
     static {
         messageDao = SpringContextHolder.getBean("messageDao");
         commonDao = SpringContextHolder.getBean("commonDao");
+        taskDao = SpringContextHolder.getBean("taskDao");
     }
     /**
      * Json解析器
@@ -384,6 +386,39 @@ public class CommonUtil {
         condMap.put("status", status);
         condMap.put("msg_no", msg_no);
         messageDao.updateReadUserAndStatus(condMap);
+        return "";
+    }
+    /**
+     * 更新任务的处理状态，更新成功返回空，更新失败返回错误信息
+     */
+    public static String updateTaskStatus(String task_no, String user_no) {
+        String status = taskDao.selectTaskStatus(task_no);
+        if ("1".equals(status)) {
+            return "该任务已被其他用户处理！";
+        }
+        HashMap<String, Object> taskInfo = taskDao.selectTaskInfo(task_no);
+        String deal_user = (String) taskInfo.get("deal_user");
+        if (!CommonUtil.isStrBlank(deal_user)) {
+            deal_user += "," + user_no;
+        } else {
+            deal_user = user_no;
+        }
+        //单人处理形式时，直接结束事项
+        String deal_type = (String) taskInfo.get("deal_type");
+        if ("1".equals(deal_type)) {
+            status = "1";//已处理
+        } else {
+            // 比对已阅用户和目标用户
+            String receive_user = (String) taskInfo.get("receive_user");
+            if (deal_user.split(",").length >= receive_user.split(",").length) {
+                status = "1";//已处理
+            }
+        }
+        HashMap<String, Object> condMap = new HashMap<String, Object>();
+        condMap.put("deal_type", deal_type);
+        condMap.put("status", status);
+        condMap.put("task_no", task_no);
+        taskDao.updateDealUserAndStatus(condMap);
         return "";
     }
     /**

@@ -5,19 +5,46 @@ $(document).ready(function () {
     try {
         // 渲染下拉框
         commonPutNormalSelectOpts(FIELD_STAGE, "createProject_stage1", "", true);
-        createProject_updateDocList($("#createProject_stage1").val(), "createProject_stageDoc1");
-        layui.form.on('select(createProject_stage1)', function(data){
-            createProject_updateDocList(data.value, "createProject_stageDoc1");
-        });
-        layui.form.on('select(createProject_stageDoc1)', function(data){
-            createProject_updateUserList(data.value, "createProject_stageUser1");
-        });
-        commonPutNormalSelectOpts([{
-            "name" : "（阶段负责人）请先选择阶段文档",
-            "value" : "-"
-        }], "createProject_stageUser1", "", true, true);
-        layui.form.on('select(createProject_stageUser1)', function(data){
-            $("#createProject_members").val(createProject_getAllStageUser());
+        // 获取系统用户列表
+        let users = getAllUserList();
+        $("#createProject_members").click(function () {
+            layui.layer.open({
+                type: 1,// 页面层
+                area: ['500px', '500px'],// 宽高
+                title: '选择项目成员',// 标题
+                content: $("#createProject_memberTransfer"),//内容，直接取dom对象
+                btn: ['确定'],
+                yes: function (index, layero) {
+                    let transferData = layui.transfer.getData("createProject_memberTransfer");
+                    let selectTransferStr = "";
+                    for (let j = 0; j < transferData.length; j ++) {
+                        selectTransferStr += "," + transferData[j].value;
+                    }
+                    if (!commonBlank(selectTransferStr)) {
+                        selectTransferStr = selectTransferStr.substring(1, selectTransferStr.length);
+                    }
+                    $("#createProject_members").val(selectTransferStr);
+                    layui.layer.close(index);
+                },
+                success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                    layui.transfer.render({
+                        elem: '#createProject_memberTransfer',
+                        id: "createProject_memberTransfer",
+                        title: ["可选", "已选"]
+                        ,data: users,
+                        value: $("#createProject_members").val().split(",")
+                        ,parseData: function(res){
+                            return {
+                                "value": res.value //数据值
+                                ,"title": res.name //数据标题
+                                ,"disabled": false  //是否禁用
+                                ,"checked": res.checked //是否选中
+                            }
+                        }
+                    });
+                }
+            });
+
         });
         //渲染表单元素
         layui.form.render();
@@ -52,9 +79,7 @@ $(document).ready(function () {
                             "stage_type": $("#createProject_stage" + i).val(),
                             "stage_begin": $("#createProject_stage_beginDate" + i).val().replace(/-/g, ""),
                             "stage_end": $("#createProject_stage_endDate" + i).val().replace(/-/g, ""),
-                            "stage_doc": $("#createProject_stageDoc" + i).val(),
-                            "doc_writer": $("#createProject_docWriter" + i).val(),
-                            "principal": $("#createProject_stageUser" + i).val()
+                            "stage_doc": $("#createProject_stageDoc" + i).val()
                         }
                         stageList.push(tempStage);
                     }
@@ -96,10 +121,7 @@ $(document).ready(function () {
         });
         layui.laydate.render({
             elem: '#createProject_beginDate',
-            value : new Date()/*,
-            done: function (value, date, endDate) {
-                $("#createProject_stage_beginDate1").val(value);
-            }*/
+            value : new Date()
         });
 
         layui.laydate.render({
@@ -147,15 +169,8 @@ function createProject_addStage() {
         "                    </div>\n" +
         "                </div>\n" +
                         "<div class=\"layui-inline layui-inline\">\n" +
-        "                    <select lay-filter='createProject_stageDoc" + createProject_stageCount_temp + "' name=\"createProject_stageDoc" + createProject_stageCount_temp + "\" id=\"createProject_stageDoc" + createProject_stageCount_temp + "\" required lay-verify=\"required\">\n" +
-        "                    </select>\n" +
-        "                </div>\n" +
-        "                <div class=\"layui-inline layui-inline\">\n" +
-        "                    <input type=\"text\" placeholder=\"文档作者\" name=\"createProject_docWriter" + createProject_stageCount_temp + "\" id=\"createProject_docWriter" + createProject_stageCount_temp + "\" required  lay-verify=\"required\" autocomplete=\"off\" class=\"layui-input\">\n" +
-        "                </div>" +
-        "                <div class=\"layui-inline layui-inline\">\n" +
-        "                    <select lay-filter=\"createProject_stageUser" + createProject_stageCount_temp + "\" name=\"createProject_stageUser" + createProject_stageCount_temp + "\" id=\"createProject_stageUser" + createProject_stageCount_temp + "\" required lay-verify=\"required\">\n" +
-        "                    </select>\n" +
+        "                    <button class=\"layui-btn layui-btn-primary\" onclick=\"createProject_selectProjectDoc(this)\" name=\"createProject_stageDoc" + createProject_stageCount_temp + "\" id=\"createProject_stageDoc" + createProject_stageCount_temp + "\" >\n" +
+        "                    </button>\n" +
         "                </div>\n" +
         "                <button type=\"button\" class=\"layui-btn\" onclick=\"createProject_addStage()\"><i class=\"layui-icon layui-icon-add-circle\"></i></button>" +
         "                <button type=\"button\" class=\"layui-btn\" onclick=\"createProject_minStage()\"><i class=\"layui-icon layui-icon-reduce-circle\"></i></button>\n" +
@@ -164,20 +179,6 @@ function createProject_addStage() {
     $("#roleConfig_addFrm").append(html);
     // 渲染下拉框
     commonPutNormalSelectOpts(FIELD_STAGE, "createProject_stage" + createProject_stageCount_temp, "", true);
-    createProject_updateDocList($("#createProject_stage" + createProject_stageCount_temp).val(), "createProject_stageDoc" + createProject_stageCount_temp);
-    layui.form.on('select(createProject_stage' + createProject_stageCount_temp + ')', function(data){
-        createProject_updateDocList(data.value, "createProject_stageDoc" + createProject_stageCount_temp);
-    });
-    layui.form.on('select(createProject_stageDoc' + createProject_stageCount_temp + ')', function(data){
-        createProject_updateUserList(data.value, "createProject_stageUser" + createProject_stageCount_temp);
-    });
-    commonPutNormalSelectOpts([{
-        "name" : "（阶段负责人）请先选择阶段文档",
-        "value" : "-"
-    }], "createProject_stageUser" + createProject_stageCount_temp, "", true, true);
-    layui.form.on('select(createProject_stageUser' + createProject_stageCount_temp + ')', function(data){
-        $("#createProject_members").val(createProject_getAllStageUser());
-    });
     //渲染表单元素
     layui.form.render();
     // 渲染日期组件
@@ -187,12 +188,7 @@ function createProject_addStage() {
     });
     // 渲染日期组件
     layui.laydate.render({
-        elem: '#createProject_stage_endDate' + createProject_stageCount_temp/*,
-        done: function (value) {
-            if ($("#createProject_stage_beginDate" + createProject_stageCount_temp + 1) != undefined) {
-                $("#createProject_stage_beginDate" + createProject_stageCount_temp + 1).val(value);
-            }
-        }*/
+        elem: '#createProject_stage_endDate' + createProject_stageCount_temp
     });
     createProject_stageCount = createProject_stageCount_temp;
 }
@@ -203,106 +199,21 @@ function createProject_minStage() {
     if (createProject_stageCount == 1) {
         return;
     }
-    // let menbers = $("#createProject_members").val();
-    // menbers = menbers.replace($("#createProject_stageUser" + createProject_stageCount).val(), "");
-    // $("#createProject_members").val(menbers);
     $("div[stageCount='" + createProject_stageCount + "']").remove();
     createProject_stageCount--;
-    $("#createProject_members").val(createProject_getAllStageUser());
-}
-
-/**
- * 选择文档-穿梭框
- */
-/*
-function createProject_selectDoc(obj) {
-    obj = $(obj);
-    // 根据阶段类型获取阶段文档
-    let retData = commonAjax("createProject.do", JSON.stringify({
-        "beanList": [],
-        "operType": "getProjectDoc",
-        "paramMap": {
-            "stage": $("#createProject_stage" + obj.attr("stageCount")).val()
-        }
-    }));
-    if (retData.retCode == HANDLE_SUCCESS) {
-        layui.layer.open({
-            type: 1,// 页面层
-            area: ['520px', '500px'],// 宽高
-            title: '新增项目文档',// 标题
-            content: $("#createProject_docTransfer"),//内容，直接取dom对象
-            btn: ['确定'],
-            yes: function (index, layero) {
-
-            },
-            success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-                // 渲染穿梭框
-                /!*layui.transfer.render({
-                    elem: "#createProject_docTransferDiv",
-                    id: "createProject_docTransferDiv",
-                    title: "选择项目阶段文档",
-                    data: retData.retMap.docList,
-                    parseData: function (res) {
-                        return {
-                            "value": res.doc_no,
-                            "title": res.doc_name
-                        }
-                    },
-                    value: [
-                        {
-                            "value": obj.attr("docValue"),
-                            "title": obj.attr("docName")
-                        }
-                    ],
-                    onchange: function (data, index) {
-                        console.log(data);
-                    }
-                });*!/
-            }
-        });
-
-    } else {
-        commonError("加载项目文档失败！");
-        return;
-    }
-
-
-}*/
-function createProject_updateDocList(stage, domId) {
-    let retData = commonAjax("createProject.do", JSON.stringify({
-        "beanList": [],
-        "operType": "getProjectDoc",
-        "paramMap": {
-            "stage": stage
-        }
-    }));
-    if (retData.retCode == HANDLE_SUCCESS) {
-        commonPutNormalSelectOpts(retData.retMap.docList, domId, "", false, false, "请选择阶段文档");
-        layui.form.render();
-    } else {
-        commonError("加载项目文档列表失败");
-    }
-}
-
-function createProject_updateUserList(docNo, domId) {
-    let retData = commonAjax("createProject.do", JSON.stringify({
-        "beanList": [],
-        "operType": "getUserList",
-        "paramMap": {
-            "docNo": docNo
-        }
-    }));
-    if (retData.retCode == HANDLE_SUCCESS) {
-        commonPutNormalSelectOpts(retData.retMap.userList, domId, "", false, false, "请选择阶段负责人");
-        layui.form.render();
-    } else {
-        commonError("加载用户列表失败");
-    }
 }
 
 function createProject_submit() {
     layui.form.on('submit(createProject_submit)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
         layui.layer.confirm("是否确认提交？", function(index) {
+            // 判断是否所有阶段都已选择阶段文档
+            let docList = $("button[id^='createProject_stageDoc']");
+            for (let i = 0; i < docList.length; i++) {
+                if (commonBlank($(docList[i]).val())) {
+                    commonInfo("请确保所有阶段已选择文档");
+                    return;
+                }
+            }
             //先提交规格说明书
             createProject_fileUploadInst.upload();// 异步的
             // 表单提交操作放到上传成功的回调函数内
@@ -311,7 +222,7 @@ function createProject_submit() {
     });
 }
 
-function createProject_getAllStageUser() {
+/*function createProject_getAllStageUser() {
     let selects = $("select[name^='createProject_stageUser']");
     let retStr = "";
     for (let i = 0; i < selects.length; i++) {
@@ -322,4 +233,62 @@ function createProject_getAllStageUser() {
         }
     }
     return retStr;
+}*/
+
+function createProject_selectProjectDoc(thisObj) {
+    let $thisObj = $(thisObj);
+    let stageCount = $thisObj.parent().parent().parent().attr("stageCount");
+    let stageType = $("#createProject_stage" + stageCount).val();
+
+    // 获取当前阶段文档列表
+    let retData = commonAjax("createProject.do", JSON.stringify({
+        "beanList": [],
+        "operType": "getProjectDoc",
+        "paramMap": {
+            "stage": stageType
+        }
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        layui.layer.open({
+            type: 1,// 页面层
+            area: ['500px', '500px'],// 宽高
+            title: '选择阶段文档',// 标题
+            content: $("#createProject_memberTransfer2"),//内容，直接取dom对象
+            btn: ['确定'],
+            yes: function (index, layero) {
+                let transferData = layui.transfer.getData("createProject_memberTransfer2");
+                let selectTransferStr = "";
+                for (let j = 0; j < transferData.length; j ++) {
+                    selectTransferStr += "," + transferData[j].value;
+                }
+                if (!commonBlank(selectTransferStr)) {
+                    selectTransferStr = selectTransferStr.substring(1, selectTransferStr.length);
+                }
+                $thisObj.val(selectTransferStr);
+                layui.layer.close(index);
+            },
+            success: function (layero, index1) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                // 渲染穿梭框
+                layui.transfer.render({
+                    elem: "#createProject_memberTransfer2",
+                    id: "createProject_memberTransfer2",
+                    title: ["可选", "已选"],
+                    data: retData.retMap.docList,
+                    parseData: function (res) {
+                        return {
+                            "value": res.value,
+                            "title": res.value + "-" + res.name
+                        }
+                    },
+                    value: $thisObj.val().split(","),
+                    onchange: function (data, index) {
+                    }
+                });
+            }
+        });
+
+    } else {
+        commonError("加载项目文档失败！");
+        return;
+    }
 }

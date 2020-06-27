@@ -5,6 +5,9 @@
     <select id="selectProjectInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         select * from project_main_tb
         where 1 = 1
+        <if test="project_no != null and project_no != ''">
+            and project_no = #{project_no}
+        </if>
         <if test="project_name != null and project_name != ''">
             and project_name like concat('%', #{project_name}, '%')
         </if>
@@ -37,14 +40,13 @@
 
     <update id="updateStageDoc" parameterType="java.lang.String">
         update project_stage_doc_tb
-        set upload_date = #{upload_date}, file_path = #{file_path}
-        where serial_no = #{doc_serial} and doc_version = '1.0'
+        set upload_date = #{upload_date}, file_path = #{file_path}, upload_user = #{upload_user}
+        where serial_no = #{doc_serial} and doc_version = '1.0' and doc_no = #{doc_no}
     </update>
     
     <insert id="insertStageDocInfo" parameterType="java.util.HashMap">
-        insert into project_stage_doc_tb (serial_no, doc_no, doc_name, doc_writer, doc_version, upload_date, file_path)
-        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_writer}, #{doc_version}, #{upload_date}, #{file_path})
-
+        insert into project_stage_doc_tb (serial_no, doc_no, doc_name, doc_version, upload_date, file_path, upload_user)
+        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_version}, #{upload_date}, #{file_path}. #{upload_user})
     </insert>
     
     <select id="selectStageInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -122,4 +124,10 @@
         where a.project_no = b.project_no and a.stage_num = b.stage_num and b.doc_serial = c.serial_no
         and c.doc_version = '1.0' and b.is_end != '1'
     </select>
+
+    <select id="selectCountOfStageDoc" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(0) from project_stage_doc_tb
+        where serial_no = #{doc_serial} and doc_no = #{doc_no}
+    </select>
+
 </mapper>

@@ -1,7 +1,9 @@
 /**
  * 任务处理函数
  */
+function taskHandler_showTask(taskBean) {
 
+}
 
 /** 文档审阅 */
 function taskHandler_docReview(taskBean) {
@@ -129,6 +131,120 @@ function taskHandler_docReview(taskBean) {
                         });
                     }
                 });
+            });
+        }
+    });
+}
+
+/**
+ * 阶段文档上传
+ */
+function taskHandler_stageDocUpload(taskBean) {
+    let html = "<div class=\"comm-dialog\" >\n" +
+        "    <form class=\"layui-form layui-form-pane\" lay-filter=\"stageDocUpload_Frm\" id=\"stageDocUpload_Frm\" action=\"\">\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">项目名称</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_projectName\" id=\"stageDocUpload_projectName\" required class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">项目阶段</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_stageName\" id=\"stageDocUpload_stageName\" class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">阶段结束时间</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_stageEndTime\" id=\"stageDocUpload_stageEndTime\" class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">文档名称</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_docName\" id=\"stageDocUpload_docName\" class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <label class=\"layui-form-label\">文档作者</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_writer\" id=\"stageDocUpload_writer\" class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item layui-form-text\">\n" +
+        "            <label class=\"layui-form-label\">选择文件</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_selectFile\" id=\"stageDocUpload_selectFile\" class=\"layui-input\" disabled>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
+        "    </form>\n" +
+        "</div>";
+    let curUploadInst;
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '600px'],// 宽高
+        title: '文档审阅',// 标题
+        content: html,//内容，直接取dom对象
+        btn: ['提交'],
+        yes: function (index, layero) {
+            //确认按钮的回调，提交表单
+            curUploadInst.upload();
+        },
+        success: function (layero, index1) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            let taskParam = JSON.parse((taskBean.task_param));
+            // 渲染弹框元素
+            layui.form.val("stageDocUpload_Frm", {
+                "stageDocUpload_projectName": taskParam.project_name, // "name": "value"
+                "stageDocUpload_stageName": taskParam.stage_name,
+                "stageDocUpload_stageEndTime": commonFormatDate(taskParam.stage_end_date),
+                "stageDocUpload_docName": taskParam.doc_name,
+                "stageDocUpload_writer": taskParam.writer
+            });
+
+            layui.form.render();
+
+            // 绑定上传插件
+            curUploadInst = layui.upload.render({
+                elem: '#stageDocUpload_selectFile',
+                url: 'projectStageDocUpload.do',//改成您自己的上传接口
+                data: {
+                    "project_no": taskParam.project_no,
+                    "doc_serial": taskParam.doc_serial,
+                    "file_root_path": taskParam.file_root_path,
+                    "doc_no": taskParam.doc_no,
+                    "stage_num": taskParam.stage_num,
+                    "doc_name": taskParam.doc_name,
+                    "doc_version": ""
+                },
+                accept: 'file',//
+                auto: false,// 选择文件后是否自动上传
+                // bindAction: "#createProject_fileSubmit",
+                multiple: false,// 是否允许多文件上传
+                choose: function(obj) {
+                    //预读本地文件,如果是多文件，则会遍历
+                    obj.preview(function (index, file, result) {
+                        $("#stageDocUpload_selectFile").val(file.name);
+                    });
+                },
+                done: function(res, index, upload){
+                    if (res.code == '0') {
+                        // 更新任务信息，关闭弹框，刷新任务列表
+                        let updateState = commonUpdateTaskState(taskBean.task_no, sessionStorage.getItem("user_no"));
+                        if (updateState.retCode != HANDLE_SUCCESS) {
+                            commonError(updateState.retMsg);
+                            return;
+                        }
+                        layui.layer.closeAll();
+                        // 刷新任务列表
+                        initTodoTask();
+                    } else {
+                        commonError("上传阶段文档失败:" + res.msg)
+                    }
+                },
+                error: function (index, upload) {
+                    commonError("上传阶段文档失败，请稍后重试");
+                }
             });
         }
     });

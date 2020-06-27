@@ -32,7 +32,8 @@ public interface ProjectManageDao {
     /**
      * 更新阶段文档 1.0
      */
-    int updateStageDoc(@Param("upload_date") String upload_date, @Param("file_path") String file_path, @Param("doc_serial") String doc_serial);
+    int updateStageDoc(@Param("upload_date") String upload_date, @Param("file_path") String file_path, @Param("doc_serial") String doc_serial,
+                       @Param("doc_no") String doc_no, @Param("upload_user") String upload_user);
     /**
      * 新增阶段文档
      */
@@ -61,4 +62,8 @@ public interface ProjectManageDao {
      * 查询所有项目所处阶段信息
      */
     List<HashMap<String, Object>> selectProjectCurStage();
+    /**
+     * 查询某阶段某文档是否已上传
+     */
+    int selectCountOfStageDoc(@Param("doc_serial") String doc_serial, @Param("doc_no") String doc_no);
 }

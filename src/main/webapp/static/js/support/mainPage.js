@@ -19,7 +19,7 @@ function initUnReadMsg() {
         let unReadMsgList = unReadMsgData.retMap.msgBeanList;
         let html = "";
         for (let i = 0; i < unReadMsgList.length; i++) {
-            let days = getDaysBetween(unReadMsgList[i].create_date, commonCurrentDateTimeStr());
+            let days = getDaysBetween(unReadMsgList[i].create_time, commonCurrentDateTimeStr());
             let label = "";
             if (days <= 1) {
                 label = "label label-success";
@@ -83,4 +83,80 @@ function showMainPageMsgFunction1(data) {
 }
 function showMainPageMsgFunction2(data) {
     showMainPageMsg(JSON.stringify(data), false);
+}
+
+/**
+ * 初始化代办任务
+ */
+function initTodoTask() {
+    let todoTaskData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initTodoTask",
+        "paramMap": {
+            "user_no": sessionStorage.getItem("user_no"),
+            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+        }
+    }));
+    if (todoTaskData.retCode == HANDLE_SUCCESS) {
+        let taskList = todoTaskData.retMap.taskList;
+        let html = "";
+        for (let i = 0; i < taskList.length; i++) {
+            let days = getDaysBetween(taskList[i].create_time, commonCurrentDateTimeStr());
+            let label = "";
+            if (days <= 1) {
+                label = "label label-success";
+            } else if (days > 1 && days <= 3) {
+                label = "label label-warning";
+            } else {
+                label = "label label-danger";
+            }
+            html += "<li>\n" +
+                "         <span class=\"handle\">\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "         </span>\n" +
+                "         <input type=\"checkbox\" value=\"\">\n" +
+                "         <a class=\"text\" href='#' onclick=\"taskHandler_showTask(" +  commonFormatObj(taskList[i]) + ")\">" + taskList[i].task_title + "</a>\n" +
+                "         <small class='" + label + "'><i class=\"fa fa-clock-o\"></i>" + commonFormatDate(taskList[i].create_time) + "创建" +"</small>\n" +
+                "    </li>";
+        }
+        $("#mainPage-todo-task-list").empty();
+        $("#mainPage-todo-task-list").append(html);
+    } else {
+        commonError("初始化代办任务失败");
+    }
+}
+
+/**
+ * 初始化已办任务
+ */
+function initDoneTask() {
+    let doneTaskData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "initDoneTask",
+        "paramMap": {
+            "user_no": sessionStorage.getItem("user_no"),
+            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+        }
+    }));
+    if (doneTaskData.retCode == HANDLE_SUCCESS) {
+        let taskList = doneTaskData.retMap.taskList;
+        let html = "";
+        for (let i = 0; i < taskList.length; i++) {
+            let label = "label label-default";
+            html += "<li>\n" +
+                "         <span class=\"handle\">\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "             <i class=\"fa fa-ellipsis-v\"></i>\n" +
+                "         </span>\n" +
+                "         <input type=\"checkbox\" value=\"\">\n" +
+                "         <a class=\"text\" href='#' >" + taskList[i].task_title + "</a>\n" +
+                "         <small class='" + label + "'><i class=\"fa fa-clock-o\"></i>" + commonFormatDate(taskList[i].create_time) + "创建" +"</small>\n" +
+                "    </li>";
+        }
+        $("#mainPage-todo-task-list").empty();
+        $("#mainPage-todo-task-list").append(html);
+    } else {
+        commonError("初始化代办任务失败");
+    }
 }

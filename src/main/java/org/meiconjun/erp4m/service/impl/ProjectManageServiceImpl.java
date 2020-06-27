@@ -2,12 +2,10 @@ package org.meiconjun.erp4m.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import org.meiconjun.erp4m.bean.MessageBean;
-import org.meiconjun.erp4m.bean.RequestBean;
-import org.meiconjun.erp4m.bean.ResponseBean;
-import org.meiconjun.erp4m.bean.RoleBean;
+import org.meiconjun.erp4m.bean.*;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.CommonDao;
+import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
 import org.meiconjun.erp4m.dao.ProjectManageDao;
 import org.meiconjun.erp4m.service.ProjectManageService;
 import org.meiconjun.erp4m.util.CommonUtil;
@@ -41,6 +39,8 @@ public class ProjectManageServiceImpl implements ProjectManageService {
     private ProjectManageDao projectManageDao;
     @Resource
     private CommonDao commonDao;
+    @Resource
+    private ProjectDocDefindDao projectDocDefindDao;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -60,8 +60,36 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             nextStageOperation(requestBean, responseBean);
         } else if ("getDownRight".equals(operType)) {
             getDownRightOperation(requestBean, responseBean);
+        } else if ("formatProjectDocs".equals(operType)) {
+            formatProjectDocsOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 格式化项目文档列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void formatProjectDocsOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String retStr = "";
+        String[] docStr = ((String) paramMap.get("docs")).split(",");
+        List<ProjectDocBean> beanList = projectDocDefindDao.selectProjectDoc();
+        for (String doc : docStr) {
+            for (ProjectDocBean bean : beanList) {
+                if (bean.getDoc_no().equals(doc)) {
+                    retStr += "," + bean.getDoc_name();
+                }
+            }
+        }
+        if (!CommonUtil.isStrBlank(retStr)) {
+            retStr = retStr.substring(1);
+        }
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("retStr", retStr);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -208,17 +236,46 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         String doc_version = (String) paramMap.get("doc_version");
         String doc_serial = (String) paramMap.get("doc_serial");
         String filePath = (String) paramMap.get("filePath");
+        String doc_no = (String) paramMap.get("doc_no");
+        String doc_name = (String) paramMap.get("doc_name");
         if ("1.0".equals(doc_version)) {
+            int docCount = projectManageDao.selectCountOfStageDoc(doc_serial, doc_no);
+            if (docCount == 0) {
+                logger.info("第一次上传阶段文档");
+                HashMap<String, Object> condMap = new HashMap<>();
+                condMap.put("serial_no", doc_serial);
+                condMap.put("doc_no", doc_no);
+                condMap.put("doc_name", doc_name);
+                condMap.put("doc_version", doc_version);
+                condMap.put("upload_date", CommonUtil.getCurrentDateStr());
+                condMap.put("file_path", filePath);
+                condMap.put("upload_user", CommonUtil.getLoginUser().getUser_no());
+                projectManageDao.insertStageDocInfo(condMap);
+                // 更新未上传文档列表
+                HashMap<String, String> stageInfo = projectManageDao.selectStageInfo(project_no, stage_num);
+                String unupload_doc = stageInfo.get("unupload_doc");
+                List<String > unuploadList = Arrays.asList(unupload_doc.split(","));
+                unuploadList.remove(doc_no);
+                unupload_doc = "";
+                for (String s : unuploadList) {
+                    unupload_doc += s;
+                }
+                if (!CommonUtil.isStrBlank(unupload_doc)) {
+                    unupload_doc = unupload_doc.substring(1);
+                }
+                condMap.put("project_no", project_no);
+                condMap.put("stage_num", stage_num);
+                condMap.put("unupload_doc", unupload_doc);
+                projectManageDao.updateStageInfo(condMap);
+            }
             //更新1.0
             logger.info("更新阶段文档，阶段未结束，直接覆盖原文档");
-            projectManageDao.updateStageDoc(CommonUtil.getCurrentDateStr(), filePath, doc_serial);
+            projectManageDao.updateStageDoc(CommonUtil.getCurrentDateStr(), filePath, doc_serial, doc_no, CommonUtil.getLoginUser().getUser_no());
         } else {
             //新增版本
             logger.info("更新阶段文档，版本已结束，版本迭代为[" + doc_version + "]");
             List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
             HashMap<String, String> docInfo = docList.get(0);
-            String doc_no = docInfo.get("doc_no");
-            String doc_name = docInfo.get("doc_name");
             String doc_writer = docInfo.get("doc_writer");
 
             HashMap<String, Object> condMap = new HashMap<String, Object>();

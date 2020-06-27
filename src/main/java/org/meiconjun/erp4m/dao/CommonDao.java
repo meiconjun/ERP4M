@@ -60,4 +60,8 @@ public interface CommonDao {
      * @return
      */
     List<HashMap<String, String>> selectRoleList(@Param("position") String position, @Param("level") String level, @Param("department") String department);
+    /**
+     * 查询用户和角色信息
+     */
+    List<HashMap<String, String>> selectAllUserAndRoleInfo();
 }

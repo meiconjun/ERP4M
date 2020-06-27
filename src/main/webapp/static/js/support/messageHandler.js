@@ -231,8 +231,9 @@ function showProjectCountersignDialog(title, content, msgStr, button) {
                             value: commonFormatDate(msgBean.msg_param.begin_date)
                         });
                         $("#projectCountersign_produceDoc_download").click(function () {
+                            let postFix = msgBean.msg_param.file_path.substring(msgBean.msg_param.file_path.lastIndexOf("."), msgBean.msg_param.file_path.length);
                             // 下载文件
-                            commonFileDownload(msgBean.msg_param.project_name + "产品规格说明书.doc", msgBean.msg_param.file_path);
+                            commonFileDownload(msgBean.msg_param.project_name + "_产品规格说明书" + postFix, msgBean.msg_param.file_path);
                         });
                     }
                 });
@@ -296,6 +297,9 @@ function showProjectBossCheckDig(title, content, msgStr) {
         "            <div class=\"layui-input-block\">\n" +
         "                <input type=\"text\" name=\"projectCreate_bossCheck_members\" id=\"projectCreate_bossCheck_members\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
+        "        </div>\n" +
+        "        <div class=\"layui-form-item\">\n" +
+        "            <button id=\"projectCreate_bossCheck_memberDownload\" class=\"layui-btn layui-icon-download-circle\">项目成员表</button>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item layui-form-text\">\n" +
         "            <label class=\"layui-form-label\">项目描述</label>\n" +
@@ -399,11 +403,17 @@ function showProjectBossCheckDig(title, content, msgStr) {
                             value : commonFormatDate(msgBean.msg_param.begin_date)
                         });
                         $("#projectCreate_bossCheck_download").click(function () {
+                            let postFix = msgBean.msg_param.specifications.substring(msgBean.msg_param.specifications.lastIndexOf("."), msgBean.msg_param.specifications.length);
                             // 下载文件
-                            commonFileDownload(msgBean.msg_param.project_name + ".doc", msgBean.msg_param.specifications);
+                            commonFileDownload(msgBean.msg_param.project_name + "_产品规格书" + postFix, msgBean.msg_param.specifications);
                             return false;
                         });
 
+                        // 项目成员表下载
+                        $("#projectCreate_bossCheck_memberDownload").click(function () {
+                            let param = "?project_no=" + msgBean.msg_param.project_no;
+                            commonExportExcel("projectMember", msgBean.msg_param.project_name + "_项目成员表.xlsx", param);
+                        });
                         // 拼接阶段信息
                         let stageData = commonAjax("projectManage.do", JSON.stringify({
                             "beanList": [],
@@ -413,10 +423,10 @@ function showProjectBossCheckDig(title, content, msgStr) {
                             }
                         }));
                         if (stageData.retCode == HANDLE_SUCCESS) {
-                            let stageList = stageData.retMap.stageList
+                            let stageList = stageData.retMap.stageList;
                             for (let i = 0;i < stageList.length; i++) {
                                 let tempHtml = "<fieldset name='projectCreate_bossCheck_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n";
-                                tempHtml += "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                                tempHtml += "            <legend>阶段" + (i + 1) + "</legend>\n";
                                 tempHtml +=    "            <div class=\"layui-field-box\">\n" +
                                     "                <div class=\"layui-form-item\">\n" +
                                     "                    <div class=\"layui-inline\">\n" +
@@ -442,18 +452,8 @@ function showProjectBossCheckDig(title, content, msgStr) {
                                     "                    <div class=\"layui-inline\">\n" +
                                     "                        <label class=\"layui-form-label\">阶段文档</label>\n" +
                                     "                        <div class=\"layui-input-inline\">\n" +
-                                    "                            <input type=\"text\" value='" + stageList[i].doc_name + "' name=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                            <input type=\"text\" value='" + formatProjectDocs(stageList[i].unupload_doc) + "' name=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
                                     "                        </div>\n" +
-                                    "                    </div>\n" +
-                                    "                </div>\n" +
-                                    "                <div class=\"layui-form-item\">\n" +
-                                    "                    <div class=\"layui-inline\">\n" +
-                                    "                        <label class=\"layui-form-label\">文档作者</label>\n" +
-                                    "                        <div class=\"layui-input-inline\">\n" +
-                                    "                            <input type=\"text\" value='" + stageList[i].doc_writer + "' name=\"projectCreate_bossCheck_docWriter_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docWriter_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
-                                    "                        </div>\n" +
-                                    "                    </div>\n" +
-                                    "                    <div class=\"layui-inline\">\n" +
                                     "                    </div>\n" +
                                     "                </div>\n" +
                                     "            </div>\n" +
@@ -463,9 +463,9 @@ function showProjectBossCheckDig(title, content, msgStr) {
 
                             layui.form.render();
                             // 绑定规格书下载事件
-                            $("#projectManage_specificationsDownload_dialog").click(function () {
+                            /*$("#projectManage_specificationsDownload_dialog").click(function () {
                                 commonFileDownload(data.project_name + "产品规格说明书.doc", $("#projectManage_specificationsDownload_dialog").val());
-                            });
+                            });*/
                         } else {
                             commonError("加载项目阶段信息失败：" + stageData.retMsg);
                         }

@@ -73,4 +73,10 @@
             and department = #{department}
         </if>
     </select>
+
+    <select id="selectAllUserAndRoleInfo" resultType="java.util.HashMap">
+        select a.user_no, a.user_name, c.role_name, c.position, c.department from sys_user_tb a, sys_user_role_tb b, sys_role_tb c
+        where a.user_no = b.user_no and b.role_no = c.role_no
+    </select>
+
 </mapper>

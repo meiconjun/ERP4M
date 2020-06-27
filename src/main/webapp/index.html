@@ -390,6 +390,22 @@ BODY 标签选项：
                         <button type="button" class="btn btn-default pull-right"><i class="fa fa-plus"></i> 添加项目</button>
                     </div>-->
                 </div>
+                <div class="box box-primary"  >
+                    <div class="box-header">
+                        <i class="ion ion-clipboard" style="color: red"></i>
+                        <a href="#" onclick="initTodoTask()" class="box-title">代办任务</a>
+                        |
+                        <i class="ion ion-clipboard"></i>
+                        <a href="#" onclick="initDoneTask()" class="box-title">已办任务</a>
+                        <div class="box-tools pull-right">
+                        </div>
+                    </div>
+                    <!-- 待办事项 -->
+                    <div class="box-body" style="height: 300px; overflow: auto;">
+                        <ul id="mainPage-todo-task-list" class="todo-list">
+                        </ul>
+                    </div>
+                </div>
                 <!-- /.box -->
                 <!-- TO DO List -->
                 <!-- /.box -->

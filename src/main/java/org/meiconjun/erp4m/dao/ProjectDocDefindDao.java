@@ -3,6 +3,7 @@ package org.meiconjun.erp4m.dao;
 import org.apache.ibatis.annotations.Param;
 import org.meiconjun.erp4m.bean.ProjectDocBean;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,4 +31,8 @@ public interface ProjectDocDefindDao {
      * 删除项目文档信息
      */
     int deleteDoc(@Param("doc_no") String doc_no);
+    /**
+     * 根据文档编号查询文档信息
+     */
+    HashMap<String, String> selectProjectDocInfoByDocNo(@Param("doc_no") String doc_no);
 }

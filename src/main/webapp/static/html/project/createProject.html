@@ -29,7 +29,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">项目成员</label>
             <div class="layui-input-block">
-                <input type="text" disabled="disabled" placeholder="选择各阶段人员后自动填写" name="createProject_members" id="createProject_members" autocomplete="off" class="layui-input layui-disabled">
+                <input type="text" placeholder="点击选择项目成员" name="createProject_members" id="createProject_members" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item layui-form-text">
@@ -64,28 +64,14 @@
                     </div>
                 </div>
                 <div class="layui-inline layui-inline">
-                    <select lay-filter='createProject_stageDoc1' name="createProject_stageDoc1" id="createProject_stageDoc1" required lay-verify="required">
-                    </select>
-                </div>
-                <div class="layui-inline layui-inline">
-                    <input type="text" placeholder="文档作者" name="createProject_docWriter1" id="createProject_docWriter1" required  lay-verify="required" autocomplete="off" class="layui-input">
-                </div>
-                <div class="layui-inline layui-inline">
-                    <select lay-filter="createProject_stageUser1" name="createProject_stageUser1" id="createProject_stageUser1" required lay-verify="required">
-                    </select>
+                    <button type="button" id="createProject_stageDoc1" name="createProject_stageDoc1" class="layui-btn layui-btn-primary" onclick="createProject_selectProjectDoc(this)">选择阶段文档</button>
                 </div>
                 <button type="button" class="layui-btn" onclick="createProject_addStage()"><i class="layui-icon layui-icon-add-circle"></i></button>
-                <!--<div class="layui-inline layui-inline">
-                    <button type="button" class="layui-btn layui-btn-primary" stageCount="1" onclick="createProject_selectDoc(this)">选择文档</button>
-                    <button type="button" class="layui-btn layui-btn-primary">选择负责人</button>
-                    <button type="button" class="layui-btn" onclick="createProject_addStage()"><i class="layui-icon layui-icon-add-circle"></i>添加阶段</button>
-                </div>-->
             </div>
         </div>
 
         <div class="layui-form-item">
 
-<!--            <button id="createProject_fileSubmit" class="layui-btn">确定</button>-->
         </div>
     </form>
 
@@ -150,4 +136,12 @@
     </form>
 </div>
 
+<!-- 穿梭框容器 -->
+<div hidden="hidden" id="createProject_memberTransfer">
+
+</div>
+
+<div hidden="hidden" id="createProject_memberTransfer2">
+
+</div>
 <script src="static/js/project/createProject.js"></script>

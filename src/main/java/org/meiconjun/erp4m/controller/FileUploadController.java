@@ -116,7 +116,10 @@ public class FileUploadController {
         String doc_version = request.getParameter("doc_version");
         String file_root_path = request.getParameter("file_root_path");
         String doc_serial = request.getParameter("doc_serial");
+        String doc_no = request.getParameter("doc_no");
+        String doc_name = request.getParameter("doc_name");
         String orgName = img.getOriginalFilename();
+
 
         String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
         String filePath = file_root_path;
@@ -139,6 +142,8 @@ public class FileUploadController {
         paramMap.put("doc_version", this_version);
         paramMap.put("doc_serial", doc_serial);
         paramMap.put("filePath", filePath);
+        paramMap.put("doc_no", doc_no);
+        paramMap.put("doc_name", doc_name);
         bean.setParamMap(paramMap);
         try {
             ResponseBean responseBean = projectManageService.excute(bean);

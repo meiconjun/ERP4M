@@ -348,3 +348,83 @@ function getDaysBetween(begin_date, end_date) {
 
     return (endDate - startDate) / (24 * 60 * 60 * 1000);
 }
+
+/**
+ * 获取系统用户列表[{
+ *     "name": "用户号-用户名",
+ *     "value": "用户号"
+ * }]
+ */
+function getAllUserList() {
+    let users = [];
+    let userListData = commonAjax("common.do", JSON.stringify({
+        "beanList": [{}],
+        "operType": "getAllUserNoAndName",
+        "paramMap": {}
+    }));
+    if (userListData.retCode == HANDLE_SUCCESS) {
+        let allUserMap = userListData.retMap.allUser;
+        for (let allUserMapKey in allUserMap) {
+            users.push({
+                "name" : allUserMapKey + "-" + allUserMap[allUserMapKey],
+                "value" : allUserMapKey
+            });
+        }
+    } else {
+        commonError("加载系统用户列表失败");
+    }
+    return users;
+}
+
+/**
+ * 格式化逗号分隔的项目文档列表
+ */
+function formatProjectDocs(str) {
+    let retData = commonAjax("projectManage.do", JSON.stringify({
+        "beanList": [{}],
+        "operType": "formatProjectDocs",
+        "paramMap": {
+            "docs": str
+        }
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        return retData.retMap.retStr;
+    } else {
+        console.error("格式化项目文档列表");
+        return str;
+    }
+}
+/**
+ * Excel导出
+ * @Param operType 导出类型标识
+ * @Param fileName 保存文件名
+ * @Param param 参数列表 xxx=xxx&xxx=xxx
+ */
+function commonExportExcel(operType, fileName, param) {
+    //隐藏的表单，用于请求下载服务
+    let html = "<form style='display: none' id='commonExportExcelFrm' target='commonIframe' hidden='hidden'  method='post' action='exportExcel.do" + param + "'>" +
+        "</form>";
+    let $html = $(html);
+    // $(document)[0].append($html);
+    $(document.body).append($html);
+    $html.find('[name="fileName"]').val(fileName.replace(/\s+/g, ""));
+    $html.find('[name="operType"]').val(operType);
+    $html.submit();
+}
+
+/**
+ * 更新任务状态
+ * @param task_no
+ * @param user_no
+ */
+function commonUpdateTaskState(task_no, user_no) {
+    let retData = commonAjax("common.do", JSON.stringify({
+        "beanList": [],
+        "operType": "updateTask",
+        "paramMap": {
+            'task_no': task_no,
+            "user_no": user_no
+        }
+    }));
+    return retData;
+}

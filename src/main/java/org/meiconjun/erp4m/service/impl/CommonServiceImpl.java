@@ -3,9 +3,11 @@ package org.meiconjun.erp4m.service.impl;
 import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
+import org.meiconjun.erp4m.bean.TaskBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.MessageDao;
+import org.meiconjun.erp4m.dao.TaskDao;
 import org.meiconjun.erp4m.service.CommonService;
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.slf4j.Logger;
@@ -35,6 +37,8 @@ public class CommonServiceImpl implements CommonService {
     private CommonDao commonDao;
     @Resource
     private MessageDao messageDao;
+    @Resource
+    private TaskDao taskDao;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -51,8 +55,69 @@ public class CommonServiceImpl implements CommonService {
             initReadMessageOperation(requestBean, responseBean);
         } else if ("getRoleList".equals(operType)) {
             getRoleListOperation(requestBean, responseBean);
+        } else if ("updateTask".equals(operType)) {
+            updateTaskStateOperation(requestBean, responseBean);
+        } else if ("initTodoTask".equals(operType)) {
+            getTodoTaskOperation(requestBean, responseBean);
+        } else if ("initDoneTask".equals(operType)) {
+            getDoneTaskOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 获取已办任务列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getDoneTaskOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String user_no = (String) paramMap.get("user_no");
+        String role_no = (String) paramMap.get("role_no");
+
+        List<TaskBean> taskList = taskDao.selectDoneTask(user_no, role_no);
+
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("taskList", taskList);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
+    }
+
+    /**
+     * 获取代办任务列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getTodoTaskOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String user_no = (String) paramMap.get("user_no");
+        String role_no = (String) paramMap.get("role_no");
+
+        List<TaskBean> taskList = taskDao.selectTodoTask(user_no, role_no);
+
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("taskList", taskList);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
+    }
+
+    /**
+     * 更新任务处理状态
+     * @param requestBean
+     * @param responseBean
+     */
+    private void updateTaskStateOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap =requestBean.getParamMap();
+        String task_no = (String) paramMap.get("task_no");
+        String user_no = (String) paramMap.get("user_no");
+
+        String retStr = CommonUtil.updateTaskStatus(task_no, user_no);
+        if (!CommonUtil.isStrBlank(retStr)) {
+            responseBean.setRetCode(SystemContants.HANDLE_FAIL);
+            responseBean.setRetMsg(retStr);
+        } else {
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        }
     }
 
     /**

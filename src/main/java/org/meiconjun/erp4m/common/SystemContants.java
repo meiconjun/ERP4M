@@ -34,7 +34,8 @@ public class SystemContants {
 
     /** 任务类型-审阅文档消息提醒 */
     public static final String FIELD_TASK_TYPE_DOC_REVIEW = "1";
-
+    /** 任务类型-阶段文档上传 */
+    public static final String FIELD_TASK_TYPE_STAGE_DOC_UPLOAD = "3";
     /** 项目阶段*/
     public static final String FIELD_STAGE = "P010100";
 
