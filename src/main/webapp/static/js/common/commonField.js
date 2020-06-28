@@ -44,3 +44,9 @@ const FIELD_DOC_SECRET = "D010200";
 const FIELD_DOC_LANGUAGE = "D010300";
 /** 文档状态*/
 const FIELD_DOC_STATE = "D010400";
+
+/*=====================任务种类===============================*/
+/** 审阅文档*/
+const FIELD_TASK_TYPE_DOC_REVIEW = "1";
+/** 阶段文档上传*/
+const FIELD_TASK_TYPE_STAGE_DOC_UPLOAD = "3";

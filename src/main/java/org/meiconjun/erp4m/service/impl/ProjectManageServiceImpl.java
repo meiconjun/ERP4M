@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import org.meiconjun.erp4m.bean.*;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.CommonDao;
+import org.meiconjun.erp4m.dao.CreateProjectDao;
 import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
 import org.meiconjun.erp4m.dao.ProjectManageDao;
 import org.meiconjun.erp4m.service.ProjectManageService;
@@ -41,6 +42,8 @@ public class ProjectManageServiceImpl implements ProjectManageService {
     private CommonDao commonDao;
     @Resource
     private ProjectDocDefindDao projectDocDefindDao;
+    @Resource
+    private CreateProjectDao createProjectDao;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -62,8 +65,68 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             getDownRightOperation(requestBean, responseBean);
         } else if ("formatProjectDocs".equals(operType)) {
             formatProjectDocsOperation(requestBean, responseBean);
+        } else if ("getStageDocList".equals(operType)) {
+            getStageDocListoperation(requestBean, responseBean);
+        } else if ("getUploadRight".equals(operType)) {
+            getUploadRightOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 获取阶段文档的可上传用户
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getUploadRightOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String department = (String) paramMap.get("department");
+        String duty_role = (String) paramMap.get("duty_role");
+        String project_menbers = (String) paramMap.get("project_menbers");
+
+        //(文员、负责人)
+        // 查询系统文员列表
+        List<String> clerkList = projectManageDao.selectClerkList();
+        // 查询文档负责用户列表
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("department", department);
+        condMap.put("duty_role", duty_role);
+        condMap.put("project_menbers", project_menbers);
+        List<String> userList = createProjectDao.selectStageDocDutyUser(condMap);
+
+        String userStr = "";
+        for (String s: clerkList) {
+            userStr += "," + s;
+        }
+        for (String s: userList) {
+            userStr += "," + s;
+        }
+        if (!CommonUtil.isStrBlank(userStr)) {
+            userStr = userStr.substring(1);
+        }
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("userStr", userStr);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
+    }
+
+    /**
+     * 获取阶段共需上传的文档列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getStageDocListoperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String stage_num = (String) paramMap.get("stage_num");
+        String unupload_doc = (String) paramMap.get("unupload_doc");
+
+        // 查询文档列表，将已上传的文档和待上传的文档合并
+        List<HashMap<String, String>> docList = projectManageDao.selectStageDocUnion(project_no, stage_num, unupload_doc);
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("docList", docList);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -93,22 +156,21 @@ public class ProjectManageServiceImpl implements ProjectManageService {
     }
 
     /**
-     * 获取项目阶段文档下载权限
+     * 获取项目阶段文档下载权限和上传权限
      * @param requestBean
      * @param responseBean
      */
     private void getDownRightOperation(RequestBean requestBean, ResponseBean responseBean) {
         Map<String, Object> paramMap = requestBean.getParamMap();
         String user_no = CommonUtil.getLoginUser().getUser_no();
-        String principal = (String) paramMap.get("principal");
-
-        if (user_no.equals(principal)) {
-            logger.info("用户[" + user_no + "]为当前阶段负责人，有文档下载权限");
+        String upload_user = (String) paramMap.get("upload_user");
+       if (user_no.equals(upload_user)) {
+            logger.info("用户[" + user_no + "]为当前文档上传者，有文档下载权限");
             responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
             return;
         }
-        // 获取阶段负责人的部门经理用户号
-        String manager = projectManageDao.selectStagePrincipalManager(principal);
+        // 获取上传者的部门经理用户号
+        String manager = projectManageDao.selectStagePrincipalManager(upload_user);
         if (user_no.equals(manager)) {
             logger.info("用户[" + user_no + "]为当前阶段负责人的所属部门经理，有文档下载权限");
             responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
@@ -274,18 +336,15 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         } else {
             //新增版本
             logger.info("更新阶段文档，版本已结束，版本迭代为[" + doc_version + "]");
-            List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
-            HashMap<String, String> docInfo = docList.get(0);
-            String doc_writer = docInfo.get("doc_writer");
 
             HashMap<String, Object> condMap = new HashMap<String, Object>();
             condMap.put("serial_no", doc_serial);
             condMap.put("doc_no", doc_no);
             condMap.put("doc_name", doc_name);
-            condMap.put("doc_writer", doc_writer);
             condMap.put("doc_version", doc_version);
             condMap.put("upload_date", CommonUtil.getCurrentDateStr());
             condMap.put("file_path", filePath);
+            condMap.put("upload_user", CommonUtil.getLoginUser().getUser_no());
             projectManageDao.insertStageDocInfo(condMap);
         }
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
@@ -300,8 +359,9 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         Map<String, Object> paramMap = requestBean.getParamMap();
         String project_no = (String) paramMap.get("project_no");
         String stage_num = (String) paramMap.get("stage_num");
+        String doc_no = (String) paramMap.get("doc_no");
 
-        String doc_version = projectManageDao.selectStageDocLastVersion(project_no, stage_num);
+        String doc_version = projectManageDao.selectStageDocLastVersion(project_no, stage_num, doc_no);
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         retMap.put("doc_version", doc_version);
         responseBean.setRetMap(retMap);

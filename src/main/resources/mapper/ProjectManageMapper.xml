@@ -20,22 +20,22 @@
     </select>
 
     <select id="selectStageOfProject" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select a.*, b.* from project_stage_tb a, project_stage_doc_tb b
-        where a.project_no = #{project_no} and a.doc_serial = b.serial_no and b. doc_version = '1.0'
+        select a.*from project_stage_tb a
+        where a.project_no = #{project_no}
         order by a.stage_num asc
     </select>
 
     <select id="selectStageDocInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select c.*, d.department  from project_stage_tb b, project_stage_doc_tb c, pd_doc_defined_tb d
+        select c.*, d.department, d.duty_role  from project_stage_tb b, project_stage_doc_tb c, pd_doc_defined_tb d
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
-        and c.file_path is not null and c.file_path != '' and c.doc_no = d.doc_no
+        and  c.doc_no = d.doc_no
         order by c.doc_version desc
     </select>
 
     <select id="selectStageDocLastVersion" parameterType="java.lang.String" resultType="java.lang.String">
         select max(c.doc_version) from project_stage_tb b, project_stage_doc_tb c
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
-        and c.file_path is not null and c.file_path != '' and b.is_end = '1'
+        and b.is_end = '1' and c.doc_no = #{doc_no}
     </select>
 
     <update id="updateStageDoc" parameterType="java.lang.String">
@@ -130,4 +130,17 @@
         where serial_no = #{doc_serial} and doc_no = #{doc_no}
     </select>
 
+    <select id="selectStageDocUnion" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select '' as serial_no, b.doc_no, b.doc_name, b.writer, b.department, b.duty_role, a.role_name from sys_role_tb a, pd_doc_defined_tb b
+        where b.doc_no in (${unupload_doc}) and b.duty_role = a.role_no
+        union
+        select b.serial_no, b.doc_no, b.doc_name, c.writer, c.department, c.duty_role, d.role_name from project_stage_tb a, project_stage_doc_tb b, pd_doc_defined_tb c, sys_role_tb d
+        where a.project_no = #{project_no} and a.stage_num = #{stage_num} and a.doc_serial = b.serial_no and
+        b.doc_no = c.doc_no and b.doc_version = '1.0' and c.duty_role = d.role_no
+    </select>
+
+    <select id="selectClerkList" resultType="java.lang.String">
+        select a.user_no from sys_user_tb a, sys_user_role_tb b, sys_role_tb c
+        where a.user_no = b.user_no and b.role_no = c.role_no and c.position = '4'/*职位 4-文员*/
+    </select>
 </mapper>

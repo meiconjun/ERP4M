@@ -2,7 +2,9 @@
  * 任务处理函数
  */
 function taskHandler_showTask(taskBean) {
-
+    if (taskBean.task_type == FIELD_TASK_TYPE_STAGE_DOC_UPLOAD) {
+        taskHandler_stageDocUpload(taskBean);
+    }
 }
 
 /** 文档审阅 */

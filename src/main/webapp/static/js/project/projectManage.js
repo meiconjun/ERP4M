@@ -241,7 +241,11 @@ function projectManage_detailOperation(data) {
                 "projectManage__desc_dialog": data.desc,
                 "projectManage_specificationsDownload_dialog": data.specifications
             });
-
+            // 项目成员表下载
+            $("#projectManage_memberDownload").click(function () {
+                let param = "?project_no=" + data.project_no;
+                commonExportExcel("projectMember", data.project_name + "_项目成员表.xlsx", param);
+            });
             // 拼接阶段信息
             let stageData = commonAjax("projectManage.do", JSON.stringify({
                 "beanList": [],
@@ -255,9 +259,9 @@ function projectManage_detailOperation(data) {
                 for (let i = 0;i < stageList.length; i++) {
                     let tempHtml = "<fieldset name='projectManage_stageFieldSet' class=\"layui-elem-field layui-field-title\">\n";
                     if ((data.stage_num == (i + 1))) {
-                        tempHtml += "            <legend style='color: forestgreen !important;'>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                        tempHtml += "            <legend style='color: forestgreen !important;'>阶段" + (i + 1) + "</legend>\n";
                     } else {
-                        tempHtml += "            <legend>阶段" + (i + 1) + ",负责人：" + commonFormatUserNo(stageList[i].principal, true) + "</legend>\n";
+                        tempHtml += "            <legend>阶段" + (i + 1) + "</legend>\n";
                     }
 
                     tempHtml +=    "            <div class=\"layui-field-box\">\n" +
@@ -283,90 +287,13 @@ function projectManage_detailOperation(data) {
                         "                        </div>\n" +
                         "                    </div>\n" +
                         "                    <div class=\"layui-inline\">\n" +
-                        "                        <label class=\"layui-form-label\">阶段文档</label>\n" +
-                        "                        <div class=\"layui-input-inline\">\n" +
-                        "                            <input type=\"text\" value='" + stageList[i].doc_name + "' name=\"projectManage_docName_dialog" + (i + 1) + "\" id=\"projectManage_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
-                        "                        </div>\n" +
+                        "                            <button type=\"button\" id=\"projectManage_docDetail_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" onclick=\"projectManage_docDetail('" + data.project_no + "','" + data.stage_num + "','" + data.unupload_doc + "','" + data.project_menbers + "')\">文档详情</button>\n" +
                         "                    </div>\n" +
-                        "                </div>\n" +
-                        "                <div class=\"layui-form-item\">\n" +
-                        "                    <div class=\"layui-inline\">\n" +
-                        "                        <label class=\"layui-form-label\">文档作者</label>\n" +
-                        "                        <div class=\"layui-input-inline\">\n" +
-                        "                            <input type=\"text\" value='" + stageList[i].doc_writer + "' name=\"projectManage_docWriter_dialog" + (i + 1) + "\" id=\"projectManage_docWriter_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
-                        "                        </div>\n" +
-                        "                    </div>\n" +
-                        "                    <div class=\"layui-inline\">\n";
-                    //上传文档，需要是处于当前阶段并且当前用户是负责人;并且当前处于项目进行中状态
-                    if ((data.stage_num == (i + 1)) && stageList[i].principal == sessionStorage.getItem("user_no")) {
-                        if (data.project_state == '3') {
-                            tempHtml += "                            <button type=\"button\" id=\"projectManage_uploadFile_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" >上传文档</button>\n";//此处传参要加''，否则会被类型转换/*onclick=\"projectManage_uploadFile('" + data.project_no + "','" + (i+1) +  "')\"*/
-                        }
-                    }
-                    if (buttonStr.indexOf("projectManage_docDetail_dialog") != -1) {
-                        tempHtml += "                            <button type=\"button\" id=\"projectManage_docDetail_dialog" + (i + 1) + "\"  class=\"layui-btn layui-btn-primary\" onclick=\"projectManage_docDetail('" + data.project_no + "','" + data.stage_num + "','" +  stageList[i].principal + "')\">文档详情</button>\n";
-                    }
-
-
-                    tempHtml += "                    </div>\n" +
                         "                </div>\n" +
                         "            </div>\n" +
                         "        </fieldset>";
                     $("#projectManage_detailFrm").append(tempHtml);
-                    // 查询阶段文档信息
-                    let stageDocData = commonAjax("projectManage.do", JSON.stringify({
-                        "beanList": [],
-                        "operType": "getStageDocVersion",
-                        "paramMap": {
-                            "project_no": data.project_no,
-                            "stage_num": data.stage_num
-                        }
-                    }));
-                    if (stageDocData.retCode == HANDLE_SUCCESS) {
-                        let doc_version = stageDocData.retMap.doc_version;
-                        //绑定上传组件到按钮
-                        let fileUploadInst = layui.upload.render({
-                            elem: '#projectManage_uploadFile_dialog' + (i + 1),
-                            url: 'projectStageDocUpload.do',//改成您自己的上传接口
-                            data: {
-                                "project_no": data.project_no,
-                                "stage_num": data.stage_num,
-                                "doc_version": commonBlank(doc_version) ? "" : doc_version,
-                                "file_root_path": data.file_root_path,
-                                "doc_serial": stageList[i].doc_serial
-                            },
-                            accept: 'file',//只允许上传图片
-                            auto: false,// 选择文件后是否自动上传
-                            // bindAction: "#createProject_fileSubmit",
-                            multiple: false,// 是否允许多文件上传
-                            choose: function(obj) {
-                                //预读本地文件,如果是多文件，则会遍历
-                                obj.preview(function (index, file, result) {
-                                    let confirmStr = commonBlank(doc_version) ? "是否确认提交文件[" + file.name + "]？当前阶段文档未定版，上传后将覆盖原先文件" : "是否确认提交文件[" + file.name + "]？当前阶段文档最新版本为[" + doc_version + "]";
-                                    layui.layer.confirm(confirmStr, function(index) {
-                                        layui.layer.load();//loading
-                                        fileUploadInst.upload();
-                                    });
-                                });
-                            },
-                            done: function(res, index, upload){
-                                if (res.code == '0') {
-                                    layui.layer.closeAll('loading');
-                                    commonOk("上传阶段文档成功");
-                                } else {
-                                    layui.layer.closeAll('loading');
-                                    commonError("上传阶段文档失败:" + res.msg)
-                                }
-                            },
-                            error: function (index, upload) {
-                                layui.layer.closeAll('loading');
-                                commonError("上传阶段文档失败，请稍后重试");
-                            }
-                        });
-                    } else {
-                        commonError("获取阶段文档信息失败：" + stageDocData.retMsg);
-                        return;
-                    }
+
 
                 }
 
@@ -385,28 +312,194 @@ function projectManage_detailOperation(data) {
 }
 
 /**
- * 阶段文档详情
+ * 阶段文档列表详情
  */
-function projectManage_docDetail(project_no, stage_num, principal) {
+function projectManage_docDetail(project_no, stage_num, unupload_doc, project_menbers) {
     layui.layer.open({
         type: 1,// 页面层
         area: ['700px', '500px'],// 宽高
-        title: '阶段文档详情',// 标题
+        title: '阶段文档列表',// 标题
         content: $("#projectManage_docDetail_dialogDiv"),//内容，直接取dom对象
         // btn: ['确定'],
         // yes: function (index, layero) {
         //     //确认按钮的回调，提交表单
         // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-            // 判断当前用户是否有下载权限（上传者、上传者部门经理、老板（特殊权限）、文员（特殊权限））
-            let rightFlag = false;
-            let rightData = commonAjax("projectManage.do", JSON.stringify({
-                "beanList": [],
-                "operType": "getDownRight",
-                "paramMap": {
-                    "principal": principal
-                }
-            }));
+
+            layui.table.render({
+                id: 'projectManage_docDetail_tableObj',
+                elem: '#projectManage_docDetail_table',
+                height: 430,
+                url: 'projectManage.do',
+                where: {
+                    message: JSON.stringify({
+                        "beanList": [{
+                        }],
+                        "operType": "getStageDocList",
+                        "paramMap": {
+                            "project_no": project_no,
+                            "stage_num": stage_num,
+                            "unupload_doc": unupload_doc
+                        }
+                    })
+                },
+                method : 'post',
+                even : true,
+                page: false,
+                loading : true,
+                skin : 'row',
+                done : function(res, curr, count){
+                    // 分页初始化
+
+                },
+                parseData: function(res){ //res 即为原始返回的数据
+                    return {
+                        "code": res.retCode, //解析接口状态
+                        "msg": res.retMsg, //解析提示文本
+                        "count": res.retMap.total, //解析数据长度
+                        "data": res.retMap.docList //解析数据列表
+                    };
+                },
+                cols : [[
+                    {
+                        field: 'doc_no',
+                        title: '文档编号',
+                        align : 'center'
+                    },
+                    {
+                        field: 'doc_name',
+                        title: '文档名称',
+                        align : 'center'
+                    },
+                    {   field: 'writer',
+                        title: '作者',
+                        align : 'center'
+                     }
+                    , { field: 'department',
+                        title: '负责部门',
+                        align : 'center',
+                        templet : function (data) {
+                            return commonFormatValue(FIELD_DEPARTMENT, data.department);
+                        }
+                    }
+                    , {
+                        field: 'duty_role',
+                        title: '负责角色',
+                        sort: true,
+                        align : 'center',
+                        templet : function (data) {
+                            return data.duty_role + '-' + data.role_name;
+                        }
+                    }
+                    , {
+                        field: 'edit',
+                        title: '操作',
+                        width: 150,
+                        sort: false,
+                        fixed: 'right',
+                        align : 'center',
+                        templet : function (data) {
+                            // 判断当前用户是否上传权限(文员、负责人)
+                            let rightData = commonAjax("projectManage.do", JSON.stringify({
+                                "beanList": [],
+                                "operType": "getUploadRight",
+                                "paramMap": {
+                                    "doc_no": data.doc_no,
+                                    "department" : data.department,
+                                    "duty_role": data.duty_role,
+                                    "project_menbers": project_menbers
+                                }
+                            }));
+                            let userStr = rightData.retMap.userStr;
+                            let html = "";
+                            if (userStr.indexOf(sessionStorage.getItem("user_no")) != -1 && !commonBlank(data.serial_no)) {/*必须要已经上传了第一版文档(待办任务处上传的)*/
+                                html += "<a class=\"layui-btn layui-btn-xs\" id='projectManage_uploadFile_dialog" + data.doc_no + "'>上传</a>";
+                            }
+                            if (buttonStr.indexOf("projectManage_docDetail_dialog") != -1) {
+                                html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"projectManage_versionDetail('" + data.project_no + "','" + data.stage_num + "')\">文档详情</a>";
+                            }
+                            // 查询阶段文档信息
+                            let stageDocData = commonAjax("projectManage.do", JSON.stringify({
+                                "beanList": [],
+                                "operType": "getStageDocVersion",
+                                "paramMap": {
+                                    "project_no": data.project_no,
+                                    "stage_num": data.stage_num,
+                                    "doc_no": data.doc_no
+                                }
+                            }));
+                            if (stageDocData.retCode == HANDLE_SUCCESS) {
+                                let doc_version = stageDocData.retMap.doc_version;
+                                //绑定上传组件到按钮
+                                let fileUploadInst = layui.upload.render({
+                                    elem: '#projectManage_uploadFile_dialog' + data.doc_no,
+                                    url: 'projectStageDocUpload.do',//改成您自己的上传接口
+                                    data: {
+                                        "project_no": data.project_no,
+                                        "stage_num": data.stage_num,
+                                        "doc_version": commonBlank(doc_version) ? "" : doc_version,
+                                        "file_root_path": data.file_root_path,
+                                        "doc_serial": stageList[i].doc_serial,
+                                        "doc_no": data.doc_no,
+                                        "doc_name": data.doc_name
+                                    },
+                                    accept: 'file',//只允许上传图片
+                                    auto: false,// 选择文件后是否自动上传
+                                    // bindAction: "#createProject_fileSubmit",
+                                    multiple: false,// 是否允许多文件上传
+                                    choose: function(obj) {
+                                        //预读本地文件,如果是多文件，则会遍历
+                                        obj.preview(function (index, file, result) {
+                                            let confirmStr = commonBlank(doc_version) ? "是否确认提交文件[" + file.name + "]？当前阶段文档未定版，上传后将覆盖原先文件" : "是否确认提交文件[" + file.name + "]？当前阶段文档最新版本为[" + doc_version + "]";
+                                            layui.layer.confirm(confirmStr, function(index) {
+                                                layui.layer.load();//loading
+                                                fileUploadInst.upload();
+                                            });
+                                        });
+                                    },
+                                    done: function(res, index, upload){
+                                        if (res.code == '0') {
+                                            layui.layer.closeAll('loading');
+                                            commonOk("上传阶段文档成功");
+                                        } else {
+                                            layui.layer.closeAll('loading');
+                                            commonError("上传阶段文档失败:" + res.msg)
+                                        }
+                                    },
+                                    error: function (index, upload) {
+                                        layui.layer.closeAll('loading');
+                                        commonError("上传阶段文档失败，请稍后重试");
+                                    }
+                                });
+                            } else {
+                                commonError("获取阶段文档信息失败：" + stageDocData.retMsg);
+                                return;
+                            }
+                            return html;
+                        }}
+                ]]
+            });
+        }
+    });
+}
+
+/**
+ * 文档版本详情
+ * @param project_no
+ * @param stage_num
+ */
+function projectManage_versionDetail(project_no, stage_num) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['600px', '500px'],// 宽高
+        title: '文档版本详情',// 标题
+        content: $("#projectManage_docDetail_dialogDiv2"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+
 
             if (rightData.retCode == HANDLE_SUCCESS) {
                 rightFlag = true;
@@ -414,8 +507,8 @@ function projectManage_docDetail(project_no, stage_num, principal) {
                 console.log("当前用户无阶段[" + stage_num + "]文档的下载权限");
             }
             layui.table.render({
-                id: 'projectManage_docDetail_tableObj',
-                elem: '#projectManage_docDetail_table',
+                id: 'projectManage_docDetail_table2',
+                elem: '#projectManage_docDetail_table2',
                 height: 430,
                 url: 'projectManage.do',
                 where: {
@@ -460,15 +553,13 @@ function projectManage_docDetail(project_no, stage_num, principal) {
                         sort: true,
                         align : 'center'
                     }
-                    , { field: 'doc_writer',
-                        title: '作者',
-                        align : 'center'
-                     }
-                    , { field: 'department',
-                        title: '负责部门',
+                    , {
+                        field: 'upload_user',
+                        title: '上传用户',
+                        sort: true,
                         align : 'center',
                         templet : function (data) {
-                            return commonFormatValue(FIELD_DEPARTMENT, data.department);
+                            return commonFormatUserNo(data.upload_user);
                         }
                     }
                     , {
@@ -488,6 +579,18 @@ function projectManage_docDetail(project_no, stage_num, principal) {
                         fixed: 'right',
                         align : 'center',
                         templet : function (data) {
+                            // 判断当前用户是否有下载权限（上传者、上传者部门经理、老板（特殊权限）、文员（特殊权限））
+                            let rightFlag = false;
+                            let rightData = commonAjax("projectManage.do", JSON.stringify({
+                                "beanList": [],
+                                "operType": "getDownRight",
+                                "paramMap": {
+                                    "upload_user": data.upload_user
+                                }
+                            }));
+                            if (rightData.retCode == HANDLE_SUCCESS) {
+                                rightFlag = true;
+                            }
                             let html = "";
                             if (rightFlag) {
                                 html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"projectManage_downloadStageDoc(" + commonFormatObj(data) + ")\">下载</a>";
@@ -499,7 +602,6 @@ function projectManage_docDetail(project_no, stage_num, principal) {
         }
     });
 }
-
 function projectManage_cleanForm() {
     layui.form.val("projectManage_detailFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
         "projectManage_projectName_dialog": "", // "name": "value"
@@ -515,5 +617,6 @@ function projectManage_cleanForm() {
 }
 
 function projectManage_downloadStageDoc(data) {
-    commonFileDownload((data.doc_name + "_" + data.doc_version + ".doc"), data.file_path);
+    let postFix = data.file_path.substring(data.file_path.lastIndexOf("."), data.file_path.length);
+    commonFileDownload((data.doc_name + "_" + data.doc_version + postFix), data.file_path);
 }

@@ -28,7 +28,7 @@ public interface ProjectManageDao {
     /**
      * 查询阶段文档版本
      */
-    String selectStageDocLastVersion(@Param("project_no") String project_no, @Param("stage_num") String stage_num);
+    String selectStageDocLastVersion(@Param("project_no") String project_no, @Param("stage_num") String stage_num, @Param("doc_no") String doc_no);
     /**
      * 更新阶段文档 1.0
      */
@@ -66,4 +66,12 @@ public interface ProjectManageDao {
      * 查询某阶段某文档是否已上传
      */
     int selectCountOfStageDoc(@Param("doc_serial") String doc_serial, @Param("doc_no") String doc_no);
+    /**
+     * 查询文档列表，将已上传的文档和待上传的文档合并
+     */
+    List<HashMap<String, String>> selectStageDocUnion(@Param("project_no") String project_no, @Param("stage_num") String stage_num, @Param("unupload_doc") String unupload_doc);
+    /**
+     * 查询文员列表
+     */
+    List<String> selectClerkList();
 }
