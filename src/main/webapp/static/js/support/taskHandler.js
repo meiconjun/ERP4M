@@ -177,7 +177,7 @@ function taskHandler_stageDocUpload(taskBean) {
         "        <div class=\"layui-form-item layui-form-text\">\n" +
         "            <label class=\"layui-form-label\">选择文件</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"stageDocUpload_selectFile\" id=\"stageDocUpload_selectFile\" class=\"layui-input\" disabled>\n" +
+        "                <input type=\"text\" name=\"stageDocUpload_selectFile\" id=\"stageDocUpload_selectFile\" class=\"layui-input\" >\n" +
         "            </div>\n" +
         "        </div>\n" +
         "    </form>\n" +
@@ -186,7 +186,7 @@ function taskHandler_stageDocUpload(taskBean) {
     layui.layer.open({
         type: 1,// 页面层
         area: ['500px', '600px'],// 宽高
-        title: '文档审阅',// 标题
+        title: '阶段文档上传',// 标题
         content: html,//内容，直接取dom对象
         btn: ['提交'],
         yes: function (index, layero) {
@@ -204,7 +204,7 @@ function taskHandler_stageDocUpload(taskBean) {
                 "stageDocUpload_writer": taskParam.writer
             });
 
-            layui.form.render();
+
 
             // 绑定上传插件
             curUploadInst = layui.upload.render({
@@ -248,6 +248,8 @@ function taskHandler_stageDocUpload(taskBean) {
                     commonError("上传阶段文档失败，请稍后重试");
                 }
             });
+
+            layui.form.render();
         }
     });
 }

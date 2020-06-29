@@ -403,8 +403,11 @@ function formatProjectDocs(str) {
 function commonExportExcel(operType, fileName, param) {
     //隐藏的表单，用于请求下载服务
     let html = "<form style='display: none' id='commonExportExcelFrm' target='commonIframe' hidden='hidden'  method='post' action='exportExcel.do" + param + "'>" +
+                "<input type='hidden' name='fileName' value=''>" +
+                "<input type='hidden' name='operType' value=''>" +
         "</form>";
     let $html = $(html);
+    console.log(html)
     // $(document)[0].append($html);
     $(document.body).append($html);
     $html.find('[name="fileName"]').val(fileName.replace(/\s+/g, ""));

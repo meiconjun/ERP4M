@@ -61,7 +61,10 @@ public class ExportController {
                 outputStream.flush();
                 outputStream.close();
             }
-            workbook.close();
+            if (workbook != null) {
+                workbook.close();
+            }
+
         }
 
     }
@@ -96,7 +99,6 @@ public class ExportController {
                 }
             }
         }
-
         Workbook workbook = ExcelUtil.exportExcel(headList, dataList);
         return workbook;
     }

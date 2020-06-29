@@ -72,7 +72,7 @@
     </select>
 
     <select id="selectStageDocDutyUser" parameterType="java.util.HashMap" resultType="java.lang.String">
-        select a.user_no form sys_user_tb a, sys_user_role_tb b, sys_role_tb c
+        select a.user_no from sys_user_tb a, sys_user_role_tb b, sys_role_tb c
         where a.user_no = b.user_no and b.role_no = c.role_no
         and c.department = #{department} and c.role_no = #{duty_role} and a.user_no in (${project_menbers})
     </select>

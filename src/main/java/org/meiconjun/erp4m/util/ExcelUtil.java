@@ -65,7 +65,7 @@ public class ExcelUtil {
             Row row = sheet.createRow(i + 1);
             for (int j = 0; j < data.length; j++) {
                 Cell cell = row.createCell(j);
-                cell.setCellValue(CommonUtil.isStrBlank(data[i]) ? "" : data[i]);
+                cell.setCellValue(CommonUtil.isStrBlank(data[j]) ? "" : data[j]);
             }
         }
         return workbook;

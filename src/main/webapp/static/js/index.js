@@ -47,6 +47,7 @@ $(document).ready(function () {
         initFilePath();
         initUnReadMessage(user_info.user_no, user_info.role_no);
         initUnReadMsg();
+        initTodoTask();
         layui.layer.closeAll('loading');
         /*============初始化操作 end===============*/
 

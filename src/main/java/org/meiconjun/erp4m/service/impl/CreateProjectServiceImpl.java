@@ -127,7 +127,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                     HashMap<String, Object> condMap = new HashMap<>();
                     condMap.put("department", department);
                     condMap.put("duty_role", duty_role);
-                    condMap.put("project_menbers", project_menbers);
+                    condMap.put("project_menbers", CommonUtil.addSingleQuo(project_menbers));
                     List<String> userList = createProjectDao.selectStageDocDutyUser(condMap);
 
                     String stage = (String) stageInfo.get("stage");

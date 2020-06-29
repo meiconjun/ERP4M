@@ -91,7 +91,7 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         HashMap<String, Object> condMap = new HashMap<>();
         condMap.put("department", department);
         condMap.put("duty_role", duty_role);
-        condMap.put("project_menbers", project_menbers);
+        condMap.put("project_menbers", CommonUtil.addSingleQuo(project_menbers));
         List<String> userList = createProjectDao.selectStageDocDutyUser(condMap);
 
         String userStr = "";
@@ -120,11 +120,12 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         String project_no = (String) paramMap.get("project_no");
         String stage_num = (String) paramMap.get("stage_num");
         String unupload_doc = (String) paramMap.get("unupload_doc");
-
+        unupload_doc = CommonUtil.addSingleQuo(unupload_doc);
         // 查询文档列表，将已上传的文档和待上传的文档合并
         List<HashMap<String, String>> docList = projectManageDao.selectStageDocUnion(project_no, stage_num, unupload_doc);
         Map<String, Object> retMap = new HashMap<>();
         retMap.put("docList", docList);
+        retMap.put("total", docList.size());
         responseBean.setRetMap(retMap);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }

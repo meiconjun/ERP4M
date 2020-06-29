@@ -468,4 +468,23 @@ public class CommonUtil {
         List<FieldBean> fieldList = commonDao.selectChildFieldList(parent_field);
         return fieldList;
     }
+
+    /**
+     * 给逗号分隔的字符串添加单引号
+     * @param str
+     * @return
+     */
+    public static String addSingleQuo(String str) {
+        if (isStrBlank(str)) {
+            return  "";
+        }
+        String retStr = "";
+        for (String s : str.split(",")) {
+            retStr += ",'" + s + "'";
+        }
+        if (!isStrBlank(retStr)) {
+            retStr = retStr.substring(1);
+        }
+        return retStr;
+    }
 }

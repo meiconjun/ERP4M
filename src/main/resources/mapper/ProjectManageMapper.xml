@@ -120,7 +120,7 @@
     </select>
 
     <select id="selectProjectCurStage" resultType="java.util.HashMap">
-        select a.project_name, b.*, c.* from project_main_tb a, project_stage_tb b, project_stage_doc_tb c
+        select a.project_name, a.project_menbers, b.*, c.* from project_main_tb a, project_stage_tb b, project_stage_doc_tb c
         where a.project_no = b.project_no and a.stage_num = b.stage_num and b.doc_serial = c.serial_no
         and c.doc_version = '1.0' and b.is_end != '1'
     </select>

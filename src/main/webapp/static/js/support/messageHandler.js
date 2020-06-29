@@ -120,7 +120,7 @@ function showProjectCountersignDialog(title, content, msgStr, button) {
         "                </div>\n" +
         "            </div>\n" +
         "            <div class=\"layui-inline\">\n" +
-        "                <button id=\"projectCountersign_produceDoc_download\" class=\"layui-btn\" >下载规格书</button>\n" +
+        "                <button type='button' id=\"projectCountersign_produceDoc_download\" class=\"layui-btn\" >下载规格书</button>\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
@@ -253,7 +253,7 @@ function showProjectCountersignDialog(title, content, msgStr, button) {
     })
 }
 
-function showProjectBossCheckDig(title, content, msgStr) {
+function showProjectBossCheckDig(title, content, msgStr, button) {
     let msgBean = JSON.parse(msgStr);
     let html = "<div class=\"comm-dialog\" id=\"projectCreate_bossCheckDiv\">\n" +
         "    <form class=\"layui-form layui-form-pane\" id=\"projectCreate_bossCheckFrm\" lay-filter=\"\" action=\"\">\n" +
@@ -283,7 +283,7 @@ function showProjectBossCheckDig(title, content, msgStr) {
         "                </div>\n" +
         "            </div>\n" +
         "            <div class=\"layui-inline\">\n" +
-        "                <button id=\"projectCreate_bossCheck_download\" class=\"layui-btn\">下载规格书</button>\n" +
+        "                <button type='button' id=\"projectCreate_bossCheck_download\" class=\"layui-btn\">下载规格书</button>\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
@@ -295,11 +295,11 @@ function showProjectBossCheckDig(title, content, msgStr) {
         "        <div class=\"layui-form-item\">\n" +
         "            <label class=\"layui-form-label\">项目成员</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
-        "                <input type=\"text\" name=\"projectCreate_bossCheck_members\" id=\"projectCreate_bossCheck_members\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
+        "                <input type=\"text\" title='' name=\"projectCreate_bossCheck_members\" id=\"projectCreate_bossCheck_members\" disabled lay-verify=\"\" autocomplete=\"off\" class=\"layui-input \">\n" +
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item\">\n" +
-        "            <button id=\"projectCreate_bossCheck_memberDownload\" class=\"layui-btn layui-icon-download-circle\">项目成员表</button>\n" +
+        "            <button type='button' id=\"projectCreate_bossCheck_memberDownload\" class=\"layui-btn\"><i class=\"layui-icon layui-icon-download-circle\"></i>项目成员表</button>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item layui-form-text\">\n" +
         "            <label class=\"layui-form-label\">项目描述</label>\n" +
@@ -398,6 +398,7 @@ function showProjectBossCheckDig(title, content, msgStr) {
                         }
                         menber = menber.substring(1, menber.length);
                         $("#projectCreate_bossCheck_members").val(menber);
+                        $("#projectCreate_bossCheck_members").attr('title', menber);
                         layui.laydate.render({
                             elem: '#projectCreate_bossCheck_beginDate',
                             value : commonFormatDate(msgBean.msg_param.begin_date)
@@ -452,7 +453,7 @@ function showProjectBossCheckDig(title, content, msgStr) {
                                     "                    <div class=\"layui-inline\">\n" +
                                     "                        <label class=\"layui-form-label\">阶段文档</label>\n" +
                                     "                        <div class=\"layui-input-inline\">\n" +
-                                    "                            <input type=\"text\" value='" + formatProjectDocs(stageList[i].unupload_doc) + "' name=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
+                                    "                            <input type=\"text\" title='" + formatProjectDocs(stageList[i].unupload_doc) + "' value='" + formatProjectDocs(stageList[i].unupload_doc) + "' name=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" id=\"projectCreate_bossCheck_docName_dialog" + (i + 1) + "\" disabled autocomplete=\"off\" class=\"layui-input\">\n" +
                                     "                        </div>\n" +
                                     "                    </div>\n" +
                                     "                </div>\n" +

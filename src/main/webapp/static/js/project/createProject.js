@@ -169,8 +169,8 @@ function createProject_addStage() {
         "                    </div>\n" +
         "                </div>\n" +
                         "<div class=\"layui-inline layui-inline\">\n" +
-        "                    <button class=\"layui-btn layui-btn-primary\" onclick=\"createProject_selectProjectDoc(this)\" name=\"createProject_stageDoc" + createProject_stageCount_temp + "\" id=\"createProject_stageDoc" + createProject_stageCount_temp + "\" >\n" +
-        "                    </button>\n" +
+        "                    <button type=\"button\" class=\"layui-btn layui-btn-primary\" onclick=\"createProject_selectProjectDoc(this)\" name=\"createProject_stageDoc" + createProject_stageCount_temp + "\" id=\"createProject_stageDoc" + createProject_stageCount_temp + "\" >\n" +
+        "                    选择阶段文档</button>\n" +
         "                </div>\n" +
         "                <button type=\"button\" class=\"layui-btn\" onclick=\"createProject_addStage()\"><i class=\"layui-icon layui-icon-add-circle\"></i></button>" +
         "                <button type=\"button\" class=\"layui-btn\" onclick=\"createProject_minStage()\"><i class=\"layui-icon layui-icon-reduce-circle\"></i></button>\n" +
