@@ -240,6 +240,7 @@ function taskHandler_stageDocUpload(taskBean) {
                         layui.layer.closeAll();
                         // 刷新任务列表
                         initTodoTask();
+                        commonOk("操作成功！");
                     } else {
                         commonError("上传阶段文档失败:" + res.msg)
                     }

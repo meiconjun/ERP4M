@@ -29,6 +29,9 @@
         select c.*, d.department, d.duty_role  from project_stage_tb b, project_stage_doc_tb c, pd_doc_defined_tb d
         where b.project_no = #{project_no} and b.doc_serial = c.serial_no and b.stage_num = #{stage_num}
         and  c.doc_no = d.doc_no
+        <if test="doc_no != null and doc_no != ''">
+            and c.doc_no = #{doc_no}
+        </if>
         order by c.doc_version desc
     </select>
 
@@ -46,7 +49,7 @@
     
     <insert id="insertStageDocInfo" parameterType="java.util.HashMap">
         insert into project_stage_doc_tb (serial_no, doc_no, doc_name, doc_version, upload_date, file_path, upload_user)
-        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_version}, #{upload_date}, #{file_path}. #{upload_user})
+        values (#{serial_no}, #{doc_no}, #{doc_name}, #{doc_version}, #{upload_date}, #{file_path}, #{upload_user})
     </insert>
     
     <select id="selectStageInfo" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -66,10 +69,10 @@
             <if test="is_end != null and is_end != ''">
                 end_date = #{end_date},
             </if>
-            <if test="unupload_doc != null and unupload_doc != ''">
+            <if test="unupload_doc != null">
                 unupload_doc = #{unupload_doc},
             </if>
-
+            project_no = #{project_no}
         </set>
         where project_no = #{project_no} and stage_num = #{stage_num}
     </update>

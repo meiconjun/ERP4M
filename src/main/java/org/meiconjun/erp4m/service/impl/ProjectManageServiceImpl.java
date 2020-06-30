@@ -10,6 +10,7 @@ import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
 import org.meiconjun.erp4m.dao.ProjectManageDao;
 import org.meiconjun.erp4m.service.ProjectManageService;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.meiconjun.erp4m.util.WebsocketMsgUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +205,8 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         String project_no = (String) paramMap.get("project_no");
         String stage_num = (String) paramMap.get("stage_num");
         String project_menbers = (String) paramMap.get("project_menbers");
-        String project_name = (String)  paramMap.get("project_name");
+        String project_name = (String) paramMap.get("project_name");
+        String file_root_path = (String) paramMap.get("file_root_path");
 
         //当前阶段标记为已结束,若结束时间与预计不符，后面的都顺延或提前
         String cur_date = CommonUtil.getCurrentDateStr();
@@ -264,24 +266,76 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             stage_num = String.valueOf(Integer.valueOf(stage_num) + 1);
             //OR项目主表阶段计数+1,推送消息给下一阶段负责人
             stageInfo = projectManageDao.selectStageInfo(project_no, stage_num);
-            HashMap<String, String> stageDocInfo = projectManageDao.selectStageDocInfo(project_no, stage_num).get(0);
-            String nextPrincipal = stageInfo.get("principal");
-            String nextStage = stageInfo.get("stage");
-            String nextStageName = CommonUtil.getFieldName(SystemContants.FIELD_STAGE, nextStage);
-            String nextStageEnd = stageInfo.get("end_date");
-            String nextDocName = stageDocInfo.get("doc_name");
-            String nextDocWriter = stageDocInfo.get("doc_writer");
-            MessageBean messageBean = new MessageBean();
-            messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
-            messageBean.setCreate_user("system");
-            messageBean.setMsg_content("项目[" + project_name + "]阶段[" + nextStageName + "]开始<br>请在结束日期[" + CommonUtil.formatDateString(nextStageEnd, "yyyyMMdd", "yyyy-MM-dd") + "]" +
-                    "前上传阶段文档<br>[" + nextDocName + ",作者：" + nextDocWriter + "]");
-            messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_PROJECT_STAGE);//项目阶段提醒
-            messageBean.setMsg_param(new HashMap<>());
-            List<String> userList = Arrays.asList(new String[]{nextPrincipal});
-            String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, "1", CommonUtil.getCurrentDateAfterDays(7));
-            messageBean.setMsg_no(msg_no);
-            WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+            String unupload_doc = stageInfo.get("unupload_doc");//未上传文档列表
+            String doc_serial = stageInfo.get("doc_serial");
+            // 阶段每个带上传文档单独推送任务
+            for (String doc_no : unupload_doc.split(",")) {
+                HashMap<String, String> projectDocInfo = projectDocDefindDao.selectProjectDocInfoByDocNo(doc_no);
+                String department = projectDocInfo.get("department");
+                String duty_role = projectDocInfo.get("duty_role");
+                String doc_name = projectDocInfo.get("doc_name");
+                String writer = projectDocInfo.get("writer");
+                // 根据当前阶段各文档负责部门与项目成员判断需要推送的用户
+                HashMap<String, Object> condMap1= new HashMap<>();
+                condMap.put("department", department);
+                condMap.put("duty_role", duty_role);
+                condMap.put("project_menbers", CommonUtil.addSingleQuo(project_menbers));
+                List<String> userList = createProjectDao.selectStageDocDutyUser(condMap);
+
+                String stage = stageInfo.get("stage");
+                String stage_end_date = stageInfo.get("end_date");//结束时间
+                String stage_name = CommonUtil.getFieldName(SystemContants.FIELD_STAGE, stage);
+
+                MessageBean messageBean = new MessageBean();
+                messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+                messageBean.setCreate_user("");
+                messageBean.setMsg_content("项目[" + project_name + "]阶段[" + stage_name + "]开始<br>请在结束日期[" + stage_end_date + "]" +
+                        "前上传阶段文档<br>[" + doc_name + ",作者：" + writer + "]<br>已在任务列表中新增该任务");
+                messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_PROJECT_STAGE);//项目阶段提醒
+                Map<String, Object> msg_param = new HashMap<String, Object>();
+                // 填入前端所需要素 推送
+                messageBean.setMsg_param(msg_param);
+                String deal_type = "2";
+                String end_time = CommonUtil.getCurrentDateAfterDays(7);
+                String msg_no2 = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+                messageBean.setMsg_no(msg_no2);
+                WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+
+                // 新增代办任务
+                String taskReceiveUser = "";
+                for (String receive_user : userList) {
+                    taskReceiveUser += "," + receive_user;
+                }
+                if (!CommonUtil.isStrBlank(taskReceiveUser)) {
+                    taskReceiveUser = taskReceiveUser.substring(1);
+                }
+                TaskBean taskBean = new TaskBean();
+                taskBean.setTask_no(SerialNumberGenerater.getInstance().generaterNextNumber());
+                taskBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+                taskBean.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+                taskBean.setDeal_type("1");
+                taskBean.setDeal_user("");
+                taskBean.setEnd_time("");
+                taskBean.setReceive_role("");
+                taskBean.setReceive_user(taskReceiveUser);
+                taskBean.setStatus("0");
+                taskBean.setTask_title("项目阶段" + stage_name +  "文档上传，项目[" + project_name + "]，文档[" + doc_name + "]");
+                taskBean.setTask_type(SystemContants.FIELD_TASK_TYPE_STAGE_DOC_UPLOAD);
+                HashMap<String, Object> taskParamMap = new HashMap<>();
+                taskParamMap.put("project_no", project_no);
+                taskParamMap.put("project_name", project_name);
+                taskParamMap.put("stage_name", stage_name);
+                taskParamMap.put("stage_end_date", stage_end_date);
+                taskParamMap.put("doc_name", doc_name);
+                taskParamMap.put("writer", writer);
+                taskParamMap.put("doc_serial", doc_serial);
+                taskParamMap.put("doc_no", doc_no);
+                taskParamMap.put("file_root_path", file_root_path);
+                taskParamMap.put("stage_num", stage_num);
+                taskBean.setTask_param(CommonUtil.objToJson(taskParamMap));
+
+                commonDao.insertTaskInfo(taskBean);
+            }
         }
         mainMap.put("stage_num", stage_num);
         projectManageDao.updateProjectMainInfo(mainMap);
@@ -317,11 +371,12 @@ public class ProjectManageServiceImpl implements ProjectManageService {
                 // 更新未上传文档列表
                 HashMap<String, String> stageInfo = projectManageDao.selectStageInfo(project_no, stage_num);
                 String unupload_doc = stageInfo.get("unupload_doc");
-                List<String > unuploadList = Arrays.asList(unupload_doc.split(","));
-                unuploadList.remove(doc_no);
+                List<String> unuploadList = Arrays.asList(unupload_doc.split(","));
                 unupload_doc = "";
                 for (String s : unuploadList) {
-                    unupload_doc += s;
+                    if (!s.equals(doc_no)) {
+                        unupload_doc += "," + s;
+                    }
                 }
                 if (!CommonUtil.isStrBlank(unupload_doc)) {
                     unupload_doc = unupload_doc.substring(1);
@@ -352,7 +407,7 @@ public class ProjectManageServiceImpl implements ProjectManageService {
     }
 
     /**
-     * 查询阶段文档版本
+     * 查询阶段文档版本和上传根路径
      * @param requestBean
      * @param responseBean
      */
@@ -363,8 +418,13 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         String doc_no = (String) paramMap.get("doc_no");
 
         String doc_version = projectManageDao.selectStageDocLastVersion(project_no, stage_num, doc_no);
+        //获取根路径
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("project_no", project_no);
+        String file_root_path = projectManageDao.selectProjectInfo(condMap).get(0).get("file_root_path");
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         retMap.put("doc_version", doc_version);
+        retMap.put("file_root_path", file_root_path);
         responseBean.setRetMap(retMap);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
@@ -378,8 +438,9 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         Map<String, Object> paramMap = requestBean.getParamMap();
         String project_no = (String) paramMap.get("project_no");
         String stage_num = (String) paramMap.get("stage_num");
+        String doc_no = (String) paramMap.get("doc_no");
 
-        List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num);
+        List<HashMap<String, String>> docList = projectManageDao.selectStageDocInfo(project_no, stage_num, doc_no);
 
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         retMap.put("list", docList);

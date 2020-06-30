@@ -24,7 +24,7 @@ public interface ProjectManageDao {
     /**
      * 查询阶段文档信息
      */
-    List<HashMap<String, String>> selectStageDocInfo(@Param("project_no") String project_no, @Param("stage_num") String stage_num);
+    List<HashMap<String, String>> selectStageDocInfo(@Param("project_no") String project_no, @Param("stage_num") String stage_num, @Param("doc_no") String doc_no);
     /**
      * 查询阶段文档版本
      */

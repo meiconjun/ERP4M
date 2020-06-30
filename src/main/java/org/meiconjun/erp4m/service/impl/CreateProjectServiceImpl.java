@@ -166,7 +166,7 @@ public class CreateProjectServiceImpl implements CreateProjectService {
                     taskBean.setReceive_role("");
                     taskBean.setReceive_user(taskReceiveUser);
                     taskBean.setStatus("0");
-                    taskBean.setTask_title("项目阶段" + stage_name +  "文档上传，项目[" + project_name + "]");
+                    taskBean.setTask_title("项目阶段" + stage_name +  "文档上传，项目[" + project_name + "]，文档[" + doc_name + "]");
                     taskBean.setTask_type(SystemContants.FIELD_TASK_TYPE_STAGE_DOC_UPLOAD);
                     HashMap<String, Object> taskParamMap = new HashMap<>();
                     taskParamMap.put("project_no", project_no);

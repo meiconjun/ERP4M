@@ -415,7 +415,7 @@ public class CommonUtil {
             }
         }
         HashMap<String, Object> condMap = new HashMap<String, Object>();
-        condMap.put("deal_type", deal_type);
+        condMap.put("deal_user", deal_user);
         condMap.put("status", status);
         condMap.put("task_no", task_no);
         taskDao.updateDealUserAndStatus(condMap);
