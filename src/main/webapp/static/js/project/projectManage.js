@@ -144,6 +144,10 @@ $(document).ready(function () {
         $("#projectManage_query").click(function () {
             projectManage_queryOperation('1', FIELD_EACH_PAGE_NUM);
         });
+        // 删除
+        $("#projectManage_delete").click(function () {
+            projectManage_deleteOperation();
+        });
         //进入下阶段
         /*$("#projectManage_nextStage").click(function () {
             projectManage_nextStageOperation();
@@ -202,6 +206,10 @@ function projectManage_detailOperation(data) {
                 commonInfo("只有项目负责人可以进行此操作！");
                 return false;
             }
+            if (data.project_state != '3') {
+                commonInfo("该项目不是进行中状态，不能进行此操作。");
+                return false;
+            }
             layui.layer.confirm("确认进入下一阶段？", function(index) {
                 let retData = commonAjax("projectManage.do", JSON.stringify({
                     "beanList" : [],
@@ -216,7 +224,10 @@ function projectManage_detailOperation(data) {
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
                     commonOk("操作成功");
+                    layui.layer.closeAll();
                 } else if (retData.retCode == '3') {
+                    layui.layer.closeAll();
+                    projectManage_queryOperation('1', FIELD_EACH_PAGE_NUM);
                     commonInfo("操作成功！当前是该项目最终阶段，项目结项成功");
                 } else {
                     commonError(retData.retMsg);
@@ -301,7 +312,8 @@ function projectManage_detailOperation(data) {
                 layui.form.render();
                 // 绑定规格书下载事件
                 $("#projectManage_specificationsDownload_dialog").click(function () {
-                    commonFileDownload(data.project_name + "产品规格说明书.doc", $("#projectManage_specificationsDownload_dialog").val());
+                    let postFix = commonGetFilePostFix(data.specifications);
+                    commonFileDownload(data.project_name + "_产品规格说明书" + postFix, $("#projectManage_specificationsDownload_dialog").val());
                 });
             } else {
                 commonError("加载项目阶段信息失败：" + stageData.retMsg);
@@ -626,4 +638,35 @@ function projectManage_uploadStageDoc(objId, project_no, stage_num, data) {
         return;
     }
 
+}
+
+/**
+ * 删除项目信息
+ */
+function projectManage_deleteOperation() {
+    let checkData = layui.table.checkStatus("projectManage_tableObj").data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要删除的项目信息");
+        return;
+    } else if (checkData.length > 1) {
+        commonInfo("同时只能删除一个项目信息");
+        return;
+    } else {
+        layui.layer.confirm("确认删除项目[" + checkData[0].project_name + "]的信息？相关联的文档将一并删除，此操作不可逆", function(index) {
+            let retData = commonAjax("projectManage.do", JSON.stringify({
+                "beanList" : [],
+                "operType" : "delete",
+                "paramMap" : {
+                    "project_no": checkData[0].project_no,
+                    "file_root_path": checkData[0].file_root_path
+                }
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("删除成功");
+                projectManage_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
+    }
 }

@@ -431,3 +431,11 @@ function commonUpdateTaskState(task_no, user_no) {
     }));
     return retData;
 }
+
+/**
+ * 获取文件后缀名,带"."
+ * @param String
+ */
+function commonGetFilePostFix(filePath) {
+    return filePath.substring(filePath.lastIndexOf("."), filePath.length);
+}

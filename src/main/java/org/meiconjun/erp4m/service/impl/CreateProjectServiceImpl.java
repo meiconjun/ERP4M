@@ -410,13 +410,18 @@ public class CreateProjectServiceImpl implements CreateProjectService {
         msg_param.put("file_path", specifications);
         msg_param.put("desc", desc);
         messageBean.setMsg_param(msg_param);
-        List<String> userList = Arrays.asList((project_menbers.split(",")));
+        List<String> countersignUsers = new ArrayList<String>();
+        for (String s : project_menbers.split(",")) {
+            if (!s.equals(principal)) {
+                countersignUsers.add(s);
+            }
+        }
         String deal_type = "2";
         String end_time = CommonUtil.getCurrentDateAfterDays(7);
 
-        String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+        String msg_no = CommonUtil.addMessageAndSend(countersignUsers, null, messageBean, deal_type, end_time);
         messageBean.setMsg_no(msg_no);
-        WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+        WebsocketMsgUtil.sendMsgToMultipleUser(countersignUsers, null, messageBean);
 
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }

@@ -476,7 +476,7 @@ public class CommonUtil {
      */
     public static String addSingleQuo(String str) {
         if (isStrBlank(str)) {
-            return  "";
+            return  "''";
         }
         String retStr = "";
         for (String s : str.split(",")) {

@@ -28,7 +28,7 @@
     <select id="selectTodoTask" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.TaskBean">
         select * from sys_task_tb
         where (concat(',', receive_user, ',') like concat('%,', #{user_no}, ',%') or concat(',', receive_role, ',') like concat('%,', #{role_no}, ',%'))
-        and concat(',', deal_user, ',') not like concat('%,', #{user_no}, ',%') and (status = '0' or status = '' or status is null)
+        and (concat(',', deal_user, ',') not like concat('%,', #{user_no}, ',%') or deal_user is null) and (status = '0' or status = '' or status is null)
     </select>
 
     <select id="selectDoneTask" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.TaskBean">

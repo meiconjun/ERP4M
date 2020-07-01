@@ -9,9 +9,7 @@ import org.meiconjun.erp4m.dao.CreateProjectDao;
 import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
 import org.meiconjun.erp4m.dao.ProjectManageDao;
 import org.meiconjun.erp4m.service.ProjectManageService;
-import org.meiconjun.erp4m.util.CommonUtil;
-import org.meiconjun.erp4m.util.SerialNumberGenerater;
-import org.meiconjun.erp4m.util.WebsocketMsgUtil;
+import org.meiconjun.erp4m.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -70,8 +68,36 @@ public class ProjectManageServiceImpl implements ProjectManageService {
             getStageDocListoperation(requestBean, responseBean);
         } else if ("getUploadRight".equals(operType)) {
             getUploadRightOperation(requestBean, responseBean);
+        } else if ("delete".equals(operType)) {
+            deleteOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 删除项目信息，并删除相关文档
+     * @param requestBean
+     * @param responseBean
+     */
+    private void deleteOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String project_no = (String) paramMap.get("project_no");
+        String file_root_path = (String) paramMap.get("file_root_path");
+        // 查询项目所有阶段信息，删除阶段文档信息
+        List<HashMap<String, String>> stageInfoList = projectManageDao.selectStageOfProject(project_no);
+        for (HashMap<String, String> stageInfo: stageInfoList) {
+            String doc_serial = stageInfo.get("doc_serial");
+            projectManageDao.deleteProjectStageDocInfo(doc_serial);
+        }
+        projectManageDao.deleteProjectMainInfo(project_no);
+        projectManageDao.deleteProjectStageInfo(project_no);
+
+        String filePath = PropertiesUtil.getProperty("fileSavePath") + file_root_path;
+        boolean flag = FileUtil.deleteFolder(filePath);
+        if (!flag) {
+            throw new RuntimeException("删除项目文档失败！");
+        }
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -336,9 +362,11 @@ public class ProjectManageServiceImpl implements ProjectManageService {
 
                 commonDao.insertTaskInfo(taskBean);
             }
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         }
         mainMap.put("stage_num", stage_num);
         projectManageDao.updateProjectMainInfo(mainMap);
+
     }
 
     /**

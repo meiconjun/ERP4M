@@ -74,4 +74,16 @@ public interface ProjectManageDao {
      * 查询文员列表
      */
     List<String> selectClerkList();
+    /**
+     * 删除项目主表信息
+     */
+    int deleteProjectMainInfo(@Param("project_no")String project_no);
+    /**
+     * 删除项目阶段信息
+     */
+    int deleteProjectStageInfo(@Param("project_no")String project_no);
+    /**
+     * 删除项目阶段文档信息
+     */
+    int deleteProjectStageDocInfo(@Param("serial_no")String serial_no);
 }

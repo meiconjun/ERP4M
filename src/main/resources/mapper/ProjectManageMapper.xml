@@ -146,4 +146,19 @@
         select a.user_no from sys_user_tb a, sys_user_role_tb b, sys_role_tb c
         where a.user_no = b.user_no and b.role_no = c.role_no and c.position = '4'/*职位 4-文员*/
     </select>
+
+    <delete id="deleteProjectMainInfo" parameterType="java.lang.String">
+        delete from project_main_tb
+        where project_no = #{project_no}
+    </delete>
+
+    <delete id="deleteProjectStageInfo" parameterType="java.lang.String">
+        delete from project_stage_tb
+        where project_no = #{project_no}
+    </delete>
+
+    <delete id="deleteProjectStageDocInfo" parameterType="java.lang.String">
+        delete from project_stage_doc_tb
+        where serial_no = #{serial_no}
+    </delete>
 </mapper>
