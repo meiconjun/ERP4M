@@ -48,6 +48,8 @@ public class DocBean {
     private String judge_time;
     // 文档存储路径
     private String file_path;
+    // 创建用户
+    private String create_user;
 
     public String getDoc_serial_no() {
         return doc_serial_no;
@@ -207,5 +209,13 @@ public class DocBean {
 
     public void setFile_root_path(String file_root_path) {
         this.file_root_path = file_root_path;
+    }
+
+    public String getCreate_user() {
+        return create_user;
+    }
+
+    public void setCreate_user(String create_user) {
+        this.create_user = create_user;
     }
 }

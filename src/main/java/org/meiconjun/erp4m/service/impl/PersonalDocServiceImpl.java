@@ -6,6 +6,7 @@ import org.meiconjun.erp4m.bean.*;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.PersonalDocDao;
+import org.meiconjun.erp4m.dao.PublicDocDao;
 import org.meiconjun.erp4m.service.PersonalDocService;
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import javax.print.Doc;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,6 +39,8 @@ public class PersonalDocServiceImpl implements PersonalDocService {
     @Resource
     private PersonalDocDao personalDocDao;
     @Resource
+    private PublicDocDao publicDocDao;
+    @Resource
     private CommonDao commonDao;
 
     @Override
@@ -59,8 +61,92 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             reviewSubmitOperation(requestBean, responseBean);
         } else if ("userReview".equals(operType)) {
             userReviewOperation(requestBean, responseBean);
+        } else if ("judgeDenied".equals(operType)) {
+            judgeDenidOperation(requestBean, responseBean);
+        } else if ("judgePass".equals(operType)) {
+            judgePassOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 裁决通过，发行文档
+     * @param requestBean
+     * @param responseBean
+     */
+    private void judgePassOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String doc_serial_no = (String) paramMap.get("doc_serial_no");
+        String judge_user = (String) paramMap.get("judge_user");
+
+        HashMap<String, Object> condMap = new HashMap();
+        // 更新文档审阅信息
+        condMap.put("doc_serial_no", doc_serial_no);
+        condMap.put("judge_user", judge_user);
+        condMap.put("judge_time", CommonUtil.getCurrentTimeStr());
+        personalDocDao.updateDocReviewState(condMap);
+        // 获取文档信息,插入公共文档主表
+        DocBean docBean = personalDocDao.selectPersonalDocInfo(condMap).get(0);
+        docBean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
+        publicDocDao.insertNewPublicDocInfo(docBean);
+
+        // 删除个人文档库数据
+        personalDocDao.deletePersonalDocInfo(doc_serial_no);
+
+        // 推送提醒文档创建者文档已成功发行
+        MessageBean messageBean = new MessageBean();
+        messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+        messageBean.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+        messageBean.setMsg_content("您提交的文档[" + docBean.getDoc_no() + "]已审核通过，成功发行到公共文档库");
+        messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_DOC_PASS);
+        messageBean.setMsg_param(new HashMap<>());
+        List<String> userList = Arrays.asList(docBean.getUpload_user());
+        String deal_type = "1";
+        String end_time = "";
+        String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+        messageBean.setMsg_no(msg_no);
+        WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    /**
+     * 裁决人驳回文档
+     * @param requestBean
+     * @param responseBean
+     */
+    private void judgeDenidOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String doc_serial_no = (String) paramMap.get("doc_serial_no");
+        String judge_user = (String) paramMap.get("judge_user");
+        String opinion = (String) paramMap.get("opinion");
+        String doc_no = (String) paramMap.get("doc_no");
+        String upload_user = (String) paramMap.get("upload_user");
+
+        // 更新文档状态和失败原因
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("review_state", "4");// 驳回
+        condMap.put("judge_user", judge_user);
+        condMap.put("judge_reason", opinion);
+        condMap.put("judge_time", CommonUtil.getCurrentTimeStr());
+        condMap.put("doc_serial_no", doc_serial_no);
+        personalDocDao.updateDocReviewState(condMap);
+
+        // 提醒文档创建者文档已被驳回
+        MessageBean messageBean = new MessageBean();
+        messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+        messageBean.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+        messageBean.setMsg_content("您提交的文档[" + doc_no + "]已被驳回<br>驳回原因：" + opinion);
+        messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_DOC_DENIED);
+        messageBean.setMsg_param(new HashMap<>());
+        List<String> userList = Arrays.asList(upload_user);
+        String deal_type = "1";
+        String end_time = "";
+        String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+        messageBean.setMsg_no(msg_no);
+        WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
+
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -74,12 +160,14 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         String review_user = (String) paramMap.get("review_user");
         String opinion = (String) paramMap.get("opinion");
         String task_no = (String) paramMap.get("task_no");
+        Map<String, Object> docBean = (Map<String, Object>) paramMap.get("docBean");
+
 
         // 更新文档审阅信息
         HashMap<String, Object> reviewInfo = personalDocDao.selectDocReviewInfoBySerial(doc_serial_no);
 
         String review_detail = (String) reviewInfo.get("review_detail");
-        Map<String, String> reviewDetailMap = null;
+        Map<String, String> reviewDetailMap;
         if (CommonUtil.isStrBlank(review_detail)) {
             reviewDetailMap = new HashMap<String, String>();
         } else {
@@ -107,9 +195,42 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         if (length2 >= length1) {
             reviewMap.put("review_state", "2");
             taskBean2.setStatus("1");
-            //TODO 创建裁决任务,推送裁决人
+            // 创建裁决任务,推送裁决人
+            String judge_user = (String) reviewInfo.get("judge_user");//裁决者用户号
+            // 获取文档信息
+            docBean.put("reviewDetail", reviewDetailMap);// 审阅详情
 
+            TaskBean taskBean_judge = new TaskBean();
+            taskBean_judge.setTask_no(SerialNumberGenerater.getInstance().generaterNextNumber());
+            taskBean_judge.setCreate_time(CommonUtil.getCurrentTimeStr());
+            taskBean_judge.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+            taskBean_judge.setDeal_type("1");
+            taskBean_judge.setDeal_user("");
+            taskBean_judge.setEnd_time("");
+            taskBean_judge.setReceive_role("");
+            taskBean_judge.setReceive_user(judge_user);
+            taskBean_judge.setStatus("0");
+            taskBean_judge.setTask_title("文档裁决，文档号[" + docBean.get("doc_no") + "]");
+            taskBean_judge.setTask_type(SystemContants.FIELD_TASK_TYPE_DOC_JUDGE);
+            taskBean_judge.setTask_param(CommonUtil.objToJson(docBean));
 
+            int effect = commonDao.insertTaskInfo(taskBean_judge);
+            if (effect == 0) {
+                throw new RuntimeException("文档审阅失败！");
+            }
+            // 推送提醒
+            MessageBean messageBean = new MessageBean();
+            messageBean.setCreate_time(CommonUtil.getCurrentTimeStr());
+            messageBean.setCreate_user(CommonUtil.getLoginUser().getUser_no());
+            messageBean.setMsg_content("新增待裁决的文档，请在任务列表中处理");
+            messageBean.setMsg_type(SystemContants.FIELD_MSG_TYPE_DOC_JUDGE);
+            messageBean.setMsg_param(new HashMap<>());
+            List<String> userList = Arrays.asList(judge_user);
+            String deal_type = "1";
+            String end_time = "";
+            String msg_no = CommonUtil.addMessageAndSend(userList, null, messageBean, deal_type, end_time);
+            messageBean.setMsg_no(msg_no);
+            WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
         }
         personalDocDao.updateDocReviewState(reviewMap);
         commonDao.updateTaskInfo(taskBean2);
@@ -150,7 +271,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             taskBean.setReceive_role("");
             taskBean.setReceive_user(reviewer);
             taskBean.setStatus("0");
-            taskBean.setTask_title("文档审阅:" + docBean.getDoc_no());
+            taskBean.setTask_title("文档审阅，文档号[" + docBean.getDoc_no() + "]");
             taskBean.setTask_type(SystemContants.FIELD_TASK_TYPE_DOC_REVIEW);
             taskBean.setTask_param(CommonUtil.objToJson(docBean));
 

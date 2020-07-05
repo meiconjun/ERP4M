@@ -30,10 +30,17 @@ public class SystemContants {
     public static final String FIELD_MSG_TYPE_PROJECT_END = "5";
     /** 消息类型-审阅文档消息提醒 */
     public static final String FIELD_MSG_TYPE_DOC_REVIEW = "6";
+    /** 消息类型-裁决文档消息提醒 */
+    public static final String FIELD_MSG_TYPE_DOC_JUDGE = "7";
+    /** 消息类型-文档被驳回消息提醒 */
+    public static final String FIELD_MSG_TYPE_DOC_DENIED = "8";
+    /** 消息类型-文档成功发行提醒 */
+    public static final String FIELD_MSG_TYPE_DOC_PASS = "9";
 
-
-    /** 任务类型-审阅文档消息提醒 */
+    /** 任务类型-审阅文档 */
     public static final String FIELD_TASK_TYPE_DOC_REVIEW = "1";
+    /** 任务类型-裁决文档 */
+    public static final String FIELD_TASK_TYPE_DOC_JUDGE = "2";
     /** 任务类型-阶段文档上传 */
     public static final String FIELD_TASK_TYPE_STAGE_DOC_UPLOAD = "3";
     /** 项目阶段*/

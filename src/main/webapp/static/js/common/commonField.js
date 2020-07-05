@@ -34,6 +34,12 @@ const FIELD_MSG_TYPE_PROJECT_STAGE = "4";
 const FIELD_MSG_TYPE_PROJECT_END = "5";
 /** 消息类型-文档审阅提醒 */
 const FIELD_MSG_TYPE_DOC_REVIEW = "6";
+/** 消息类型-文档裁决提醒 */
+const FIELD_MSG_TYPE_DOC_JUDGE = "7";
+/** 消息类型-文档被驳回消息提醒 */
+const FIELD_MSG_TYPE_DOC_DENIED = "8";
+/** 消息类型-文档成功发行提醒 */
+const FIELD_MSG_TYPE_DOC_PASS = "9";
 
 /*===================文档管理相关==============================*/
 /** 文档类型*/
@@ -48,5 +54,10 @@ const FIELD_DOC_STATE = "D010400";
 /*=====================任务种类===============================*/
 /** 审阅文档*/
 const FIELD_TASK_TYPE_DOC_REVIEW = "1";
+/** 裁决文档*/
+const FIELD_TASK_TYPE_DOC_JUDGE = "2";
 /** 阶段文档上传*/
 const FIELD_TASK_TYPE_STAGE_DOC_UPLOAD = "3";
+
+/** 通用分隔符 */
+const DELIMITER = ",@,";

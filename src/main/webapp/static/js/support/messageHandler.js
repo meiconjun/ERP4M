@@ -19,6 +19,10 @@ function distributionMessage(msgStr) {
         showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_DOC_REVIEW == msgBean.msg_type) {
         showNotificationKeep("文档审阅", msgBean.msg_content, msgBean.msg_no, true);
+    } else if (FIELD_MSG_TYPE_DOC_DENIED == msgBean.msg_type) {
+        showNotificationKeep("文档驳回", msgBean.msg_content, msgBean.msg_no, true);
+    } else if (FIELD_MSG_TYPE_DOC_PASS == msgBean.msg_type) {
+        showNotificationKeep("文档审批通过", msgBean.msg_content, msgBean.msg_no, true);
     }
 }
 

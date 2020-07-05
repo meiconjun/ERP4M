@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.PublicDocDao">
+    <insert id="insertNewPublicDocInfo" parameterType="org.meiconjun.erp4m.bean.DocBean">
+        insert into doc_main_tb (doc_serial_no, doc_no, doc_name, doc_language, secret_level, doc_type, doc_writer,
+        doc_desc, create_user, upload_user, upload_time, last_modi_time, doc_version, file_root_path)
+        values (#{doc_serial_no}, #{doc_no}, #{doc_name}, #{doc_language}, #{secret_level}, #{doc_type},
+        #{doc_writer}, #{doc_desc}, #{create_user}, #{upload_user}, #{upload_time}, #{last_modi_time}, #{doc_version}, #{file_root_path}, )
+    </insert>
+</mapper>
