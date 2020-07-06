@@ -1,0 +1,40 @@
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            文档编号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="recycleStation_docNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            文档名称：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="recycleStation_docName" autocomplete="off">
+        </div>
+        <!--<div class="row-label">
+            上传者：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="personalDoc_uploadUser" autocomplete="off">
+        </div>-->
+        <div class="row-label">
+            文档类别：
+        </div>
+        <div class="row-input">
+            <select  id="recycleStation_docType" >
+            </select>
+        </div>
+
+        <button class="layui-btn" id="recycleStation_queryBtn" data-type="reload">查询</button>
+    </div>
+    <table id="recycleStation_table">
+
+    </table>
+    <div>
+        <div id="recycleStation_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="recycleStation_revert">还原</a>
+        </div>
+    </div>
+</div>

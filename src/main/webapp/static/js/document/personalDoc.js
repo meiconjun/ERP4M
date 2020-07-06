@@ -334,6 +334,9 @@ function personalDoc_digSubmit(cusData, operType) {
                 if (retData.retCode == HANDLE_SUCCESS) {
                     commonOk("操作成功！");
                     layui.layer.close(digIndex);
+                    personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
+                } else {
+                    commonError("操作失败！" + retData.retMsg);
                 }
             }
 
@@ -707,6 +710,9 @@ function personalDoc_SubmitpreviewOperation() {
                 if (retData.retCode == HANDLE_SUCCESS) {
                     commonOk("操作成功！");
                     layui.layer.close(index1);
+                    personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
+                } else {
+                    commonError("提交评审失败！");
                 }
 
             });

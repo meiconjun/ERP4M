@@ -50,6 +50,8 @@ public class DocBean {
     private String file_path;
     // 创建用户
     private String create_user;
+    // 最后修改用户
+    private String last_modi_user;
 
     public String getDoc_serial_no() {
         return doc_serial_no;
@@ -217,5 +219,13 @@ public class DocBean {
 
     public void setCreate_user(String create_user) {
         this.create_user = create_user;
+    }
+
+    public String getLast_modi_user() {
+        return last_modi_user;
+    }
+
+    public void setLast_modi_user(String last_modi_user) {
+        this.last_modi_user = last_modi_user;
     }
 }

@@ -24,9 +24,9 @@
 
     <insert id="insertPersonalDocInfo" parameterType="java.util.HashMap">
         insert into doc_personal_doc_tb (doc_serial_no, doc_no, doc_name, doc_language, doc_type, doc_writer, doc_desc, upload_user, upload_time,
-        last_modi_time, doc_version, file_root_path, create_user)
+        last_modi_time, doc_version, file_root_path, create_user, last_modi_user)
         values(#{doc_serial_no}, #{docBean.doc_no}, #{docBean.doc_name}, #{docBean.doc_language}, #{docBean.doc_type}, #{docBean.doc_writer}, #{docBean.doc_desc}, #{upload_user},
-        #{upload_time}, #{last_modi_time}, #{docBean.doc_version}, #{file_root_path}, #{upload_user})
+        #{upload_time}, #{last_modi_time}, #{docBean.doc_version}, #{file_root_path}, #{upload_user}, #{last_modi_user})
     </insert>
     
     <insert id="insertDocReviewInfo" parameterType="java.util.HashMap">
@@ -44,7 +44,7 @@
         update doc_personal_doc_tb
         set doc_name = #{docBean.doc_name}, doc_language = #{docBean.doc_language}, doc_writer = #{doc_writer}, doc_desc = #{doc_desc},
         upload_user = #{upload_user}, upload_time = #{upload_time}, last_modi_time = #{last_modi_time}, doc_version = #{docBean.doc_version},
-        file_root_path = #{file_root_path}
+        file_root_path = #{file_root_path}, last_modi_user = #{last_modi_user}
         where doc_serial_no = #{doc_serial_no}
     </update>
 
@@ -55,10 +55,10 @@
     
     <insert id="insertRecycleInfo" parameterType="java.util.HashMap">
         insert into doc_recycle_tb (doc_serial_no, doc_no, doc_name, doc_language, doc_type, doc_writer, doc_desc, upload_user, upload_time,
-        last_modi_time, doc_version, file_root_path, delete_time, expire_time, delete_state, create_user)
+        last_modi_time, doc_version, file_root_path, delete_time, expire_time, delete_state, create_user, last_modi_user)
         values(#{docBean.doc_serial_no}, #{docBean.doc_no}, #{docBean.doc_name}, #{docBean.doc_language}, #{docBean.doc_type}, #{docBean.doc_writer},
         #{docBean.doc_desc}, #{docBean.upload_user}, #{docBean.upload_time}, #{docBean.last_modi_time}, #{docBean.doc_version}, #{docBean.file_root_path},
-        #{delete_time}, #{expire_time}, #{delete_state}, #{docBean.create_user})
+        #{delete_time}, #{expire_time}, #{delete_state}, #{docBean.create_user}, #{last_modi_user})
     </insert>
 
     <select id="selectDocHistory" parameterType="java.lang.String" resultType="java.util.HashMap">
@@ -67,7 +67,7 @@
         order by b.doc_version desc
     </select>
 
-    <update id="updateDocReviewState" parameterType="java.lang.String">
+    <update id="updateDocReviewState" parameterType="java.util.HashMap">
         update doc_review_tb
         <set>
             <if test="review_state != null and review_state != ''">

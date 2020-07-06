@@ -84,7 +84,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("doc_serial_no", doc_serial_no);
         condMap.put("judge_user", judge_user);
         condMap.put("judge_time", CommonUtil.getCurrentTimeStr());
-        personalDocDao.updateDocReviewState(condMap);
+        personalDocDao.updateDocReviewInfo(condMap);
         // 获取文档信息,插入公共文档主表
         DocBean docBean = personalDocDao.selectPersonalDocInfo(condMap).get(0);
         docBean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
@@ -130,7 +130,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("judge_reason", opinion);
         condMap.put("judge_time", CommonUtil.getCurrentTimeStr());
         condMap.put("doc_serial_no", doc_serial_no);
-        personalDocDao.updateDocReviewState(condMap);
+        personalDocDao.updateDocReviewInfo(condMap);
 
         // 提醒文档创建者文档已被驳回
         MessageBean messageBean = new MessageBean();
@@ -232,7 +232,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             messageBean.setMsg_no(msg_no);
             WebsocketMsgUtil.sendMsgToMultipleUser(userList, null, messageBean);
         }
-        personalDocDao.updateDocReviewState(reviewMap);
+        personalDocDao.updateDocReviewInfo(reviewMap);
         commonDao.updateTaskInfo(taskBean2);
 
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
@@ -255,7 +255,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("judge_user", adjudicator);
 
         // update doc review_state
-        int effect = personalDocDao.updateDocReviewState(condMap);
+        int effect = personalDocDao.updateDocReviewInfo(condMap);
 
         // send msg and task to reviewers
         if (effect > 0) {
@@ -339,6 +339,8 @@ public class PersonalDocServiceImpl implements PersonalDocService {
             condMap.put("delete_time", delete_time);
             condMap.put("expire_time", expire_time);
             condMap.put("delete_state", "0");
+            condMap.put("last_modi_user", CommonUtil.getLoginUser().getUser_no());
+
             personalDocDao.insertRecycleInfo(condMap);
             logger.info("文档编号[" + docBean.getDoc_no() + "]移入回收站--------");
         }
@@ -367,6 +369,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("upload_user", upload_user);
         condMap.put("upload_time", upload_time);
         condMap.put("last_modi_time", last_modi_time);
+        condMap.put("last_modi_user", upload_user);
 
         personalDocDao.updatePersonalDocInfo(condMap);
         personalDocDao.insertDocVersionInfo(condMap);
@@ -424,6 +427,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("upload_user", upload_user);
         condMap.put("upload_time", upload_time);
         condMap.put("last_modi_time", last_modi_time);
+        condMap.put("last_modi_user", upload_user);
 
         personalDocDao.insertPersonalDocInfo(condMap);
         // 审批表新增数据
