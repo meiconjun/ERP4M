@@ -391,7 +391,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         HashMap<String, Object> condMap = new HashMap<String, Object>();
         condMap.put("doc_no", bean.getDoc_no());
         condMap.put("doc_name", bean.getDoc_name());
-        condMap.put("upload_user", bean.getUpload_user());
+        condMap.put("last_modi_user", bean.getLast_modi_user());
         condMap.put("doc_type", bean.getDoc_type());
 
         Page page = PageHelper.startPage(curPage, limit);

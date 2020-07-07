@@ -1,22 +1,22 @@
-var recycleStation_tableIns;
-var recycleStation_curr = 1;
+var publicDoc_curr = 1;
+var publicDoc_tableIns;
 $(document).ready(function () {
     try {
         // 获取按钮权限
-        let buttonMap = commonGetAuthField('D02000');
+        let buttonMap = commonGetAuthField('D03000');
         let buttonStr = buttonMap.buttonStr;
 
-        recycleStation_tableIns = layui.table.render({
-            id : "recycleStation_tableObj",
-            elem: '#recycleStation_table',
+        publicDoc_tableIns = layui.table.render({
+            id : "publicDoc_docDetail_tableObj",
+            elem: '#publicDoc_docDetail_table',
             height: 'full-450',
-            url: 'recycleStation.do',
+            url: 'publicDoc.do',
             where : {
                 message : JSON.stringify({
                     "beanList" : [{
                         "doc_no" : "",
                         "doc_name" : "",
-                        "upload_user" : "",
+                        "create_user" : "",
                         "doc_type" : ""
                     }],
                     "operType" : "query",
@@ -34,10 +34,10 @@ $(document).ready(function () {
             done : function(res, curr, count){
                 // 分页初始化
                 layui.laypage.render({
-                    elem : 'recycleStation_page',
+                    elem : 'publicDoc_page',
                     limit : Number(FIELD_EACH_PAGE_NUM),
                     groups : 5,
-                    curr : recycleStation_curr,
+                    curr : publicDoc_curr,
                     count : count,
                     prev : '上一页',
                     next : '下一页',
@@ -48,7 +48,7 @@ $(document).ready(function () {
                         //obj包含了当前分页的所有参数，比如：
                         // console.log(obj.limit); //得到每页显示的条数
                         if (!first) {
-                            recycleStation_queryOperation(obj.curr, obj.limit);// 重载页面
+                            publicDoc_queryOperation(obj.curr, obj.limit);// 重载页面
                         }
                     }
                 });
@@ -110,117 +110,33 @@ $(document).ready(function () {
                 , {
                     field: 'doc_version',
                     title: '最新版本',
+                    width : 110,
                     sort: true ,
-                    align : 'center'/*,
+                    align : 'center',
                     templet : function (data) {
                         let html = "";
-                        if (personalDoc_buttonStr.indexOf("personalDoc_versionHis") != -1) {
+                        if (buttonStr.indexOf("personalDoc_versionHis") != -1) {
                             html += "<a title='点击查看版本历史' class=\"layui-btn layui-btn-xs\" name='personalDoc_versionHis' onclick='personalDoc_versionHis(" + commonFormatObj(data) + ")'>" + data.doc_version + "</a>";
                         } else {
                             return data.doc_version;
-                        // }
-                        // return html;
-                    }*/
+                        }
+                        return html;
+                    }
                 }
                 , {
-                    field: 'delete_time',
-                    title: '删除时间',
+                    field: 'edit',
+                    title: '操作',
+                    width : 80,
                     fixed: 'right',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatDate(data.delete_time);
-                    }
-                },
-                {
-                    field: 'expire_time',
-                    title: '过期时间',
-                    fixed: 'right',
-                    align : 'center',
-                    templet : function (data) {
-                        return commonFormatDate(data.expire_time);
-                    }
-                }
+                        let html = "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='personalDoc_detail' onclick='personalDoc_detail(" + commonFormatObj(data) + ")'>详情</a>";
+                        return html;
+                    }}
             ]]
         });
-        commonPutNormalSelectOpts(FIELD_DOC_TYPE, "recycleStation_docType", "", false);
-
-        layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
-        //查询
-        $("#recycleStation_queryBtn").click(function () {
-            recycleStation_queryOperation('1', FIELD_EACH_PAGE_NUM);
-        });
-        //还原
-        $("#recycleStation_revert").click(function () {
-            recycleStation_revertOperation();
-        });
-
-        // 权限控制
-        if (buttonStr.indexOf("recycleStation_queryBtn") == -1) {
-            $("#recycleStation_queryBtn").hide();
-        }
-        if (buttonStr.indexOf("recycleStation_revert") == -1) {
-            $("#recycleStation_revert").hide();
-        }
-        // 绑定重置表格事件
-        commonResizeTable('recycleStation_tableObj');
     } catch (e) {
         console.error(e.message, e);
         commonError(e.message);
     }
 });
-
-/**
- * 查询操作
- */
-function recycleStation_queryOperation(curPage, limit) {
-    let doc_no = $("#recycleStation_docNo").val();
-    let doc_name = $("#recycleStation_docName").val();
-    let last_modi_user = sessionStorage.getItem("user_no");
-    let doc_type = $("#recycleStation_docType").val();
-
-    recycleStation_curr = curPage;
-    recycleStation_tableIns.reload({
-        where: { //设定异步数据接口的额外参数，任意设
-            message : JSON.stringify({
-                "beanList" : [{
-                    "doc_no" : doc_no,
-                    "doc_name" : doc_name,
-                    "last_modi_user" : last_modi_user,
-                    "doc_type" : doc_type
-                }],
-                "operType" : "query",
-                "paramMap" : {
-                    "curPage" : String(curPage),// 当前页码
-                    "limit" : String(limit)// 每页条数
-                }
-            })
-        }
-    });
-}
-
-/**
- * 文档还原到个人库
- */
-function recycleStation_revertOperation() {
-    let checkData = layui.table.checkStatus("recycleStation_tableObj").data;
-    if (checkData.length == 0) {
-        commonInfo("请选择需要还原的文档");
-        return;
-    } else {
-        layui.layer.confirm("是否确认还原选择的文档？", function(index) {
-            let retData = commonAjax("recycleStation.do", JSON.stringify({
-                "beanList": [],
-                "operType": "revertDoc",
-                "paramMap": {
-                    "docList" : [checkData]
-                }
-            }));
-            if (retData.retCode == HANDLE_SUCCESS) {
-                commonOk("还原成功！");
-                recycleStation_queryOperation('1', FIELD_EACH_PAGE_NUM);
-            } else {
-                commonOk("还原失败!" + retData.retMsg);
-            }
-        })
-    }
-}

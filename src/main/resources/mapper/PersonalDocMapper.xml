@@ -11,8 +11,8 @@
         <if test="doc_name != '' and doc_name != null">
             and a.doc_name like concat('%', #{doc_name}, '%')
         </if>
-        <if test="upload_user != '' and upload_user != null">
-            and a.upload_user like concat('%', #{upload_user}, '%')
+        <if test="last_modi_user != '' and last_modi_user != null">
+            and a.last_modi_user like concat('%', #{last_modi_user}, '%')
         </if>
         <if test="doc_type != '' and doc_type != null">
             and a.doc_type = #{doc_type}

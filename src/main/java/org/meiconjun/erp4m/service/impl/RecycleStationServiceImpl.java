@@ -51,10 +51,30 @@ public class RecycleStationServiceImpl implements RecycleStationService {
      * @param responseBean
      */
     private void revertDocOperation(RequestBean requestBean, ResponseBean responseBean) {
-        List<DocBean> docList = requestBean.getBeanList();
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        List<Map<String, Object>> docList = (List<Map<String, Object>>) paramMap.get("doc_list");
+        HashMap<String, Object> condMap = new HashMap<>();
+        for (Map<String, Object> map : docList) {
+            // 数据移入个人文档库
+            condMap.put("doc_serial_no", map.get("doc_serial_no"));
+            condMap.put("doc_no", map.get("doc_no"));
+            condMap.put("doc_name", map.get("doc_name"));
+            condMap.put("doc_language", map.get("doc_language"));
+            condMap.put("secret_level", map.get("secret_level"));
+            condMap.put("doc_type", map.get("doc_type"));
+            condMap.put("doc_writer", map.get("doc_writer"));
+            condMap.put("doc_desc", map.get("doc_desc"));
+            condMap.put("create_user", map.get("create_user"));
+            condMap.put("upload_user", map.get("upload_user"));
+            condMap.put("upload_time", map.get("upload_time"));
+            condMap.put("last_modi_user", map.get("last_modi_user"));
+            condMap.put("last_modi_time", map.get("last_modi_time"));
+            condMap.put("doc_version", map.get("doc_version"));
+            condMap.put("file_root_path", map.get("file_root_path"));
 
-        for (DocBean doc : docList) {
-
+            recycleStationDao.insertPersonalDocInfo(condMap);
+            // 删除回收站数据
+            recycleStationDao.deleteRecycleInfo((String) map.get("doc_serial_no"));
         }
     }
 
@@ -72,11 +92,11 @@ public class RecycleStationServiceImpl implements RecycleStationService {
         HashMap<String, Object> condMap = new HashMap<String, Object>();
         condMap.put("doc_no", bean.getDoc_no());
         condMap.put("doc_name", bean.getDoc_name());
-        condMap.put("upload_user", bean.getUpload_user());
+        condMap.put("last_modi_user", bean.getLast_modi_user());
         condMap.put("doc_type", bean.getDoc_type());
 
         Page page = PageHelper.startPage(curPage, limit);
-        List<DocBean> list = recycleStationDao.selectPersonalRecycleDocInfo(condMap);
+        List<HashMap<String, Object>> list = recycleStationDao.selectPersonalRecycleDocInfo(condMap);
 
         long total = page.getTotal();// 总条数
         Map<String, Object> retMap = new HashMap<String, Object>();

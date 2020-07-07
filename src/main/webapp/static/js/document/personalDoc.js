@@ -20,7 +20,7 @@ $(document).ready(function () {
                     "beanList" : [{
                         "doc_no" : "",
                         "doc_name" : "",
-                        "upload_user" : "",
+                        "last_modi_user" : "",
                         "doc_type" : ""
                     }],
                     "operType" : "query",
@@ -192,7 +192,7 @@ $(document).ready(function () {
 function personalDoc_queryOperation(curPage, limit) {
     let doc_no = $("#personalDoc_docNo").val();
     let doc_name = $("#personalDoc_docName").val();
-    let upload_user = sessionStorage.getItem("user_no");
+    let last_modi_user = sessionStorage.getItem("user_no");
     let doc_type = $("#personalDoc_docType").val();
 
     personalDoc_curr = curPage;
@@ -202,7 +202,7 @@ function personalDoc_queryOperation(curPage, limit) {
                 "beanList" : [{
                     "doc_no" : doc_no,
                     "doc_name" : doc_name,
-                    "upload_user" : upload_user,
+                    "last_modi_user" : last_modi_user,
                     "doc_type" : doc_type
                 }],
                 "operType" : "query",

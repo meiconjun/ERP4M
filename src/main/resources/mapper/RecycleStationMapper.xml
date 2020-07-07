@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.meiconjun.erp4m.dao.RecycleStationDao">
-    <select id="selectPersonalRecycleDocInfo" parameterType="java.util.HashMap" resultType="org.meiconjun.erp4m.bean.DocBean">
+    <select id="selectPersonalRecycleDocInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
         select a.*, b.review_state, b.review_user, b.review_detail, b.judge_user, b.judge_reason, b.judge_time
         , c.file_path from doc_recycle_tb a, doc_review_tb b, doc_version_tb c
         where a.doc_serial_no = b.doc_serial_no and a.doc_serial_no = c.doc_serial_no and a.doc_version = c.doc_version
@@ -11,8 +11,8 @@
         <if test="doc_name != '' and doc_name != null">
             and a.doc_name like concat('%', #{doc_name}, '%')
         </if>
-        <if test="upload_user != '' and upload_user != null">
-            and a.upload_user like concat('%', #{upload_user}, '%')
+        <if test="last_modi_user != '' and last_modi_user != null">
+            and a.last_modi_user like concat('%', #{last_modi_user}, '%')
         </if>
         <if test="doc_type != '' and doc_type != null">
             and a.doc_type = #{doc_type}
@@ -20,9 +20,29 @@
         <if test="doc_serial_no != '' and doc_serial_no != null">
             and a.doc_serial_no = #{doc_serial_no}
         </if>
+        <if test="expire_time != '' and expire_time != null">
+            and a.expire_time &lt;= #{expire_time}
+        </if>
+        and a.delete_state = '0'
     </select>
 
-    <insert id="insertPersonalDocInfo" parameterType="org.meiconjun.erp4m.bean.DocBean">
-        insert into doc_personal_doc_tb ()
+    <insert id="insertPersonalDocInfo" parameterType="java.util.HashMap">
+        insert into doc_personal_doc_tb (doc_serial_no, doc_no, doc_name, doc_language, secret_level,
+        doc_type, doc_writer, doc_desc, create_user, upload_user, upload_time, last_modi_user,
+        last_modi_time, doc_version, file_root_path)
+        values (#{doc_serial_no}, #{doc_no}, #{doc_name}, #{doc_language}, #{secret_level},
+        #{doc_type}, #{doc_writer}, #{doc_desc}, #{create_user}, #{upload_user},  #{upload_time},
+        #{last_modi_user}, #{last_modi_time}, #{doc_version}, #{file_root_path})
     </insert>
+
+    <delete id="deleteRecycleInfo" parameterType="java.lang.String">
+        delete from doc_recycle_tb
+        where doc_serial_no = #{doc_serial_no}
+    </delete>
+
+    <update id="updateRecycleInfo" parameterType="java.util.HashMap">
+        update doc_recycle_tb
+        set delete_state = '1', last_modi_time = #{last_modi_time}
+        where doc_serial_no = #{doc_serial_no}
+    </update>
 </mapper>

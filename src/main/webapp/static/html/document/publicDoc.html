@@ -1,0 +1,107 @@
+<!-- 公共文档库 -->
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            文档编号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="publicDoc_docNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            文档名称：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="publicDoc_docName" autocomplete="off">
+        </div>
+        <div class="row-label">
+            创建者：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="publicDoc_createUser" autocomplete="off">
+        </div>
+        <div class="row-label">
+            文档类别：
+        </div>
+        <div class="row-input">
+            <select  id="publicDoc_docType" >
+            </select>
+        </div>
+
+        <button class="layui-btn" id="publicDoc_queryBtn" data-type="reload">查询</button>
+    </div>
+    <table id="publicDoc_table">
+
+    </table>
+    <div>
+        <div id="publicDoc_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-primaty" id="publicDoc_checkOutBtn">检出文档</a>
+            <a class="layui-btn layui-btn-sm layui-btn-primaty" id="publicDoc_modifyBtn">修改文档</a>
+        </div>
+    </div>
+</div>
+
+<!-- 注意表单字段要用name做标识 -->
+<div hidden="hidden" class="comm-dialog" id="publicDoc_addDiv">
+    <form class="layui-form layui-form-pane" lay-filter="publicDoc_addFrm" id="publicDoc_addFrm" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档编号</label>
+            <div class="layui-input-block">
+                <input type="text" name="publicDoc_docNo_addTxt" maxlength="10" id="publicDoc_docNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <!--            <label class="layui-form-label">-->
+            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="publicDoc_selectFile"><i class="layui-icon layui-icon-upload"></i>选择文档</button>
+            <!--            </label>-->
+            <!--            <div class="layui-input-block">-->
+            <input type="text" name="publicDoc_fileNameTxt" id="publicDoc_fileNameTxt" disabled class="layui-input">
+            <!--            </div>-->
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="publicDoc_docName_addTxt" id="publicDoc_docName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档语言</label>
+            <div class="layui-input-block">
+                <select name="publicDoc_docLanguage_addTxt" id="publicDoc_docLanguage_addTxt" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档类型</label>
+            <div class="layui-input-block">
+                <select name="publicDoc_docType_addTxt" id="publicDoc_docType_addTxt" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文档作者</label>
+            <div class="layui-input-block">
+                <input type="text" name="publicDoc_docWriter_addTxt" id="publicDoc_docWriter_addTxt"  autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">文档摘要</label>
+            <div class="layui-input-block">
+                <textarea name="publicDoc_docDesc_addTxt" id="publicDoc_docDesc_addTxt" placeholder="请输入文档摘要" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item comm-dialog-button">
+            <button class="layui-btn" id="publicDoc_submitBtn" lay-submit lay-filter="publicDoc_submitBtn">确定</button>
+            <button class="layui-btn" type="button"  id="publicDoc_downLoad" hidden="hidden">下载文档</button>
+        </div>
+    </form>
+</div>
+
+<div hidden="hidden" id="publicDoc_docDetail_dialogDiv">
+    <table id="publicDoc_docDetail_table">
+
+    </table>
+</div>
+
+
+<script src="static/js/document/publicDoc.js"></script>
