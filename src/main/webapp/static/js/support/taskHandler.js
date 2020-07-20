@@ -51,6 +51,12 @@ function taskHandler_docJudge(taskBean) {
         "                <textarea name=\"docJudge_docDesc\" id=\"docJudge_docDesc\" class=\"layui-textarea\" disabled></textarea>\n" +
         "            </div>\n" +
         "        </div>\n" +
+        "        <div class=\"layui-form-item layui-form-text\">\n" +
+        "            <label class=\"layui-form-label\">备注</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <textarea name=\"docJudge_remarks\" id=\"docJudge_remarks\" class=\"layui-textarea\" disabled></textarea>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
         "        <div class=\"layui-form-item comm-dialog-button\">\n" +
         "            <button class=\"layui-btn\" type=\"button\"  id=\"docJudge_review\" >提交</button>\n" +
         "            <button class=\"layui-btn\" type=\"button\"  id=\"docJudge_download\" >下载文档</button>\n" +
@@ -60,7 +66,7 @@ function taskHandler_docJudge(taskBean) {
     let html2 = "<div class=\"comm-dialog\" >\n" +
         "    <form class=\"layui-form layui-form-pane\" lay-filter=\"docJudge_submitFrm\" id=\"docJudge_submitFrm\" action=\"\">\n" +
         "        <div class=\"layui-form-item layui-form-text\">\n" +
-        "            <label class=\"layui-form-label\">审阅意见</label>\n" +
+        "            <label class=\"layui-form-label\">驳回原因</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
         "                <textarea name=\"docJudge_opinion\" id=\"docJudge_opinion\" required lay-verify=\"required\" class=\"layui-textarea\" ></textarea>\n" +
         "            </div>\n" +
@@ -73,20 +79,21 @@ function taskHandler_docJudge(taskBean) {
 
     layui.layer.open({
         type: 1,// 页面层
-        area: ['500px', '600px'],// 宽高
+        area: ['500px', '750px'],// 宽高
         title: '文档审阅',// 标题
         content: html,//内容，直接取dom对象
-        btn: ['提交', '驳回', '下载文档'],
+        btn: ['通过', '驳回', '下载文档'],
         yes: function (index, layero) {
             let docBean = JSON.parse((taskBean.task_param));
             //确认按钮的回调，提交表单
-            layui.layer.confirm("是否确认提交？", function(index) {
+            layui.layer.confirm("是否确认通过？", function(index) {
                 let retData = commonAjax("personalDoc.do", JSON.stringify({
                     "beanList": [{}],
                     "operType": "judgePass",
                     "paramMap": {
                         "doc_serial_no": docBean.doc_serial_no,
-                        "judge_user": sessionStorage.getItem("user_no")
+                        "judge_user": sessionStorage.getItem("user_no"),
+                        "remarks": docBean.remarks
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
@@ -160,7 +167,8 @@ function taskHandler_docJudge(taskBean) {
                 "docJudge_docLanguage": docBean.doc_language,
                 "docJudge_docType": docBean.doc_type,
                 "docJudge_docWriter": docBean.doc_writer,
-                "docJudge_docDesc": docBean.doc_desc
+                "docJudge_docDesc": docBean.doc_desc,
+                "docJudge_remarks": docBean.remarks
             });
             // 渲染审阅详情表格
             let reviewDetail = taskBean.reviewDetail;
@@ -246,6 +254,12 @@ function taskHandler_docReview(taskBean) {
         "                <textarea name=\"docReview_docDesc\" id=\"docReview_docDesc\" class=\"layui-textarea\" disabled></textarea>\n" +
         "            </div>\n" +
         "        </div>\n" +
+        "        <div class=\"layui-form-item layui-form-text\">\n" +
+        "            <label class=\"layui-form-label\">备注</label>\n" +
+        "            <div class=\"layui-input-block\">\n" +
+        "                <textarea name=\"docReview_remarks\" id=\"docReview_remarks\" class=\"layui-textarea\" disabled></textarea>\n" +
+        "            </div>\n" +
+        "        </div>\n" +
         "        <div class=\"layui-form-item comm-dialog-button\">\n" +
         "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_review\" >提交意见</button>\n" +
         "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_download\" >下载文档</button>\n" +
@@ -269,7 +283,7 @@ function taskHandler_docReview(taskBean) {
 
     layui.layer.open({
         type: 1,// 页面层
-        area: ['500px', '600px'],// 宽高
+        area: ['500px', '750px'],// 宽高
         title: '文档审阅',// 标题
         content: html,//内容，直接取dom对象
         // btn: ['确定'],
@@ -288,7 +302,8 @@ function taskHandler_docReview(taskBean) {
                 "docReview_docLanguage": docBean.doc_language,
                 "docReview_docType": docBean.doc_type,
                 "docReview_docWriter": docBean.doc_writer,
-                "docReview_docDesc": docBean.doc_desc
+                "docReview_docDesc": docBean.doc_desc,
+                "docReview_remarks": docBean.remarks
             });
 
             $("#docReview_download").click(function () {

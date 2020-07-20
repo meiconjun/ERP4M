@@ -689,9 +689,10 @@ function personalDoc_SubmitpreviewOperation() {
     }
     $("personalDoc_reviewSubmit_reviewer").val("");
     $("personalDoc_reviewSubmit_adjudicator").val("");
+    $("personalDoc_reviewSubmit_remarks").val("");
     layui.layer.open({
         type: 1,// 页面层
-        area: ['600px', '300px'],// 宽高
+        area: ['600px', '450px'],// 宽高
         title: '提交评审',// 标题
         content: $("#personalDoc_reviewSubmit_dialogDiv"),//内容，直接取dom对象
         btn: ['确定'],
@@ -703,8 +704,8 @@ function personalDoc_SubmitpreviewOperation() {
                     "operType": "reviewSubmit",
                     "paramMap": {
                         "reviewer": $("personalDoc_reviewSubmit_reviewer").val(),
-                        "adjudicator": $("personalDoc_reviewSubmit_adjudicator").val()
-
+                        "adjudicator": $("personalDoc_reviewSubmit_adjudicator").val(),
+                        "remarks": $("personalDoc_reviewSubmit_remarks").val()
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {

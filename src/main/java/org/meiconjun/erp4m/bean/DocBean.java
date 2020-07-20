@@ -52,6 +52,8 @@ public class DocBean {
     private String create_user;
     // 最后修改用户
     private String last_modi_user;
+    // 提交审阅备注
+    private String remarks;
 
     public String getDoc_serial_no() {
         return doc_serial_no;
@@ -227,5 +229,13 @@ public class DocBean {
 
     public void setLast_modi_user(String last_modi_user) {
         this.last_modi_user = last_modi_user;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -33,6 +33,10 @@ public interface PersonalDocDao {
      */
     int insertDocVersionInfo(HashMap<String, Object> condMap);
     /**
+     * 更新版本信息
+     */
+    int updateDocVersionInfo(HashMap<String, Object> condMap);
+    /**
      * 更新文档信息
      */
     int updatePersonalDocInfo(HashMap<String, Object> condMap);

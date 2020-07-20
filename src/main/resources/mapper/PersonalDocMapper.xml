@@ -40,6 +40,27 @@
         values(#{doc_serial_no}, #{docBean.doc_version}, #{docBean.doc_writer}, #{upload_user}, #{upload_time}, #{docBean.file_path})
     </insert>
 
+    <update id="updateDocVersionInfo" parameterType="java.util.HashMap">
+        update doc_version_tb
+        <set>
+            <if test="doc_writer != null and doc_writer != ''">
+                doc_writer = #{doc_writer},
+            </if>
+            <if test="upload_user != null and upload_user != ''">
+                upload_user = #{upload_user},
+            </if>
+            <if test="upload_time != null and upload_time != ''">
+                upload_time = #{upload_time},
+            </if>
+            <if test="file_path != null and file_path != ''">
+                file_path = #{file_path},
+            </if>
+            <if test="update_desc != null and update_desc != ''">
+                update_desc = #{update_desc},
+            </if>
+        </set>
+        where doc_serial_no = #{doc_serial_no} and doc_version = #{doc_version}
+    </update>
     <update id="updatePersonalDocInfo" parameterType="java.util.HashMap">
         update doc_personal_doc_tb
         set doc_name = #{docBean.doc_name}, doc_language = #{docBean.doc_language}, doc_writer = #{doc_writer}, doc_desc = #{doc_desc},
@@ -87,6 +108,9 @@
             </if>
             <if test="judge_time != null and judge_time != ''">
                 judge_time = #{judge_time},
+            </if>
+            <if test="remarks != null and remarks != ''">
+                remarks = #{remarks},
             </if>
         </set>
         where doc_serial_no = #{doc_serial_no}

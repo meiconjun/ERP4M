@@ -7,4 +7,31 @@
         values (#{doc_serial_no}, #{doc_no}, #{doc_name}, #{doc_language}, #{secret_level}, #{doc_type},
         #{doc_writer}, #{doc_desc}, #{create_user}, #{upload_user}, #{upload_time}, #{last_modi_time}, #{doc_version}, #{file_root_path}, )
     </insert>
+
+    <select id="selectPublicDocInfo" parameterType="java.util.HashMap" resultType="org.meiconjun.erp4m.bean.DocBean">
+        select a.*, b.review_state, b.review_user, b.review_detail, b.judge_user, b.judge_reason, b.judge_time
+        , c.file_path from doc_personal_doc_tb a, doc_review_tb b, doc_version_tb c
+        where a.doc_serial_no = b.doc_serial_no and a.doc_serial_no = c.doc_serial_no and a.doc_version = c.doc_version
+        <if test="doc_no != '' and doc_no != null">
+            and a.doc_no like concat('%', #{doc_no}, '%')
+        </if>
+        <if test="doc_name != '' and doc_name != null">
+            and a.doc_name like concat('%', #{doc_name}, '%')
+        </if>
+        <if test="create_user != '' and create_user != null">
+            and a.create_user like concat('%', #{create_user}, '%')
+        </if>
+        <if test="doc_type != '' and doc_type != null">
+            and a.doc_type = #{doc_type}
+        </if>
+        <if test="doc_serial_no != '' and doc_serial_no != null">
+            and a.doc_serial_no = #{doc_serial_no}
+        </if>
+    </select>
+
+    <select id="selectDocHistory" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select a.doc_no, a.doc_name, b.* from doc_main_tb a, doc_version_tb b
+        where a.doc_serial_no = b.doc_serial_no and a.doc_serial_no = #{doc_serial_no}
+        order by b.doc_version desc
+    </select>
 </mapper>

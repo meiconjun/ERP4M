@@ -47,10 +47,10 @@
         <div class="layui-form-item">
             <label class="layui-form-label">文档编号</label>
             <div class="layui-input-block">
-                <input type="text" name="publicDoc_docNo_addTxt" maxlength="10" id="publicDoc_docNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="text" name="publicDoc_docNo_addTxt" maxlength="10" id="publicDoc_docNo_addTxt" required disabled lay-verify="required" autocomplete="off" class="layui-input">
             </div>
         </div>
-        <div class="layui-form-item">
+        <div class="layui-form-item" hidden="hidden">
             <!--            <label class="layui-form-label">-->
             <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="publicDoc_selectFile"><i class="layui-icon layui-icon-upload"></i>选择文档</button>
             <!--            </label>-->
@@ -61,37 +61,36 @@
         <div class="layui-form-item">
             <label class="layui-form-label">文档名称</label>
             <div class="layui-input-block">
-                <input type="text" name="publicDoc_docName_addTxt" id="publicDoc_docName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+                <input type="text" name="publicDoc_docName_addTxt" id="publicDoc_docName_addTxt" required disabled lay-verify="required" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">文档语言</label>
             <div class="layui-input-block">
-                <select name="publicDoc_docLanguage_addTxt" id="publicDoc_docLanguage_addTxt" required lay-verify="required">
+                <select name="publicDoc_docLanguage_addTxt" id="publicDoc_docLanguage_addTxt" required disabled lay-verify="required">
                 </select>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">文档类型</label>
             <div class="layui-input-block">
-                <select name="publicDoc_docType_addTxt" id="publicDoc_docType_addTxt" required lay-verify="required">
+                <select name="publicDoc_docType_addTxt" id="publicDoc_docType_addTxt" required disabled lay-verify="required">
                 </select>
             </div>
         </div>
         <div class="layui-form-item">
             <label class="layui-form-label">文档作者</label>
             <div class="layui-input-block">
-                <input type="text" name="publicDoc_docWriter_addTxt" id="publicDoc_docWriter_addTxt"  autocomplete="off" class="layui-input">
+                <input type="text" name="publicDoc_docWriter_addTxt" id="publicDoc_docWriter_addTxt" disabled autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item layui-form-text">
             <label class="layui-form-label">文档摘要</label>
             <div class="layui-input-block">
-                <textarea name="publicDoc_docDesc_addTxt" id="publicDoc_docDesc_addTxt" placeholder="请输入文档摘要" class="layui-textarea"></textarea>
+                <textarea name="publicDoc_docDesc_addTxt" id="publicDoc_docDesc_addTxt" placeholder="请输入文档摘要" disabled class="layui-textarea"></textarea>
             </div>
         </div>
         <div class="layui-form-item comm-dialog-button">
-            <button class="layui-btn" id="publicDoc_submitBtn" lay-submit lay-filter="publicDoc_submitBtn">确定</button>
             <button class="layui-btn" type="button"  id="publicDoc_downLoad" hidden="hidden">下载文档</button>
         </div>
     </form>
