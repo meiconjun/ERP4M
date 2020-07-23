@@ -146,11 +146,17 @@ $(document).ready(function () {
         $("#publicDoc_queryBtn").click(function () {
             publicDoc_queryOperation('1', FIELD_EACH_PAGE_NUM);
         });
+        //检出
+        $("#publicDoc_checkOutBtn").click(function () {
+            publicDoc_checkOutBtn();
+        });
         // 权限控制
         if (publicDoc_buttonStr.indexOf("publicDoc_queryBtn") == -1) {
             $("#publicDoc_queryBtn").hide();
         }
-
+        if (publicDoc_buttonStr.indexOf("publicDoc_checkOutBtn") == -1) {
+            $("#publicDoc_checkOutBtn").hide();
+        }
         // 绑定重置表格事件
         commonResizeTable('publicDoc_tableObj');
     } catch (e) {
@@ -338,4 +344,32 @@ function publicDoc_versionHis(data) {
 function publicDoc_downloadVersionDoc(data) {
     let postFix = data.file_path.substring(data.file_path.lastIndexOf("."), data.file_path.length);
     commonFileDownload((data.doc_name + "_" + data.doc_version + postFix), data.file_path);
+}
+
+/**
+ * 检出文档
+ */
+function publicDoc_checkOutBtn() {
+    let checkData = layui.table.checkStatus("publicDoc_tableObj").data;
+    if (checkData.length == 0) {
+        commonInfo("请选择需要检出的文档");
+        return;
+    } else if (checkData.length > 1) {
+        commonInfo("同时只能检出一个文档");
+        return;
+    } else {
+        layui.layer.confirm("确认检出该文档？检出后文档将移出公共文档库，移入您的个人文档库", function (index) {
+            let retData = commonAjax("publicDoc.do", JSON.stringify({
+                "beanList": [checkData[0]],
+                "operType": "checkOut",
+                "paramMap": {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("检出成功，文档已移入您的个人文档库");
+                publicDoc_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError("检出失败！" + retData.retMsg);
+            }
+        });
+    }
 }

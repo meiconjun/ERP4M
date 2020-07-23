@@ -199,20 +199,22 @@ public class FileUploadController {
         String file_path = file_root_path;
         if (CommonUtil.isStrBlank(doc_version) || "undefined".equals(doc_version)) {
             doc_version = "1.00";
-        } else {
+        }
+        // 检出时更新版本号
+        /*else {
             if ("1".equals(checkOut)) {
                 // 检出时直接更新大版本
-                /*// 检出更新，更新大版本
+                // 检出更新，更新大版本
                 double doc_version_n = Double.valueOf(doc_version);
                 doc_version_n = doc_version_n + 1;
-                doc_version = String.valueOf(doc_version_n);*/
+                doc_version = String.valueOf(doc_version_n);
             } else {
                 // 更新小版本
                 double doc_version_n = Double.valueOf(doc_version);
-                doc_version_n = doc_version_n + 0.01;
+                doc_version_n = doc_version_n + 0.1;
                 doc_version = String.valueOf(doc_version_n);
             }
-        }
+        }*/
         file_path += doc_version + File.separator + doc_no + "_" + doc_version + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
         logger.info("文档存放路径：" + file_path);
         // 写入文件

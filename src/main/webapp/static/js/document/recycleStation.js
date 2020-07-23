@@ -212,14 +212,14 @@ function recycleStation_revertOperation() {
                 "beanList": [],
                 "operType": "revertDoc",
                 "paramMap": {
-                    "docList" : [checkData]
+                    "doc_list" : checkData
                 }
             }));
             if (retData.retCode == HANDLE_SUCCESS) {
                 commonOk("还原成功！");
                 recycleStation_queryOperation('1', FIELD_EACH_PAGE_NUM);
             } else {
-                commonOk("还原失败!" + retData.retMsg);
+                commonError("还原失败!" + retData.retMsg);
             }
         })
     }

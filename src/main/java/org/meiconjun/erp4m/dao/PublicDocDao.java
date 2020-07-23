@@ -31,4 +31,8 @@ public interface PublicDocDao {
      * 查询版本历史
      */
     List<HashMap<String, Object>> selectDocHistory(@Param("doc_serial_no")String doc_serial_no);
+    /**
+     * 删除公共文档库信息
+     */
+    int deletePublicDocInfo(@Param("doc_serial_no")String doc_serial_no);
 }

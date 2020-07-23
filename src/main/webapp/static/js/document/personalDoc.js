@@ -4,6 +4,7 @@ var personalDoc_tableIns;
 var personalDoc_fileUploadInst = null;
 var personalDoc_fileUploadFlag = false;
 var personalDoc_buttonStr = "";
+var personalDoc_transferInst = null;
 $(document).ready(function () {
     try {
         // 获取按钮权限
@@ -20,7 +21,7 @@ $(document).ready(function () {
                     "beanList" : [{
                         "doc_no" : "",
                         "doc_name" : "",
-                        "last_modi_user" : "",
+                        "last_modi_user" : sessionStorage.getItem("user_no"),
                         "doc_type" : ""
                     }],
                     "operType" : "query",
@@ -108,7 +109,12 @@ $(document).ready(function () {
                     title: '文档状态',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatValue(FIELD_DOC_STATE, data.review_state, false);
+                        if (data.review_state == '4') {
+                            let html = "<a title='点击查看驳回原因' href='#' style='color: red' onclick='personalDoc_showFailReason(\"" + data.judge_reason + "\")'>" + commonFormatValue(FIELD_DOC_STATE, data.review_state, false) + "</a>";
+                            return html;
+                        } else {
+                            return commonFormatValue(FIELD_DOC_STATE, data.review_state, false);
+                        }
                     }
                 }
                 , {
@@ -237,8 +243,9 @@ function personalDoc_addOperation() {
             commonPutNormalSelectOpts(FIELD_DOC_TYPE, "personalDoc_docType_addTxt", "", true);
 
             personalDoc_initUploadInst({}, "add", index);
+            $("#personalDoc_submitBtn").off('click');//必须先解绑事件，否则会重复绑定
             $("#personalDoc_submitBtn").click(function () {
-                personalDoc_digSubmit({}, "add");
+                personalDoc_digSubmit({}, "add", index);
             });
 
             $("#personalDoc_submitBtn").show();
@@ -288,11 +295,13 @@ function personalDoc_modifyOperation() {
                 $("#personalDoc_docNo_addTxt").attr('disabled', 'disabled');
                 $("#personalDoc_docType_addTxt").attr('disabled', 'disabled');
                 personalDoc_initUploadInst(cusData, "modify", index);
+                $("#personalDoc_submitBtn").off('click');//必须先解绑事件，否则会重复绑定
                 $("#personalDoc_submitBtn").click(function () {
-                    personalDoc_digSubmit(cusData, "modify");
+                    personalDoc_digSubmit(cusData, "modify", index);
                 });
 
                 $("#personalDoc_submitBtn").show();
+                $("#personalDoc_downLoad").off('click');//必须先解绑事件，否则会重复绑定
                 $("#personalDoc_downLoad").click(function () {
                     commonFileDownload(cusData.doc_no + postFix, cusData.file_path);
                 });
@@ -302,7 +311,7 @@ function personalDoc_modifyOperation() {
         });
     }
 }
-function personalDoc_digSubmit(cusData, operType) {
+function personalDoc_digSubmit(cusData, operType, digIndex) {
     if ("add" == operType && !personalDoc_fileUploadFlag) {
         commonInfo("请选择需要上传的文档");
         return;
@@ -332,6 +341,7 @@ function personalDoc_digSubmit(cusData, operType) {
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
+                    layui.layer.closeAll('loading');
                     commonOk("操作成功！");
                     layui.layer.close(digIndex);
                     personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
@@ -492,7 +502,9 @@ function personalDoc_detail(data) {
             $("#personalDoc_selectFile").parent().hide();
             $("#personalDoc_submitBtn").hide();
 
+            $("#personalDoc_downLoad").off('click');//必须先解绑事件，否则会重复绑定
             $("#personalDoc_downLoad").click(function () {
+                console.log("下载文档");
                 commonFileDownload(cusData.doc_no + postFix, cusData.file_path);
             });
             layui.form.render();
@@ -573,6 +585,7 @@ function personalDoc_initUploadInst(data, operType, digIndex) {
                     if (retData.retCode == HANDLE_SUCCESS) {
                         commonOk("操作成功！");
                         layui.layer.close(digIndex);
+                        personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
                     } else {
                         commonError("操作失败！" + retData.retMsg)
                     }
@@ -652,7 +665,7 @@ function personalDoc_deleteOperation() {
             }
         }
         layui.layer.confirm("是否确认删除选中的文档，删除后文档将进入回收站并保留90天", function (index) {
-            layui.layer.load();//loading
+            // layui.layer.load();//loading
             let retData = commonAjax("personalDoc.do", JSON.stringify({
                 "beanList" : checkData,
                 "operType": "delete",
@@ -660,12 +673,11 @@ function personalDoc_deleteOperation() {
 
                 }
             }));
-            layui.layer.close(digIndex);
             if (retData.retCode == HANDLE_SUCCESS) {
                 commonOk("删除成功");
                 personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
             } else {
-                commonOk("删除失败！" + retData.retCode);
+                commonError("删除失败！" + retData.retCode);
             }
         });
     }
@@ -687,9 +699,9 @@ function personalDoc_SubmitpreviewOperation() {
         commonInfo("只能提交状态为未提交评审或评审驳回的文档");
         return;
     }
-    $("personalDoc_reviewSubmit_reviewer").val("");
-    $("personalDoc_reviewSubmit_adjudicator").val("");
-    $("personalDoc_reviewSubmit_remarks").val("");
+    $("#personalDoc_reviewSubmit_reviewer").val("");
+    $("#personalDoc_reviewSubmit_adjudicator").val("");
+    $("#personalDoc_reviewSubmit_remarks").val("");
     layui.layer.open({
         type: 1,// 页面层
         area: ['600px', '450px'],// 宽高
@@ -703,9 +715,9 @@ function personalDoc_SubmitpreviewOperation() {
                     "beanList": [checkData[0]],
                     "operType": "reviewSubmit",
                     "paramMap": {
-                        "reviewer": $("personalDoc_reviewSubmit_reviewer").val(),
-                        "adjudicator": $("personalDoc_reviewSubmit_adjudicator").val(),
-                        "remarks": $("personalDoc_reviewSubmit_remarks").val()
+                        "reviewer": $("#personalDoc_reviewSubmit_reviewer").val(),
+                        "adjudicator": $("#personalDoc_reviewSubmit_adjudicator").val(),
+                        "remarks": $("#personalDoc_reviewSubmit_remarks").val()
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
@@ -731,23 +743,24 @@ function personalDoc_SubmitpreviewOperation() {
                 let allUserMap = userListData.retMap.allUser;
                 for (let allUserMapKey in allUserMap) {
                     users.push({
-                        "name" : allUserMapKey + "-" + allUserMap[allUserMapKey],
+                        "name" : allUserMapKey + '-' + allUserMap[allUserMapKey],
                         "value" : allUserMapKey
                     });
                 }
             } else {
                 commonError("加载系统用户列表失败");
             }
-            commonPutNormalSelectOpts(users, "personalDoc_reviewSubmit_adjudicator", "", true, false);
+            commonPutNormalSelectOpts(users, "personalDoc_reviewSubmit_adjudicator", "", true, true);
             // 穿梭框
+            $("#personalDoc_reviewSubmit_selectReviewer").off('click');//必须先解绑事件，否则会重复绑定
             $("#personalDoc_reviewSubmit_selectReviewer").click(function () {
-                    layui.layer.open({
+                parent.layer.open({
                     type: 1,// 页面层
                     area: ['500px', '500px'],// 宽高
                     title: '选择审阅人',// 标题
                     content: $("#personalDoc_transfer"),//内容，直接取dom对象
                     btn: ['确定'],
-                    yes: function (index, layero) {
+                    yes: function (index3, layero) {
                         let transferData = layui.transfer.getData("personalDoc_transfer");
                         let selectTransferStr = "";
                         for (let j = 0; j < transferData.length; j ++) {
@@ -757,24 +770,45 @@ function personalDoc_SubmitpreviewOperation() {
                             selectTransferStr = selectTransferStr.substring(1, selectTransferStr.length);
                         }
                         $("#personalDoc_reviewSubmit_reviewer").val(selectTransferStr);
-                        layui.layer.close(index);
+                        layui.layer.close(index3);
                     },
-                    success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
-                        layui.transfer.render({
-                            elem: '#personalDoc_transfer',
-                            id: "personalDoc_transfer",
-                            title: ["可选", "已选"]
-                            ,data: users,
-                            value: $("#personalDoc_reviewSubmit_reviewer").val().split(",")
-                            ,parseData: function(res){
-                                return {
-                                    "value": res.value //数据值
-                                    ,"title": res.name //数据标题
-                                    ,"disabled": false  //是否禁用
-                                    ,"checked": res.checked //是否选中
+                    success: function (layero, index2) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                        if (personalDoc_transferInst == null) {// 穿梭框不可以重复渲染
+                            console.log("创建穿梭框");
+                            personalDoc_transferInst = layui.transfer.render({
+                                elem: '#personalDoc_transfer',
+                                id: "personalDoc_transfer",
+                                title: ["可选", "已选"]
+                                ,data: users,
+                                value: $("#personalDoc_reviewSubmit_reviewer").val().split(",")
+                                ,parseData: function(res){
+                                    return {
+                                        "value": res.value //数据值
+                                        ,"title": res.name //数据标题
+                                        ,"disabled": false  //是否禁用
+                                        ,"checked": res.checked //是否选中
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            console.log("重载穿梭框");
+                            personalDoc_transferInst.reload({
+                                elem: '#personalDoc_transfer',
+                                id: "personalDoc_transfer",
+                                title: ["可选", "已选"],
+                                data: users,
+                                value: $("#personalDoc_reviewSubmit_reviewer").val().split(",")
+                                ,parseData: function(res){
+                                    return {
+                                        "value": res.value //数据值
+                                        ,"title": res.name //数据标题
+                                        ,"disabled": false  //是否禁用
+                                        ,"checked": res.checked //是否选中
+                                    }
+                                }
+                            });
+                        }
+
                     }
                 });
 
@@ -791,4 +825,14 @@ function personalDoc_SubmitpreviewOperation() {
 function personalDoc_downloadVersionDoc(data) {
     let postFix = data.file_path.substring(data.file_path.lastIndexOf("."), data.file_path.length);
     commonFileDownload((data.doc_name + "_" + data.doc_version + postFix), data.file_path);
+}
+
+/**
+ * 展示驳回原因
+ */
+function personalDoc_showFailReason(judge_reason) {
+    layui.layer.open({
+        title: "驳回原因",
+        content: judge_reason
+    });
 }

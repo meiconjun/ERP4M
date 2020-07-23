@@ -109,9 +109,10 @@ $(document).ready(function () {
                     align : 'center',
                     templet : function (data) {
                         let html = "";
-                        if (buttonStr.indexOf("userConfig_rightBtn") != -1) {
+                        // 暂时不需要用户权限设定功能
+                        /*if (buttonStr.indexOf("userConfig_rightBtn") != -1) {
                             html += "<a class=\"layui-btn layui-btn-xs\" name='userConfig_rightBtn' onclick='userConfig_rightOperation(" + commonFormatObj(data) + ")'>权限设定</a>";
-                        }
+                        }*/
                         if (buttonStr.indexOf("userConfig_modifyBtn") != -1) {
                             html += "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='userConfig_modifyBtn' onclick='userConfig_modifyOperation(" + commonFormatObj(data) + "," +  commonFormatObj(roleList) + ")'>修改信息</a>";
                         }

@@ -6,6 +6,8 @@ function taskHandler_showTask(taskBean) {
         taskHandler_stageDocUpload(taskBean);
     } else if (taskBean.task_type == FIELD_TASK_TYPE_DOC_REVIEW) {
         taskHandler_docReview(taskBean);
+    } else if (taskBean.task_type == FIELD_TASK_TYPE_DOC_JUDGE) {
+        taskHandler_docJudge(taskBean);
     }
 }
 /** 文档裁决 */
@@ -56,10 +58,6 @@ function taskHandler_docJudge(taskBean) {
         "            <div class=\"layui-input-block\">\n" +
         "                <textarea name=\"docJudge_remarks\" id=\"docJudge_remarks\" class=\"layui-textarea\" disabled></textarea>\n" +
         "            </div>\n" +
-        "        </div>\n" +
-        "        <div class=\"layui-form-item comm-dialog-button\">\n" +
-        "            <button class=\"layui-btn\" type=\"button\"  id=\"docJudge_review\" >提交</button>\n" +
-        "            <button class=\"layui-btn\" type=\"button\"  id=\"docJudge_download\" >下载文档</button>\n" +
         "        </div>\n" +
         "    </form>\n" +
         "</div>";
@@ -113,7 +111,7 @@ function taskHandler_docJudge(taskBean) {
             let docBean = JSON.parse((taskBean.task_param));
             layui.layer.open({
                 type: 1,// 页面层
-                area: ['500px', '250px'],// 宽高
+                area: ['500px', '350px'],// 宽高
                 title: '驳回原因',// 标题
                 content: html2,//内容，直接取dom对象
                 success: function (layero, index2) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
@@ -150,11 +148,13 @@ function taskHandler_docJudge(taskBean) {
                     });
                 }
             });
+            return false;
         },
         btn3: function (index, layero) {
             let docBean = JSON.parse((taskBean.task_param));
             let postFix = docBean.file_path.substring(docBean.file_path.lastIndexOf("."), docBean.file_path.length);
             commonFileDownload(docBean.doc_no + postFix, docBean.file_path);
+            return false;
         },
         success: function (layero, index1) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
             let docBean = JSON.parse((taskBean.task_param));
@@ -171,7 +171,7 @@ function taskHandler_docJudge(taskBean) {
                 "docJudge_remarks": docBean.remarks
             });
             // 渲染审阅详情表格
-            let reviewDetail = taskBean.reviewDetail;
+            let reviewDetail = docBean.reviewDetail;
             let tempReviewList = [];
             for (let key in reviewDetail) {
                 tempReviewList.push({
@@ -191,13 +191,16 @@ function taskHandler_docJudge(taskBean) {
                     {
                         field: 'review_user',
                         title: '审阅用户',
-                        align : 'center'
+                        align : 'center',
+                        templet: function (data) {
+                            return commonFormatUserNo(data.review_user);
+                        }
                     },
                     {
                         field: 'review_time',
                         title: '审阅时间',
                         align : 'center',
-                        template: function (data) {
+                        templet: function (data) {
                             return commonFormatDate(data.review_time);
                         }
                     }
@@ -305,15 +308,16 @@ function taskHandler_docReview(taskBean) {
                 "docReview_docDesc": docBean.doc_desc,
                 "docReview_remarks": docBean.remarks
             });
-
+            $("#docReview_download").off("click");
             $("#docReview_download").click(function () {
                 commonFileDownload(docBean.doc_no + postFix, docBean.file_path);
             });
             layui.form.render();
+            $("#docReview_review").off('click');
             $("#docReview_review").click(function () {
                 layui.layer.open({
                     type: 1,// 页面层
-                    area: ['500px', '250px'],// 宽高
+                    area: ['500px', '300px'],// 宽高
                     title: '审阅意见',// 标题
                     content: html2,//内容，直接取dom对象
                     // btn: ['确定'],

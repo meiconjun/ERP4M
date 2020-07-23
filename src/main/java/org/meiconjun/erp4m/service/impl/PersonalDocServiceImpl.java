@@ -84,10 +84,12 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("doc_serial_no", doc_serial_no);
         condMap.put("judge_user", judge_user);
         condMap.put("judge_time", CommonUtil.getCurrentTimeStr());
+        condMap.put("review_state", "3");
         personalDocDao.updateDocReviewInfo(condMap);
         // 获取文档信息,插入公共文档主表
         DocBean docBean = personalDocDao.selectPersonalDocInfo(condMap).get(0);
         docBean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
+        docBean.setLast_modi_user(CommonUtil.getLoginUser().getUser_no());
         publicDocDao.insertNewPublicDocInfo(docBean);
         // 更新文档版本信息
         condMap.put("doc_version", docBean.getDoc_version());
@@ -174,7 +176,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         if (CommonUtil.isStrBlank(review_detail)) {
             reviewDetailMap = new HashMap<String, String>();
         } else {
-            reviewDetailMap = (HashMap<String, String>) CommonUtil.jsonToObj(review_detail, Map.class);
+            reviewDetailMap = (Map<String, String>) CommonUtil.jsonToObj(review_detail, Map.class);
         }
         reviewDetailMap.put(review_user, opinion + SystemContants.DELIMITER + CommonUtil.getCurrentTimeStr());
         HashMap<String, Object> reviewMap = new HashMap<String, Object>();
@@ -259,7 +261,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("review_user", reviewer);
         condMap.put("judge_user", adjudicator);
         condMap.put("remarks", remarks);
-
+        condMap.put("review_state", "1");
         // update doc review_state
         int effect = personalDocDao.updateDocReviewInfo(condMap);
 
@@ -373,6 +375,7 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("file_root_path", file_root_path);
         condMap.put("doc_serial_no", doc_serial_no);
         condMap.put("upload_user", upload_user);
+        condMap.put("doc_desc", docBean.getDoc_desc());
         condMap.put("upload_time", upload_time);
         condMap.put("last_modi_time", last_modi_time);
         condMap.put("last_modi_user", upload_user);
@@ -381,7 +384,8 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         condMap.put("doc_version", docBean.getDoc_version());
 
         personalDocDao.updatePersonalDocInfo(condMap);
-        personalDocDao.insertDocVersionInfo(condMap);
+//        personalDocDao.insertDocVersionInfo(condMap); 修改时不改变文档版本，只有新增和检出时改变
+        personalDocDao.updateDocVersionInfo(condMap);
 
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }

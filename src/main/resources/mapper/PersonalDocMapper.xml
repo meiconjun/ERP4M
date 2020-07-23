@@ -97,7 +97,7 @@
             <if test="review_user != null and review_user != ''">
                 review_user = #{review_user},
             </if>
-            <if test="review_detail != null and review_detail != ''">
+            <if test="review_detail != null">
                 review_detail = #{review_detail},
             </if>
             <if test="judge_user != null and judge_user != ''">

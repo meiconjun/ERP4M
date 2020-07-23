@@ -75,6 +75,8 @@ public class RecycleStationServiceImpl implements RecycleStationService {
             recycleStationDao.insertPersonalDocInfo(condMap);
             // 删除回收站数据
             recycleStationDao.deleteRecycleInfo((String) map.get("doc_serial_no"));
+
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
         }
     }
 

@@ -23,6 +23,8 @@ function distributionMessage(msgStr) {
         showNotificationKeep("文档驳回", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_DOC_PASS == msgBean.msg_type) {
         showNotificationKeep("文档审批通过", msgBean.msg_content, msgBean.msg_no, true);
+    } else if (FIELD_MSG_TYPE_DOC_JUDGE == msgBean.msg_type) {
+        showNotificationKeep("文档裁决", msgBean.msg_content, msgBean.msg_no, true);
     }
 }
 
@@ -42,6 +44,14 @@ function showMainPageMsg(msgStr, showButton) {
         showNotificationKeep("项目负责阶段提醒", msgBean.msg_content, msgBean.msg_no, showButton);
     } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
         showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_DOC_REVIEW == msgBean.msg_type) {
+        showNotificationKeep("文档审阅", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_DOC_DENIED == msgBean.msg_type) {
+        showNotificationKeep("文档驳回", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_DOC_PASS == msgBean.msg_type) {
+        showNotificationKeep("文档审批通过", msgBean.msg_content, msgBean.msg_no, showButton);
+    } else if (FIELD_MSG_TYPE_DOC_JUDGE == msgBean.msg_type) {
+        showNotificationKeep("文档裁决", msgBean.msg_content, msgBean.msg_no, showButton);
     }
 }
 /*=========================================================================*/
@@ -234,6 +244,7 @@ function showProjectCountersignDialog(title, content, msgStr, button) {
                             elem: '#projectCountersign_beginDate',
                             value: commonFormatDate(msgBean.msg_param.begin_date)
                         });
+                        $("#projectCountersign_produceDoc_download").off('click');
                         $("#projectCountersign_produceDoc_download").click(function () {
                             let postFix = msgBean.msg_param.file_path.substring(msgBean.msg_param.file_path.lastIndexOf("."), msgBean.msg_param.file_path.length);
                             // 下载文件
@@ -407,6 +418,7 @@ function showProjectBossCheckDig(title, content, msgStr, button) {
                             elem: '#projectCreate_bossCheck_beginDate',
                             value : commonFormatDate(msgBean.msg_param.begin_date)
                         });
+                        $("#projectCreate_bossCheck_download").off('click');
                         $("#projectCreate_bossCheck_download").click(function () {
                             let postFix = msgBean.msg_param.specifications.substring(msgBean.msg_param.specifications.lastIndexOf("."), msgBean.msg_param.specifications.length);
                             // 下载文件
@@ -415,6 +427,7 @@ function showProjectBossCheckDig(title, content, msgStr, button) {
                         });
 
                         // 项目成员表下载
+                        $("#projectCreate_bossCheck_memberDownload").off('click');
                         $("#projectCreate_bossCheck_memberDownload").click(function () {
                             let param = "?project_no=" + msgBean.msg_param.project_no;
                             commonExportExcel("projectMember", msgBean.msg_param.project_name + "_项目成员表.xlsx", param);

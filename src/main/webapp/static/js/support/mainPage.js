@@ -45,7 +45,7 @@ function initUnReadMsg() {
     }
 }
 
-/** 初始化未读消息列表*/
+/** 初始化已读消息列表*/
 function initReadMsg() {
     let readMsgData = commonAjax("common.do", JSON.stringify({
         "beanList": [],

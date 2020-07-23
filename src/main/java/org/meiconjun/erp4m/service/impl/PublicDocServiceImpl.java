@@ -6,8 +6,10 @@ import org.meiconjun.erp4m.bean.DocBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.dao.PersonalDocDao;
 import org.meiconjun.erp4m.dao.PublicDocDao;
 import org.meiconjun.erp4m.service.PublicDocService;
+import org.meiconjun.erp4m.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class PublicDocServiceImpl implements PublicDocService {
 
     @Resource
     private PublicDocDao publicDocDao;
+    @Resource
+    private PersonalDocDao personalDocDao;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -41,8 +45,57 @@ public class PublicDocServiceImpl implements PublicDocService {
             queryOperation(requestBean, responseBean);
         } else if ("getDocHistory".equals(operType)) {
             getDocHistoryOperation(requestBean, responseBean);
+        } else if ("checkOut".equals(operType)) {
+            checkOutOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 文档检出
+     * @param requestBean
+     * @param responseBean
+     */
+    private void checkOutOperation(RequestBean requestBean, ResponseBean responseBean) {
+        DocBean docBean = (DocBean)requestBean.getBeanList().get(0);
+        // 更新版本号！
+        String doc_version = docBean.getDoc_version();
+        double doc_version_n = Double.valueOf(doc_version);
+        doc_version_n = doc_version_n + 0.1;
+        doc_version = String.valueOf(doc_version_n);
+
+        docBean.setDoc_version(doc_version);
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("doc_serial_no", docBean.getDoc_serial_no());
+        condMap.put("doc_no", docBean.getDoc_no());
+        condMap.put("doc_name", docBean.getDoc_name());
+        condMap.put("doc_language", docBean.getDoc_language());
+        condMap.put("doc_type", docBean.getDoc_type());
+        condMap.put("doc_writer", docBean.getDoc_writer());
+        condMap.put("doc_desc", docBean.getDoc_desc());
+        condMap.put("upload_user", docBean.getUpload_user());
+        condMap.put("upload_time", docBean.getUpload_time());
+        condMap.put("last_modi_time", CommonUtil.getCurrentTimeStr());
+        condMap.put("doc_version", doc_version);
+        condMap.put("file_root_path", docBean.getFile_root_path());
+        condMap.put("create_user", docBean.getCreate_user());
+        condMap.put("last_modi_user", CommonUtil.getLoginUser().getUser_no());
+        condMap.put("docBean", docBean);
+
+        int effect = personalDocDao.insertPersonalDocInfo(condMap);
+        if (effect > 0) {
+            personalDocDao.insertDocVersionInfo(condMap);
+            publicDocDao.deletePublicDocInfo(docBean.getDoc_serial_no());
+            // 更新文档状态为未提交审阅,清空审阅者，裁决者
+            condMap.put("review_state", "0");
+            condMap.put("review_detail", "");
+            personalDocDao.updateDocReviewInfo(condMap);
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        } else {
+            logger.error("文档序列号[{}]插入个人文档库表失败", docBean.getDoc_serial_no());
+            responseBean.setRetCode(SystemContants.HANDLE_FAIL);
+            responseBean.setRetMsg("检出文档失败，文档移入个人文档库失败");
+        }
     }
 
     /**
