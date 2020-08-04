@@ -93,7 +93,10 @@ public class PersonalDocServiceImpl implements PersonalDocService {
         publicDocDao.insertNewPublicDocInfo(docBean);
         // 更新文档版本信息
         condMap.put("doc_version", docBean.getDoc_version());
-        condMap.put("update_desc", (String) paramMap.get("remarks"));
+
+        if (!CommonUtil.isStrBlank((String) paramMap.get("remarks"))) {
+            condMap.put("update_desc", (String) paramMap.get("remarks"));
+        }
         personalDocDao.updateDocVersionInfo(condMap);
         // 删除个人文档库数据
         personalDocDao.deletePersonalDocInfo(doc_serial_no);
