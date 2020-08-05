@@ -18,7 +18,7 @@ function distributionMessage(msgStr) {
     } else if (FIELD_MSG_TYPE_PROJECT_END == msgBean.msg_type) {
         showNotificationKeep("项目结项", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_DOC_REVIEW == msgBean.msg_type) {
-        showNotificationKeep("文档审阅", msgBean.msg_content, msgBean.msg_no, true);
+        showNotificationKeep("文档审核", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_DOC_DENIED == msgBean.msg_type) {
         showNotificationKeep("文档驳回", msgBean.msg_content, msgBean.msg_no, true);
     } else if (FIELD_MSG_TYPE_DOC_PASS == msgBean.msg_type) {

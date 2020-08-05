@@ -700,7 +700,7 @@ function personalDoc_SubmitpreviewOperation() {
         return;
     }
     $("#personalDoc_reviewSubmit_reviewer").val("");
-    $("#personalDoc_reviewSubmit_adjudicator").val("");
+    // $("#personalDoc_reviewSubmit_adjudicator").val("");
     $("#personalDoc_reviewSubmit_remarks").val("");
     layui.layer.open({
         type: 1,// 页面层
@@ -716,7 +716,7 @@ function personalDoc_SubmitpreviewOperation() {
                     "operType": "reviewSubmit",
                     "paramMap": {
                         "reviewer": $("#personalDoc_reviewSubmit_reviewer").val(),
-                        "adjudicator": $("#personalDoc_reviewSubmit_adjudicator").val(),
+                        // "adjudicator": $("#personalDoc_reviewSubmit_adjudicator").val(), 去除裁决步骤，审核人员会签审核文档
                         "remarks": $("#personalDoc_reviewSubmit_remarks").val()
                     }
                 }));
@@ -750,7 +750,7 @@ function personalDoc_SubmitpreviewOperation() {
             } else {
                 commonError("加载系统用户列表失败");
             }
-            commonPutNormalSelectOpts(users, "personalDoc_reviewSubmit_adjudicator", "", true, true);
+            // commonPutNormalSelectOpts(users, "personalDoc_reviewSubmit_adjudicator", "", true, true);
             // 穿梭框
             $("#personalDoc_reviewSubmit_selectReviewer").off('click');//必须先解绑事件，否则会重复绑定
             $("#personalDoc_reviewSubmit_selectReviewer").click(function () {

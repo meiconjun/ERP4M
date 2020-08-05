@@ -264,7 +264,8 @@ function taskHandler_docReview(taskBean) {
         "            </div>\n" +
         "        </div>\n" +
         "        <div class=\"layui-form-item comm-dialog-button\">\n" +
-        "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_review\" >提交意见</button>\n" +
+        "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_pass\" >通过</button>\n" +
+        "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_denied\" >驳回</button>\n" +
         "            <button class=\"layui-btn\" type=\"button\"  id=\"docReview_download\" >下载文档</button>\n" +
         "        </div>\n" +
         "    </form>\n" +
@@ -273,7 +274,7 @@ function taskHandler_docReview(taskBean) {
     let html2 = "<div class=\"comm-dialog\" >\n" +
         "    <form class=\"layui-form layui-form-pane\" lay-filter=\"docReview_submitFrm\" id=\"docReview_submitFrm\" action=\"\">\n" +
         "        <div class=\"layui-form-item layui-form-text\">\n" +
-        "            <label class=\"layui-form-label\">审阅意见</label>\n" +
+        "            <label class=\"layui-form-label\">驳回原因</label>\n" +
         "            <div class=\"layui-input-block\">\n" +
         "                <textarea name=\"docReview_opinion\" id=\"docReview_opinion\" required lay-verify=\"required\" class=\"layui-textarea\" ></textarea>\n" +
         "            </div>\n" +
@@ -287,7 +288,7 @@ function taskHandler_docReview(taskBean) {
     layui.layer.open({
         type: 1,// 页面层
         area: ['500px', '750px'],// 宽高
-        title: '文档审阅',// 标题
+        title: '文档审核',// 标题
         content: html,//内容，直接取dom对象
         // btn: ['确定'],
         // yes: function (index, layero) {
@@ -313,12 +314,35 @@ function taskHandler_docReview(taskBean) {
                 commonFileDownload(docBean.doc_no + postFix, docBean.file_path);
             });
             layui.form.render();
-            $("#docReview_review").off('click');
-            $("#docReview_review").click(function () {
+            $("#docReview_pass").off('click');
+            $("#docReview_pass").click(function () {
+                layui.layer.confirm("是否确认审批通过？", function(index2) {
+                    let retData = commonAjax("personalDoc.do", JSON.stringify({
+                        "beanList": [{}],
+                        "operType": "userReview",
+                        "paramMap": {
+                            "doc_serial_no": docBean.doc_serial_no,
+                            "review_user": sessionStorage.getItem("user_no"),
+                            "task_no": taskBean.task_no,
+                            "docBean": docBean
+                        }
+                    }));
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        // 更新任务信息，关闭弹框，刷新任务列表
+                        initTodoTask();
+                        layui.layer.closeAll();
+                        commonInfo(retData.retMsg);
+                    } else {
+                        commonError(retData.retMsg);
+                    }
+                });
+            });
+            $("#docReview_denied").off('click');
+            $("#docReview_denied").click(function () {
                 layui.layer.open({
                     type: 1,// 页面层
                     area: ['500px', '300px'],// 宽高
-                    title: '审阅意见',// 标题
+                    title: '文档驳回',// 标题
                     content: html2,//内容，直接取dom对象
                     // btn: ['确定'],
                     // yes: function (index, layero) {
@@ -330,17 +354,18 @@ function taskHandler_docReview(taskBean) {
                             layui.layer.confirm("是否确认提交？", function(index) {
                                 let retData = commonAjax("personalDoc.do", JSON.stringify({
                                     "beanList": [{}],
-                                    "operType": "userReview",
+                                    "operType": "userReviewDenied",
                                     "paramMap": {
                                         "doc_serial_no": docBean.doc_serial_no,
-                                        "review_user": sessionStorage.getItem("user_no"),
+                                        "judge_user": sessionStorage.getItem("user_no"),
                                         "opinion": $("#docReview_opinion").val(),
                                         "task_no": taskBean.task_no,
-                                        "docBean": docBean
+                                        "doc_no": docBean.doc_no,
+                                        "upload_user": docBean.upload_user
                                     }
                                 }));
                                 if (retData.retCode == HANDLE_SUCCESS) {
-                                    commonOk("提交成功!");
+                                    commonOk("驳回成功!");
                                     // 更新任务信息，关闭弹框，刷新任务列表
                                     initTodoTask();
                                     layui.layer.closeAll();

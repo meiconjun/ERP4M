@@ -16,6 +16,10 @@ public class SystemContants {
      * 操作失败
      */
     public static final String HANDLE_FAIL = "1";
+    /**
+     * 其它状态
+     */
+    public static final String OTHER_STATUS = "99";
 
 
     /** 消息类型-立项会签 */
