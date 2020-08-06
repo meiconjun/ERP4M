@@ -198,7 +198,7 @@ public class FileUploadController {
         }
         String file_path = file_root_path;
         if (CommonUtil.isStrBlank(doc_version) || "undefined".equals(doc_version)) {
-            doc_version = "1.00";
+            doc_version = "1.0";
         }
         // 检出时更新版本号
         /*else {

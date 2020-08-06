@@ -316,6 +316,7 @@ function roleConfig_rightOperation(data) {
         yes: function (index1, layero) {
             //确认按钮的回调，提交表单
             layui.layer.confirm("是否确认提交修改？", function(index) {
+                layui.layer.load();
                 afterNodes = treeInst.getCheckedNodes(true);// 获取最终的勾选节点
                 for (let i = 0; i < afterNodes.length; i++) {
                     if (!beforeNodes.some(function (curValue) {
@@ -332,6 +333,7 @@ function roleConfig_rightOperation(data) {
                     }
                 }
                 if ($.isEmptyObject(addRight) && $.isEmptyObject(delRight)) {
+                    layui.layer.closeAll('loading');
                     commonInfo("没有任何修改");
                     return;
                 } else {
@@ -343,6 +345,7 @@ function roleConfig_rightOperation(data) {
                             "delRight" : delRight
                         }
                     }));
+                    layui.layer.closeAll('loading');
                     if (retData.retCode == HANDLE_SUCCESS) {
                         commonOk("更新成功");
                         layui.layer.close(index1);

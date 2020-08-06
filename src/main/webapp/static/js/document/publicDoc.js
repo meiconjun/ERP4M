@@ -359,11 +359,13 @@ function publicDoc_checkOutBtn() {
         return;
     } else {
         layui.layer.confirm("确认检出该文档？检出后文档将移出公共文档库，移入您的个人文档库", function (index) {
+            layui.layer.load();
             let retData = commonAjax("publicDoc.do", JSON.stringify({
                 "beanList": [checkData[0]],
                 "operType": "checkOut",
                 "paramMap": {}
             }));
+            layui.layer.closeAll('loading');
             if (retData.retCode == HANDLE_SUCCESS) {
                 commonOk("检出成功，文档已移入您的个人文档库");
                 publicDoc_queryOperation('1', FIELD_EACH_PAGE_NUM);

@@ -33,10 +33,10 @@ public class SystemInit {
     private void initScheduler() throws SchedulerException {
         SchedulerUtil schedulerUtil = new SchedulerUtil();
         // 项目阶段提醒 每天凌晨1点执行
-        schedulerUtil.addCronTrigger("项目阶段提醒", "项目Job", "通用",
+        schedulerUtil.addCronTrigger("项目阶段提醒", "项目Job", "项目阶段提醒Trigger",
                 "通用", org.meiconjun.erp4m.job.ProjectStageRemind.class, "0 0 1 * * ? *");
         // 文档回收站清理 每天林晨2点执行
-        schedulerUtil.addCronTrigger("文档回收站清理", "文档Job", "通用",
+        schedulerUtil.addCronTrigger("文档回收站清理", "文档Job", "文档回收站清理Trigger",
                 "通用", org.meiconjun.erp4m.job.RecycleDocClean.class, "0 0 2 * * ? *");
 
         //启动

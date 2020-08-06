@@ -208,6 +208,7 @@ function recycleStation_revertOperation() {
         return;
     } else {
         layui.layer.confirm("是否确认还原选择的文档？", function(index) {
+            layui.layer.load();
             let retData = commonAjax("recycleStation.do", JSON.stringify({
                 "beanList": [],
                 "operType": "revertDoc",
@@ -215,6 +216,7 @@ function recycleStation_revertOperation() {
                     "doc_list" : checkData
                 }
             }));
+            layui.layer.closeAll('loading');
             if (retData.retCode == HANDLE_SUCCESS) {
                 commonOk("还原成功！");
                 recycleStation_queryOperation('1', FIELD_EACH_PAGE_NUM);

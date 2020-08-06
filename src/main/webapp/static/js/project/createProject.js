@@ -70,6 +70,7 @@ $(document).ready(function () {
             },
             done: function(res, index, upload){
                 if (res.code == '0') {
+                    layui.layer.load();
                     createProject_fileUploadFlag = true;
                     // 获取阶段信息
                     let stageList = [];
@@ -99,6 +100,7 @@ $(document).ready(function () {
                         }
                     };
                     let retData = commonAjax("createProject.do", JSON.stringify(reqMsg));
+                    layui.layer.closeAll('loading');
                     if (retData.retCode == HANDLE_SUCCESS) {
                         commonOk("提交立项申请成功!");
                         // 关闭标签页

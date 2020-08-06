@@ -666,6 +666,7 @@ function personalDoc_deleteOperation() {
         }
         layui.layer.confirm("是否确认删除选中的文档，删除后文档将进入回收站并保留90天", function (index) {
             // layui.layer.load();//loading
+            layui.layer.load();
             let retData = commonAjax("personalDoc.do", JSON.stringify({
                 "beanList" : checkData,
                 "operType": "delete",
@@ -673,6 +674,7 @@ function personalDoc_deleteOperation() {
 
                 }
             }));
+            layui.layer.closeAll('loading');
             if (retData.retCode == HANDLE_SUCCESS) {
                 commonOk("删除成功");
                 personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);
@@ -711,6 +713,7 @@ function personalDoc_SubmitpreviewOperation() {
         yes: function (index1, layero) {
             //确认按钮的回调，提交表单
             layui.layer.confirm("是否确认提交评审？", function(index) {
+                layui.layer.load();
                 let retData = commonAjax("personalDoc.do", JSON.stringify({
                     "beanList": [checkData[0]],
                     "operType": "reviewSubmit",
@@ -720,6 +723,7 @@ function personalDoc_SubmitpreviewOperation() {
                         "remarks": $("#personalDoc_reviewSubmit_remarks").val()
                     }
                 }));
+                layui.layer.closeAll('loading');
                 if (retData.retCode == HANDLE_SUCCESS) {
                     commonOk("操作成功！");
                     layui.layer.close(index1);
