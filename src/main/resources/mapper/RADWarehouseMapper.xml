@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.RADWarehouseDao">
+    <select id="selectRADWarehouseInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+        select * from materials_flow_tb
+        where 1 = 1
+        <if test="serial_no != '' and serial_no != null">
+            and serial_no like concat('%', #{serial_no}, '%')
+        </if>
+        <if test="material_no != '' and material_no != null">
+            and material_no like concat('%', #{material_no}, '%')
+        </if>
+        <if test="oper_type != '' and oper_type != null">
+            and oper_type = #{oper_type}
+        </if>
+        <if test="date_begin != '' and date_begin != null">
+            and last_modi_time &gt;= #{date_begin}
+        </if>
+        <if test="date_end != '' and date_end != null">
+            and last_modi_time &lt;= #{date_end}
+        </if>
+    </select>
+
+
+</mapper>

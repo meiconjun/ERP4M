@@ -120,7 +120,8 @@ public class Test {
 //        lengthOfLongestSubstring("abcabcbb");
         int ii = "123".charAt(1) - '0';
         System.out.println(ii);
-
+        char[] arr = {'a', 'A'};
+        System.out.println(Character.toUpperCase(arr[0]) == arr[1]);
     }
     public static int method_3(String string, String a) {
         int number = 0;

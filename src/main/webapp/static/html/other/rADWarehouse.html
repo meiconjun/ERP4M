@@ -1,0 +1,40 @@
+<!--研发仓-->
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            流水号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="rADWarehouse_serialNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            料号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="rADWarehouse_materialNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            操作：
+        </div>
+        <div class="row-input">
+            <select  id="rADWarehouse_operType" >
+            </select>
+        </div>
+        <div class="row-label">
+            录入时间：
+        </div>
+        <div class="row-input">
+            <input type="text" class="layui-input" id="rADWarehouse_inputDate" placeholder=" - ">
+        </div>
+        <button class="layui-btn" id="rADWarehouse_queryBtn" data-type="reload">查询</button>
+    </div>
+    <table id="rADWarehouse_table">
+
+    </table>
+    <div>
+        <div id="rADWarehouse_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="rADWarehouse_addBtn">录入</a>
+        </div>
+    </div>
+</div>

@@ -51,6 +51,11 @@ const FIELD_DOC_LANGUAGE = "D010300";
 /** 文档状态*/
 const FIELD_DOC_STATE = "D010400";
 
+/*===================其它管理相关==============================*/
+/** 操作类型*/
+const FIELD_WAREHOSE_OPERTYOPE = "O010100";
+
+
 /*=====================任务种类===============================*/
 /** 审阅文档*/
 const FIELD_TASK_TYPE_DOC_REVIEW = "1";
