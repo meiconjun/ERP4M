@@ -64,4 +64,8 @@ public interface CommonDao {
      * 查询用户和角色信息
      */
     List<HashMap<String, String>> selectAllUserAndRoleInfo();
+    /**
+     * 查询项目信息
+     */
+    List<HashMap<String, String>> selectProjectList();
 }

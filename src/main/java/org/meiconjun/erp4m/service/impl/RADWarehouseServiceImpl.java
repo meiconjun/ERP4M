@@ -8,6 +8,8 @@ import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.RADWarehouseDao;
 import org.meiconjun.erp4m.service.RADWarehouseService;
+import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,8 +41,25 @@ public class RADWarehouseServiceImpl implements RADWarehouseService {
         ResponseBean responseBean = new ResponseBean();
         if ("query".equals(operType)) {
             queryOperation(requestBean, responseBean);
+        } else if ("add".equals(operType)) {
+            addOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 录入研发仓流水
+     * @param requestBean
+     * @param responseBean
+     */
+    private void addOperation(RequestBean requestBean, ResponseBean responseBean) {
+        RADWarehouseBean radWarehouseBean = (RADWarehouseBean) requestBean.getBeanList().get(0);
+        radWarehouseBean.setSerial_no(SerialNumberGenerater.getInstance().generaterNextNumber());
+        radWarehouseBean.setLast_modi_time(CommonUtil.getCurrentTimeStr());
+        radWarehouseBean.setLast_modi_user(CommonUtil.getLoginUser().getUser_no());
+
+        radWarehouseDao.insertRADWarehousrInfo(radWarehouseBean);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**

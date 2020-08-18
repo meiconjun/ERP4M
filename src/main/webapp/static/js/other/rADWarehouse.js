@@ -127,9 +127,14 @@ $(document).ready(function () {
         $("#rADWarehouse_queryBtn").click(function () {
             rADWarehouse_queryOperation('1', FIELD_EACH_PAGE_NUM);
         });
-
+        $("#rADWarehouse_addBtn").click(function () {
+            rADWarehouse_addOperation();
+        });
         if (buttonStr.indexOf("rADWarehouse_queryBtn") == -1) {
             $("#rADWarehouse_queryBtn").hide();
+        }
+        if (buttonStr.indexOf("rADWarehouse_addBtn") == -1) {
+            $("#rADWarehouse_addBtn").hide();
         }
 
         // 绑定重置表格事件
@@ -173,5 +178,94 @@ function rADWarehouse_queryOperation(curPage, limit) {
                 }
             })
         }
+    });
+}
+
+/**
+ * 录入出入库流水
+ */
+function rADWarehouse_addOperation() {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '700px'],// 宽高
+        title: '录入流水',// 标题
+        content: $("#rADWarehouse_addDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            rADWarehouse_cleanForm();
+            // 加载项目列表
+            let projectList = commonGetProjectList();
+
+            commonPutNormalSelectOpts(projectList, "rADWarehouse_projectNo_addTxt", "", false);
+            commonPutNormalSelectOpts(FIELD_WAREHOSE_OPERTYOPE, "rADWarehouse_operType_addTxt", "", true);
+            $("#rADWarehouse_submitBtn").off('click');//必须先解绑事件，否则会重复绑定
+            $("#rADWarehouse_submitBtn").click(function () {
+                rADWarehouse_digSubmit({}, "add", index);
+            });
+
+            layui.form.render();
+
+        }
+    });
+}
+function rADWarehouse_digSubmit(curData, operType, digIndex) {
+    layui.form.on('submit(rADWarehouse_submitBtn)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
+        layui.layer.confirm("是否确认提交？", function(index) {
+            layui.layer.load();//loading
+            let retData = commonAjax("rADWarehouse.do", JSON.stringify({
+                "beanList": [{
+                    "material_no": $("#rADWarehouse_materialNo_addTxt").val(),
+                    "material_name": $("#rADWarehouse_materialName_addTxt").val(),
+                    "number": $("#rADWarehouse_number_addTxt").val(),
+                    "oper_type": $("#rADWarehouse_operType_addTxt").val(),
+                    "desc": $("#rADWarehouse_desc_addTxt").val(),
+                    "project_no": $("#rADWarehouse_projectNo_addTxt").val(),
+                    "supplier": $("#rADWarehouse_supplier_addTxt").val(),
+                    "supplier_type": $("#rADWarehouse_supplierType_addTxt").val(),
+                    "proxy": $("#rADWarehouse_proxy_addTxt").val()
+                }],
+                "operType": operType,
+                "paramMap": {
+
+                }
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                layui.layer.closeAll('loading');
+                commonOk("录入成功！");
+                layui.layer.close(digIndex);
+                rADWarehouse_queryOperation("1", FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError("操作失败！" + retData.retMsg);
+            }
+
+        });
+        return false;
+    });
+}
+function rADWarehouse_cleanForm() {
+    $("#rADWarehouse_materialNo_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_materialName_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_number_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_operType_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_desc_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_projectNo_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_supplier_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_supplierType_addTxt").removeAttr('disabled');
+    $("#rADWarehouse_proxy_addTxt").removeAttr('disabled');
+    layui.form.val("rADWarehouse_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+        "rADWarehouse_serialNo_addTxt": "", // "name": "value"
+        "rADWarehouse_materialNo_addTxt": "",
+        "rADWarehouse_materialName_addTxt": "",
+        "rADWarehouse_number_addTxt": '',
+        "rADWarehouse_operType_addTxt": '',
+        "rADWarehouse_desc_addTxt": '',
+        "rADWarehouse_projectNo_addTxt": "",
+        "rADWarehouse_supplier_addTxt": "",
+        "rADWarehouse_supplierType_addTxt": "",
+        "rADWarehouse_proxy_addTxt": ""
     });
 }

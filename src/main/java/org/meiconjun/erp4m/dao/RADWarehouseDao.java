@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.dao;
 
+import org.meiconjun.erp4m.bean.RADWarehouseBean;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,4 +19,8 @@ public interface RADWarehouseDao {
      * @return
      */
     List<HashMap<String, String>> selectRADWarehouseInfo(HashMap<String, String> condMap);
+    /**
+     * 新增流水信息
+     */
+    int insertRADWarehousrInfo(RADWarehouseBean radWarehouseBean);
 }

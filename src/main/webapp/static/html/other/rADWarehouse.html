@@ -38,3 +38,73 @@
         </div>
     </div>
 </div>
+
+<div hidden="hidden" class="comm-dialog" id="rADWarehouse_addDiv">
+    <form class="layui-form layui-form-pane" lay-filter="rADWarehouse_addFrm" id="rADWarehouse_addFrm" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">流水号</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_serialNo_addTxt" placeholder="后台自动生成" disabled id="rADWarehouse_serialNo_addTxt" required  lay-verify="required" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">料号</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_materialNo_addTxt" id="rADWarehouse_materialNo_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">物料名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_materialName_addTxt" id="rADWarehouse_materialName_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">数量</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_number_addTxt" id="rADWarehouse_number_addTxt" required  lay-verify="required" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">操作类型</label>
+            <div class="layui-input-block">
+                <select name="rADWarehouse_operType_addTxt" id="rADWarehouse_operType_addTxt" required  lay-verify="required" >
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">出入库描述</label>
+            <div class="layui-input-block">
+                <textarea name="rADWarehouse_desc_addTxt" id="rADWarehouse_desc_addTxt" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">项目</label>
+            <div class="layui-input-block">
+                <select name="rADWarehouse_projectNo_addTxt" id="rADWarehouse_projectNo_addTxt" >
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">厂家</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_supplier_addTxt" id="rADWarehouse_supplier_addTxt" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">厂商型号</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_supplierType_addTxt" id="rADWarehouse_supplierType_addTxt" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">代理</label>
+            <div class="layui-input-block">
+                <input type="text" name="rADWarehouse_proxy_addTxt" id="rADWarehouse_proxy_addTxt" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item comm-dialog-button">
+            <button class="layui-btn" id="rADWarehouse_submitBtn" lay-submit lay-filter="rADWarehouse_submitBtn">确定</button>
+        </div>
+    </form>
+</div>

@@ -79,4 +79,8 @@
         where a.user_no = b.user_no and b.role_no = c.role_no
     </select>
 
+    <select id="selectProjectList" resultType="java.util.HashMap">
+        select project_no as value, project_name as name from project_main_tb
+        order by project_no asc
+    </select>
 </mapper>

@@ -61,8 +61,23 @@ public class CommonServiceImpl implements CommonService {
             getTodoTaskOperation(requestBean, responseBean);
         } else if ("initDoneTask".equals(operType)) {
             getDoneTaskOperation(requestBean, responseBean);
+        } else if ("getProjectList".equals(operType)) {
+            getProjectListOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 获取项目列表
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getProjectListOperation(RequestBean requestBean, ResponseBean responseBean) {
+        List<HashMap<String, String>> projectList = commonDao.selectProjectList();
+        Map<String, Object> retMap = new HashMap<>();
+        retMap.put("list", projectList);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
     }
 
     /**

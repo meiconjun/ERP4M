@@ -439,3 +439,23 @@ function commonUpdateTaskState(task_no, user_no) {
 function commonGetFilePostFix(filePath) {
     return filePath.substring(filePath.lastIndexOf("."), filePath.length);
 }
+
+/**
+ * 获取系统项目列表
+ * name-项目名称
+ * value-项目编号
+ */
+function commonGetProjectList() {
+    let retData = commonAjax('common.do', JSON.stringify({
+        "beanList": [],
+        "operType": "getProjectList",
+        "paramMap": {
+        }
+    }));
+    if (retData.retCode == HANDLE_SUCCESS) {
+        return retData.retMap.list;
+    } else {
+        console.error("加载项目列表失败");
+        return [];
+    }
+}
