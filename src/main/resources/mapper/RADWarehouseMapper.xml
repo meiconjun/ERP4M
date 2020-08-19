@@ -22,7 +22,7 @@
     </select>
 
     <insert id="insertRADWarehousrInfo" parameterType="org.meiconjun.erp4m.bean.RADWarehouseBean">
-        insert into materials_flow_tb(serial_no, material_no, material_name, desc, project_no, number, supplier, supplier_type,
+        insert into materials_flow_tb(serial_no, material_no, material_name, `desc`, project_no, `number`, supplier, supplier_type,
         proxy, oper_type, last_modi_user, last_modi_time)
         values (#{serial_no}, #{material_no}, #{material_name}, #{desc}, #{project_no}, #{number}, #{supplier}, #{supplier_type},
         #{proxy}, #{oper_type}, #{last_modi_user}, #{last_modi_time})

@@ -340,8 +340,8 @@ function personalDoc_digSubmit(cusData, operType, digIndex) {
 
                     }
                 }));
+                layui.layer.closeAll('loading');
                 if (retData.retCode == HANDLE_SUCCESS) {
-                    layui.layer.closeAll('loading');
                     commonOk("操作成功！");
                     layui.layer.close(digIndex);
                     personalDoc_queryOperation("1", FIELD_EACH_PAGE_NUM);

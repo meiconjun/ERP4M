@@ -1,0 +1,40 @@
+<!--buglist-->
+<div class="layui-card">
+    <div class="comm-row col-4 layui-form">
+        <div class="row-label">
+            BUG编号：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="buglist_serialNo" autocomplete="off">
+        </div>
+        <div class="row-label">
+            BUG标题：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="buglist_bugName" autocomplete="off">
+        </div>
+        <div class="row-label">
+            产品：
+        </div>
+        <div class="row-input">
+            <input class="layui-input" id="buglist_product" autocomplete="off">
+        </div>
+        <div class="row-label">
+            BUG状态：
+        </div>
+        <div class="row-input">
+            <select  id="buglist_bugStatus" >
+            </select>
+        </div>
+        <button class="layui-btn" id="buglist_queryBtn" data-type="reload">查询</button>
+    </div>
+    <table id="buglist_table">
+
+    </table>
+    <div>
+        <div id="buglist_page" class="table-footer-left"></div>
+        <div class="table-footer-right">
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="buglist_addBtn">提交BUG</a>
+        </div>
+    </div>
+</div>

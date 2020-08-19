@@ -113,14 +113,28 @@ $(document).ready(function () {
                     title: '录入用户',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatUserNo(last_modi_user);
+                        return commonFormatUserNo(data.last_modi_user);
+                    }
+                }
+                , {
+                    field: 'edit',
+                    title: '操作',
+                    width : 80,
+                    fixed: 'right',
+                    align : 'center',
+                    templet : function (data) {
+                        let html = "<a class=\"layui-btn layui-btn-xs layui-btn-normal \" name='rADWarehouse_detail' onclick='rADWarehouse_detail(" + commonFormatObj(data) + ")'>详情</a>";
+                        return html;
                     }
                 }
             ]]
         });
 
         commonPutNormalSelectOpts(FIELD_WAREHOSE_OPERTYOPE, "rADWarehouse_operType", "", false);
-
+        layui.laydate.render({
+            elem: '#rADWarehouse_inputDate'
+            ,range: true
+        });
         layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
 
         //查询
@@ -206,7 +220,7 @@ function rADWarehouse_addOperation() {
             $("#rADWarehouse_submitBtn").click(function () {
                 rADWarehouse_digSubmit({}, "add", index);
             });
-
+            $("#rADWarehouse_submitBtn").show();
             layui.form.render();
 
         }
@@ -233,8 +247,8 @@ function rADWarehouse_digSubmit(curData, operType, digIndex) {
 
                 }
             }));
+            layui.layer.closeAll('loading');
             if (retData.retCode == HANDLE_SUCCESS) {
-                layui.layer.closeAll('loading');
                 commonOk("录入成功！");
                 layui.layer.close(digIndex);
                 rADWarehouse_queryOperation("1", FIELD_EACH_PAGE_NUM);
@@ -267,5 +281,51 @@ function rADWarehouse_cleanForm() {
         "rADWarehouse_supplier_addTxt": "",
         "rADWarehouse_supplierType_addTxt": "",
         "rADWarehouse_proxy_addTxt": ""
+    });
+}
+
+function rADWarehouse_detail(data) {
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '700px'],// 宽高
+        title: '详情',// 标题
+        content: $("#rADWarehouse_addDiv"),//内容，直接取dom对象
+        // btn: ['确定'],
+        // yes: function (index, layero) {
+        //     //确认按钮的回调，提交表单
+        // },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            rADWarehouse_cleanForm();
+            // 加载项目列表
+            let projectList = commonGetProjectList();
+
+            commonPutNormalSelectOpts(projectList, "rADWarehouse_projectNo_addTxt", "", false);
+            commonPutNormalSelectOpts(FIELD_WAREHOSE_OPERTYOPE, "rADWarehouse_operType_addTxt", "", true);
+            $("#rADWarehouse_materialNo_addTxt").attr('disabled', true);
+            $("#rADWarehouse_materialName_addTxt").attr('disabled', true);
+            $("#rADWarehouse_number_addTxt").attr('disabled', true);
+            $("#rADWarehouse_operType_addTxt").attr('disabled', true);
+            $("#rADWarehouse_desc_addTxt").attr('disabled', true);
+            $("#rADWarehouse_projectNo_addTxt").attr('disabled', true);
+            $("#rADWarehouse_supplier_addTxt").attr('disabled', true);
+            $("#rADWarehouse_supplierType_addTxt").attr('disabled', true);
+            $("#rADWarehouse_proxy_addTxt").attr('disabled', true);
+            layui.form.val("rADWarehouse_addFrm", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+                "rADWarehouse_serialNo_addTxt": data.serial_no, // "name": "value"
+                "rADWarehouse_materialNo_addTxt": data.material_no,
+                "rADWarehouse_materialName_addTxt": data.material_name,
+                "rADWarehouse_number_addTxt": data.number,
+                "rADWarehouse_operType_addTxt": data.oper_type,
+                "rADWarehouse_desc_addTxt": data.desc,
+                "rADWarehouse_projectNo_addTxt": data.project_no,
+                "rADWarehouse_supplier_addTxt": data.supplier,
+                "rADWarehouse_supplierType_addTxt": data.supplier_type,
+                "rADWarehouse_proxy_addTxt": data.proxy
+            });
+            $("#rADWarehouse_submitBtn").hide();
+            layui.form.render();
+
+        }
     });
 }
