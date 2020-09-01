@@ -233,4 +233,23 @@ public class FileUploadController {
         retMap.put("data", dataMap);
         return CommonUtil.objToJson(retMap);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/bugListFileUpload.do", method = RequestMethod.POST)
+    public String tinyMceFileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
+        String fileRootPath = System.getProperty("contextRootPath");
+        String filePath = "/" + "mediaFile" + "/" + "bugList" + "/" + CommonUtil.getCurrentDateStr() + "/";
+        String orgName = img.getOriginalFilename();
+        filePath += SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
+
+        File file = new File(fileRootPath + filePath);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        img.transferTo(file);
+        HashMap<String, String> dataMap = new HashMap<String, String>();
+        dataMap.put("location",  "../../.." +
+                 filePath);
+        return CommonUtil.objToJson(dataMap);
+    }
 }

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 告诉浏览器该页面是自适应布局 -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../../static/plugins/layui/css/layui.css">
+    <!-- 自定义样式表 -->
+    <link rel="stylesheet" href="../../../static/css/main.css">
+    <!-- 富文本插件 -->
+    <script src="../../../static/plugins/tinymce/tinymce.js"></script>
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<body>
+    <div class="comm-dialog" id="buglist_newBug_div" >
+        <form class="layui-form layui-form-pane" lay-filter="buglistAdd_Frm" id="buglistAdd_Frm" action="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">BUG标题</label>
+                <div class="layui-input-block">
+                    <input type="text" maxlength="65" name="buglist_newBug_name" id="buglist_newBug_name" required  lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">所属产品</label>
+                <div class="layui-input-block">
+                    <input type="text" maxlength="33" name="buglist_newBug_product" id="buglist_newBug_product" required  lay-verify="required" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">严重级别</label>
+                    <div class="layui-input-inline">
+                        <select name="buglist_newBug_severity" id="buglist_newBug_severity" required lay-verify="required">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">优先级</label>
+                    <div class="layui-input-inline">
+                        <select name="buglist_newBug_priority" id="buglist_newBug_priority" required lay-verify="required">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <textarea id="buglist_newBug_content">
+
+                </textarea>
+            </div>
+            <div class="layui-form-item comm-dialog-button" style="margin-top:50px;">
+                <button class="layui-btn" type="button" id="buglist_newBug_submit" lay-submit lay-filter="buglist_newBug_submit">确定</button>
+            </div>
+        </form>
+    </div>
+    <script src="../../../static/plugins/adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="../../../static/js/common/commonUtil.js"></script>
+    <script src="../../../static/js/common/contants.js"></script>
+    <!-- layui插件-->
+    <script src="../../../static/plugins/layui/layui.all.js"></script>
+    <script src="../../../static/js/support/jsPlugin.js"></script>
+    <script src="../../../static/js/common/commonField.js"></script>
+    <script type="text/javascript">
+        commonPutNormalSelectOpts(FIELD_BUG_SEVERITY, "buglist_newBug_severity", "", true);
+        commonPutNormalSelectOpts(FIELD_BUG_PRIORITY, "buglist_newBug_priority", "", true);
+
+        //  初始化富文本
+        tinymce.init({
+            selector: '#buglist_newBug_content',
+            language:'zh_CN',
+            // height: 900, //编辑器高度
+            min_height: 600,
+            placeholder: '点击编辑正文',
+            plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
+            toolbar: 'undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link | alignleft aligncenter alignright alignjustify outdent indent | \
+                     styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
+                     table image media charmap emoticons hr insertdatetime print preview | bdmap indent2em lineheight formatpainter axupimgs',
+            file_picker_callback: function (callback, value, meta) {// 文件上传回调,点击文件上传图标时触发
+                //文件分类
+                let file_type='.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4, .png, .jpg, .jpeg, .gif';
+                //后端接收上传文件的地址
+                let up_url='../../../bugListFileUpload.do';
+                //模拟出一个input用于添加本地文件
+                let input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', file_type);
+                input.click();
+                input.onchange = function() {
+                    let file = this.files[0];
+
+                    let xhr, formData;
+                    console.log(file.name);
+                    xhr = new XMLHttpRequest();
+                    xhr.withCredentials = false;
+                    xhr.open('POST', up_url);
+                    xhr.onload = function () {
+                        let json;
+                        if (xhr.status != 200) {
+                            commonError('上传失败 HTTP Error: ' + xhr.status);
+                            return;
+                        }
+                        json = JSON.parse(xhr.responseText);
+                        if (!json || typeof json.location != 'string') {
+                            commonError('上传失败 Invalid JSON: ' + xhr.responseText);
+                            return;
+                        }
+                        callback(json.location);
+                    };
+                    formData = new FormData();
+                    formData.append('file', file, file.name);
+                    xhr.send(formData);
+                }
+            },
+            file_picker_types: 'file image media',
+            setup: function(editor){
+                editor.on('change',function(){ editor.save(); });
+            }
+        });
+        layui.form.render();
+
+        //TODO 绑定提交事件
+        let $dialogObj = $("#bugListAddIframe",parent.document);
+        let iframeHtml = $dialogObj.find("iframe").contents();
+        $(iframeHtml).find("#buglist_newBug_submit").off('click');
+        $(iframeHtml).find("#buglist_newBug_submit").click(function () {
+            layui.form.on('submit(buglist_newBug_submit)', function(data){
+                layui.layer.confirm("是否确认提交BUG？", function(index) {
+                    layui.layer.load();//loading
+                    //TODO 上传视频 图片
+                    let retData = commonAjax("../../../buglist.do", JSON.stringify({
+                        "beanList": [{
+                            "bug_name": $(iframeHtml).find("#buglist_newBug_name").val(),
+                            "product": $(iframeHtml).find("#buglist_newBug_product").val(),
+                            "priority": $(iframeHtml).find("#buglist_newBug_priority").val(),
+                            "severity": $(iframeHtml).find("#buglist_newBug_severity").val(),
+                            "content": $(iframeHtml).find("#buglist_newBug_content").val()
+                        }],
+                        "operType": "add",
+                        "paramMap": {}
+                    }));
+                    layui.layer.closeAll('loading');
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        commonOk("录入成功！");
+                        layui.layer.close(layui.layer.index);// 关闭当前弹出层
+                    } else {
+                        commonError("操作失败！" + retData.retMsg);
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+</body>
+</html>

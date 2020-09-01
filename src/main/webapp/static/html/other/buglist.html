@@ -1,5 +1,6 @@
 <!--buglist-->
 <div class="layui-card">
+    <!-- 查询表单区域 -->
     <div class="comm-row col-4 layui-form">
         <div class="row-label">
             BUG编号：
@@ -28,9 +29,10 @@
         </div>
         <button class="layui-btn" id="buglist_queryBtn" data-type="reload">查询</button>
     </div>
+    <!-- table区域 -->
     <table id="buglist_table">
-
     </table>
+    <!-- 底部工具栏区域 -->
     <div>
         <div id="buglist_page" class="table-footer-left"></div>
         <div class="table-footer-right">
@@ -38,3 +40,11 @@
         </div>
     </div>
 </div>
+
+
+
+<div class="comm-dialog" id="bugDetail_div"  hidden="hidden">
+
+</div>
+
+<script src="static/js/other/buglist.js"></script>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 告诉浏览器该页面是自适应布局 -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../../static/plugins/adminLTE/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../../static/plugins/adminLTE/bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="../../../static/plugins/adminLTE/bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../../static/plugins/adminLTE/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="../../../static/plugins/layui/css/layui.css">
+    <!-- 自定义样式表 -->
+    <link rel="stylesheet" href="../../../static/css/main.css">
+    <!-- 富文本插件 -->
+    <script src="../../../static/plugins/tinymce/tinymce.js"></script>
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+</head>
+<body>
+<div >
+    <!-- Box Comment -->
+    <div class="box box-widget">
+        <div class="box-header with-border">
+            <div class="user-block">
+                <img class="img-circle" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
+                <span class="username"><a href="#">Jonathan Burke Jr.</a></span>
+                <span class="description">公开分享 - 今天下午7:30</span>
+            </div>
+            <!-- /.user-block -->
+
+            <!-- /.box-tools -->
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!--<img class="img-responsive pad" src="../../../mediaFile/image/photo2.png" alt="图片">
+
+            <p>我今早拍的这张照片你们觉得怎么样？</p>-->
+            <div  id="bugMainPage_content"></div>
+            <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> 分享</button>
+            <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> 喜欢</button>
+            <span class="pull-right text-muted">127 喜欢 - 3 评论</span>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer box-comments">
+            <div class="box-comment">
+                <!-- User image -->
+                <img class="img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
+
+                <div class="comment-text">
+                      <span class="username">
+                        Maria Gonzales
+                        <span class="text-muted pull-right">今天下午 8:03</span>
+                      </span>&lt;!&ndash; /.username &ndash;&gt;
+                    一个长期以来的事实是，
+                    通过查看其布局页面内容时读者会分心。
+                </div>
+                <!-- /.comment-text -->
+            </div>
+            <!-- /.box-comment -->
+            <div class="box-comment">
+                <!-- User image -->
+                <img class="img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
+
+                <div class="comment-text">
+                      <span class="username">
+                        Luna Stark
+                        <span class="text-muted pull-right">今天下午 8:03</span>
+                      </span><!-- /.username -->
+                    一个长期以来的事实是，
+                    通过查看其布局页面内容时读者会分心。
+                </div>
+                <!-- /.comment-text -->
+            </div>
+            <!-- /.box-comment -->
+        </div>
+        <!-- /.box-footer -->
+        <div class="box-footer">
+            <form action="#" method="post">
+                <img class="img-responsive img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="Alt 文本">
+                <!-- .img-push is used to add margin to elements next to floating images -->
+                <div class="img-push">
+                    <input type="text" class="form-control input-sm" placeholder="按回车键发表评论">
+                </div>
+            </form>
+        </div>
+        <!-- /.box-footer -->
+    </div>
+    <!-- /.box -->
+</div>
+<script src="../../../static/plugins/adminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../../../static/js/common/commonUtil.js"></script>
+<script src="../../../static/js/common/contants.js"></script>
+<!-- layui插件-->
+<script src="../../../static/plugins/layui/layui.all.js"></script>
+<script src="../../../static/js/support/jsPlugin.js"></script>
+<script src="../../../static/js/common/commonField.js"></script>
+<script type="text/javascript">
+    commonPutNormalSelectOpts(FIELD_BUG_SEVERITY, "buglist_newBug_severity", "", true);
+    commonPutNormalSelectOpts(FIELD_BUG_PRIORITY, "buglist_newBug_priority", "", true);
+
+    layui.form.render();
+</script>
+</body>
+</html>

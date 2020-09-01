@@ -54,7 +54,12 @@ const FIELD_DOC_STATE = "D010400";
 /*===================其它管理相关==============================*/
 /** 操作类型*/
 const FIELD_WAREHOSE_OPERTYOPE = "O010100";
-
+/** BUG优先级*/
+const FIELD_BUG_PRIORITY = "O020100";
+/** BUG严重级别*/
+const FIELD_BUG_SEVERITY = "O020200";
+/** BUG状态*/
+const FIELD_BUG_STATUS = "O020300";
 
 /*=====================任务种类===============================*/
 /** 审阅文档*/
