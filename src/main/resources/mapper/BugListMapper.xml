@@ -25,4 +25,20 @@
         values (#{serial_no}, #{bug_name}, #{product}, #{content}, #{priority}, #{severity}, #{bug_status}, #{solve_user}, #{solve_desc},
         #{create_user}, #{last_modi_time})
     </insert>
+
+    <select id="selectUserInfoByNo" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from sys_user_tb where user_no = #{user_no}
+    </select>
+
+    <select id="selectBugComments" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select a.*, b.user_name, b.picture  from bug_list_reply_tb a, sys_user_tb b
+        where 1 = 1 and a.reply_user = b.user_no
+        <if test="serial_no != null and serial_no != ''">
+            and a.bug_serial = #{serial_no}
+        </if>
+        <if test="floor != null and floor != ''">
+            and a.floor = #{floor}
+        </if>
+        order by a.floor
+    </select>
 </mapper>

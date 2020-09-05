@@ -186,21 +186,102 @@ function buglist_addBtnOperation() {
  * @param data
  */
 function buglist_showDetail(data) {
+    // 获取用户名，头像链接
+    let userData = commonAjax("buglist.do", JSON.stringify({
+        "beanList": [],
+        "operType": "getUserInfo",
+        "paramMap": {
+            "user_no": data.create_user
+        }
+    }));
+    let user_name = userData.retMap.userInfo.user_name;
+    let user_herder = userData.retMap.userInfo.picture;
     layui.layer.open({
         id: 'bugListDetailIframe',
         type: 2,// iframe
         area: [(window.innerWidth - 20) + 'px', (window.innerHeight - 20) + 'px'],// 宽高
-        title: 'BUG详情-' + data.bug_name,// 标题
+        title: data.serial_no + '-' + data.bug_name,// 标题
         content: 'static/html/other/bugMainPage.html',//内容，因为是iframe层，得另写一个完整的html页面
-        // btn: ['提交'],
-        // yes: function (index, layero) {
-        //确认按钮的回调，提交表单
-        // var childHtml = layero.find("iframe").contents();
-        // console.log($(childHtml).find("#buglist_newBug_name").val());
-        // },
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+
             let body = layer.getChildFrame('body', index);// 获取iframe body dom 用于操作
+            $(body).find("#bugMainPage_header").attr("src", "data:image/jpg;base64," + user_herder);// 作者头像
+            $(body).find("#bugMainPage_username").html(user_name);// 作者用户名
+            $(body).find("#bugMainPage_lastModiTime").html("最后修改于 - " + commonFormatDate(data.last_modi_time));// 最后修改时间
+            $(body).find("#bugMainPage_severity").html("严重级别 - " + commonFormatValue(FIELD_BUG_SEVERITY, data.severity, true) + " |");
+            $(body).find("#bugMainPage_priority").html(" 优先级 - " + commonFormatValue(FIELD_BUG_PRIORITY, data.priority, true) + " |");
+            $(body).find("#bugMainPage_status").html(" 状态 - " + commonFormatValue(FIELD_BUG_STATUS, data.bug_status, true));
             $(body).find("#bugMainPage_content").html(data.content);// content回显
+            // 初始化评论编辑器操作在html内
+            $(body).find("#bugMainPage_userHeader").attr("src", "data:image/jpg;base64," + user_info.picture);// content回显
+
+
+            /**
+             * 载入评论
+             */
+            function reload_comments(curr, limit) {
+                let commentData = commonAjax("buglist.do", JSON.stringify({
+                    "beanList": [{
+                    }],
+                    "operType": "queryComments",
+                    "paramMap": {
+                        'curPage': String(curr),
+                        'limit': String(limit),
+                        "serial_no": data.serial_no
+                    }
+                }));
+                if (commentData.retCode == HANDLE_SUCCESS) {
+                    let total_comment_count = commentData.retMap.total;
+                    $(body).find("#bugMainPage_commentCount").html(total_comment_count + " 评论");// content回显
+                    let commentList = commentData.retMap.list;
+                    let allComment = "";
+                    for (let i = 0; i < commentList.length; i++) {
+                        allComment += "<div class=\"box-comment\" id='" + commentList[i].serial_no + "'>\n" +
+                            "                <img class=\"img-circle img-sm\" src=\"" + "data:image/jpg;base64," + commentList[i].picture + "\" alt=\"用户头像\">\n" +
+                            "\n" +
+                            "                <div class=\"comment-text\">\n" +
+                            "                      <span class=\"username\">\n" + commentList[i].user_name +
+                            "                        <span class=\"text-muted pull-right\">" + commonFormatDate(commentList[i].reply_time) + "<b> #" + commentList[i].floor + "</b>" + "</span>\n" +
+                            "                      </span>\n";
+                            if (!commonBlank(commentList[i].about_serial)) {
+                                allComment += "<span class=\"username\">回复 @" + commonFormatUserNo(commentList[i].about_user, true) + "</span>";
+                            }
+                        allComment += commentList[i].content + /** 评论内容*/
+                            "                </div>\n" +
+                            "            </div>";
+                    }
+                    //----
+                    if (!commonBlank(allComment)) {
+                        $(body).find("#bugMainPage_commentContent").html(allComment);// content回显
+                    } else {
+                        $(body).find("#bugMainPage_commentContent").html("暂无评论");
+                    }
+                    layui.laypage.render({
+                        elem : $(body).find("#bugMainPage_commentPage"),
+                        limit : limit,
+                        groups : 5,
+                        curr : curr,
+                        count : total_comment_count,
+                        prev : '上一页',
+                        next : '下一页',
+                        first : '首页',
+                        last : '尾页',
+                        theme: '#626465',
+                        layout : ['prev', 'first', 'page', 'last', 'next', 'count'],
+                        jump : function(obj, first){
+                            //obj包含了当前分页的所有参数，比如：
+                            if (!first) {
+                                reload_comments(obj.curr, obj.limit)
+                            }
+                        }
+                    });
+                } else {
+                    commonError("加载评论失败");
+                }
+            }
+            // 初始化加载评论 每页15条
+            reload_comments(1, 15);
+
         }
     });
 }

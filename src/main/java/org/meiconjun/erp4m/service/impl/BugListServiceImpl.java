@@ -9,6 +9,7 @@ import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.BugListDao;
 import org.meiconjun.erp4m.service.BugListService;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author Lch
@@ -44,8 +45,67 @@ public class BugListServiceImpl implements BugListService {
             queryOperation(requestBean, responseBean);
         } else if ("add".equals(operType)) {
             addOperation(requestBean, responseBean);
+        } else if ("getUserInfo".equals(operType)) {
+            getUserInfoOperation(requestBean, responseBean);
+        } else if ("queryComments".equals(operType)) {
+            queryCommentsOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 查询BUG评论信息
+     */
+    private void queryCommentsOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        int curPage = Integer.parseInt((String)paramMap.get("curPage"));// 当前页码
+        int limit = Integer.parseInt((String) paramMap.get("limit")) ;// 每页数量
+        String serial_no = (String) paramMap.get("serial_no");// 每页数量
+
+        Page page = PageHelper.startPage(curPage, limit);
+        List<HashMap<String, String>> list = bugListDao.selectBugComments(serial_no, null);
+        long total = page.getTotal();// 总条数
+        ListIterator li = list.listIterator();
+        // 将每个回复人的头像转为base64字符串
+        while (li.hasNext()) {
+            HashMap<String, String> map = (HashMap<String, String>)li.next();
+            String picture = PropertiesUtil.getProperty("fileSavePath") + map.get("picture");
+            File file = new File(picture);
+            String imgBase64 = null;
+            try {
+                imgBase64 = CommonUtil.fileToBase64(file);
+            } catch (IOException e) {
+                logger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
+            }
+            map.put("picture", imgBase64);
+            li.set(map);
+        }
+        Map<String, Object> retMap = new HashMap<String, Object>();
+        retMap.put("total", total);
+        retMap.put("list", list);
+        responseBean.setRetMsg("查询成功");
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        responseBean.setRetMap(retMap);
+    }
+
+    private void getUserInfoOperation(RequestBean requestBean, ResponseBean responseBean){
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String user_no = (String) paramMap.get("user_no");
+
+        HashMap<String, String> userMap = bugListDao.selectUserInfoByNo(user_no);
+        String url = PropertiesUtil.getProperty("fileSavePath") + (String) userMap.get("picture");
+        File file = new File(url);
+        String imgBase64 = null;
+        try {
+            imgBase64 = CommonUtil.fileToBase64(file);
+        } catch (IOException e) {
+            logger.error("加载发帖人头像异常：" + e.getMessage(), e);
+        }
+        userMap.put("picture", imgBase64);
+        Map retMap = new HashMap();
+        retMap.put("userInfo", userMap);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     private void addOperation(RequestBean requestBean, ResponseBean responseBean) {

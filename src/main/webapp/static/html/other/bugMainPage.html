@@ -28,9 +28,10 @@
     <div class="box box-widget">
         <div class="box-header with-border">
             <div class="user-block">
-                <img class="img-circle" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
-                <span class="username"><a href="#">Jonathan Burke Jr.</a></span>
-                <span class="description">公开分享 - 今天下午7:30</span>
+                <img id="bugMainPage_header" class="img-circle" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
+                <span class="username" id="bugMainPage_username"><a href="#">Jonathan Burke Jr.</a></span>
+                <span class="description" id="bugMainPage_lastModiTime">最后修改于 - </span>
+                <span class="description" ><span id="bugMainPage_severity">严重级别 - 中等 |</span><span id="bugMainPage_priority"> 优先级 - 低 |</span><span id="bugMainPage_status"> 状态 - 未解决</span></span>
             </div>
             <!-- /.user-block -->
 
@@ -38,16 +39,15 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-            <!--<img class="img-responsive pad" src="../../../mediaFile/image/photo2.png" alt="图片">
 
-            <p>我今早拍的这张照片你们觉得怎么样？</p>-->
             <div  id="bugMainPage_content"></div>
-            <button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> 分享</button>
+            <!--<button type="button" class="btn btn-default btn-xs"><i class="fa fa-share"></i> 分享</button>
             <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> 喜欢</button>
-            <span class="pull-right text-muted">127 喜欢 - 3 评论</span>
+            <button type="button" class="btn btn-default btn-xs"><i class="fa fa-thumbs-o-up"></i> 喜欢</button>-->
+            <span class="pull-right text-muted" id="bugMainPage_commentCount">3 评论</span>
         </div>
         <!-- /.box-body -->
-        <div class="box-footer box-comments">
+        <div class="box-footer box-comments" id="bugMainPage_commentContent">
             <div class="box-comment">
                 <!-- User image -->
                 <img class="img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="用户图像">
@@ -56,7 +56,7 @@
                       <span class="username">
                         Maria Gonzales
                         <span class="text-muted pull-right">今天下午 8:03</span>
-                      </span>&lt;!&ndash; /.username &ndash;&gt;
+                      </span>
                     一个长期以来的事实是，
                     通过查看其布局页面内容时读者会分心。
                 </div>
@@ -79,15 +79,20 @@
             </div>
             <!-- /.box-comment -->
         </div>
+        <div id="bugMainPage_commentPage" style="text-align:center;"></div>
+        <div style="text-align: right;margin-right: 10px;">
+            <button class="layui-btn layui-btn-sm layui-btn-normal" type="button" id="bugMainPage_submit" >提交评论</button>
+        </div>
         <!-- /.box-footer -->
         <div class="box-footer">
-            <form action="#" method="post">
-                <img class="img-responsive img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="Alt 文本">
+            <div>
+                <img id="bugMainPage_userHeader" class="img-responsive img-circle img-sm" src="../../../mediaFile/image/user3-128x128.jpg" alt="Alt 文本">
                 <!-- .img-push is used to add margin to elements next to floating images -->
                 <div class="img-push">
-                    <input type="text" class="form-control input-sm" placeholder="按回车键发表评论">
+                    <!--<input type="text" class="form-control input-sm" placeholder="发表评论">-->
+                    <textarea id="bugMainPage_commentTextArea"></textarea>
                 </div>
-            </form>
+            </div>
         </div>
         <!-- /.box-footer -->
     </div>
@@ -101,10 +106,57 @@
 <script src="../../../static/js/support/jsPlugin.js"></script>
 <script src="../../../static/js/common/commonField.js"></script>
 <script type="text/javascript">
-    commonPutNormalSelectOpts(FIELD_BUG_SEVERITY, "buglist_newBug_severity", "", true);
-    commonPutNormalSelectOpts(FIELD_BUG_PRIORITY, "buglist_newBug_priority", "", true);
+    tinymce.init({
+        selector:  "#bugMainPage_commentTextArea",
+        language:'zh_CN',
+        // height: 900, //编辑器高度
+        min_height: 300,
+        placeholder: '发表评论',
+        plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
+        toolbar: 'undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link | alignleft aligncenter alignright alignjustify outdent indent | \
+                     styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
+                     table image media charmap emoticons hr insertdatetime print preview | bdmap indent2em lineheight formatpainter axupimgs',
+        file_picker_callback: function (callback, value, meta) {// 文件上传回调,点击文件上传图标时触发
+            //文件分类
+            let file_type='.pdf, .txt, .zip, .rar, .7z, .doc, .docx, .xls, .xlsx, .ppt, .pptx, .mp3, .mp4, .png, .jpg, .jpeg, .gif';
+            //后端接收上传文件的地址
+            let up_url='../../../bugListFileUpload.do';
+            //模拟出一个input用于添加本地文件
+            let input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', file_type);
+            input.click();
+            input.onchange = function() {
+                let file = this.files[0];
 
-    layui.form.render();
+                let xhr, formData;
+                console.log(file.name);
+                xhr = new XMLHttpRequest();
+                xhr.withCredentials = false;
+                xhr.open('POST', up_url);
+                xhr.onload = function () {
+                    let json;
+                    if (xhr.status != 200) {
+                        commonError('上传失败 HTTP Error: ' + xhr.status);
+                        return;
+                    }
+                    json = JSON.parse(xhr.responseText);
+                    if (!json || typeof json.location != 'string') {
+                        commonError('上传失败 Invalid JSON: ' + xhr.responseText);
+                        return;
+                    }
+                    callback(json.location);
+                };
+                formData = new FormData();
+                formData.append('file', file, file.name);
+                xhr.send(formData);
+            }
+        },
+        file_picker_types: 'file image media',
+        setup: function(editor){
+            editor.on('change',function(){ editor.save(); });
+        }
+    });
 </script>
 </body>
 </html>
