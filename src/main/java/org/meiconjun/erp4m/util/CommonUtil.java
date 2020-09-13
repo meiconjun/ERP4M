@@ -17,12 +17,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import info.monitorenter.cpdetector.io.ASCIIDetector;
+/*import info.monitorenter.cpdetector.io.ASCIIDetector;
 import info.monitorenter.cpdetector.io.ByteOrderMarkDetector;
 import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
 import info.monitorenter.cpdetector.io.JChardetFacade;
 import info.monitorenter.cpdetector.io.ParsingDetector;
-import info.monitorenter.cpdetector.io.UnicodeDetector;
+import info.monitorenter.cpdetector.io.UnicodeDetector;*/
 import org.meiconjun.erp4m.bean.FieldBean;
 import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
@@ -152,7 +152,7 @@ public class CommonUtil {
      * @author meiconjun
      * @time 2019年4月7日上午1:02:57
      */
-    public static String getStreamCharset(InputStream is) throws Exception {
+    /*public static String getStreamCharset(InputStream is) throws Exception {
         byte[] b = input2byte(is);
         ByteArrayInputStream bais = new ByteArrayInputStream(b);
 
@@ -173,7 +173,7 @@ public class CommonUtil {
             bais.close();
         }
         return charset == null ? null : charset.name().toLowerCase();
-    }
+    }*/
 
     public static InputStream byte2Input(byte[] buf) {
         return new ByteArrayInputStream(buf);

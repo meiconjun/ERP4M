@@ -49,8 +49,90 @@ public class BugListServiceImpl implements BugListService {
             getUserInfoOperation(requestBean, responseBean);
         } else if ("queryComments".equals(operType)) {
             queryCommentsOperation(requestBean, responseBean);
+        } else if ("comment".equals(operType)) {
+            commentOperation(requestBean, responseBean);
+        } else if ("getFloorCommentHistory".equals(operType)) {
+            getFloorCommentHistoryOperation(requestBean, responseBean);
+        } else if ("updateContent".equals(operType)) {
+            updateContentOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 更新bug内容
+     * @param requestBean
+     * @param responseBean
+     */
+    private void updateContentOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String serial_no = (String) paramMap.get("serial_no");
+        String content = (String) paramMap.get("content");
+        String user_no = CommonUtil.getLoginUser().getUser_no();
+        String last_modi_time = CommonUtil.getCurrentTimeStr();
+
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("serial_no", serial_no);
+        condMap.put("content", content);
+        condMap.put("user_no", user_no);
+        condMap.put("last_modi_time", last_modi_time);
+
+        bugListDao.updateBugContent(condMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+
+    }
+
+    /**
+     * 获取指定楼层的楼中楼回复
+     * @param requestBean
+     * @param responseBean
+     */
+    private void getFloorCommentHistoryOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String serial_no = (String) paramMap.get("serial_no");
+
+        List<HashMap<String, Object>> list = bugListDao.selectFloorComment(serial_no);
+
+        Map retMap = new HashMap();
+        retMap.put("list", list);
+        responseBean.setRetMap(retMap);
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+    }
+
+    /**
+     * 新增评论
+     * @param requestBean
+     * @param responseBean
+     */
+    private void commentOperation(RequestBean requestBean, ResponseBean responseBean) {
+        Map<String, Object> paramMap = requestBean.getParamMap();
+        String bug_serial = (String) paramMap.get("bug_serial");
+        boolean isCommentOtherUser = (boolean) paramMap.get("isCommentOtherUser");
+        String content = (String) paramMap.get("content");
+        String about_serial = (String) paramMap.get("about_serial");
+        String about_user = (String) paramMap.get("about_user");
+        String reply_user = CommonUtil.getLoginUser().getUser_no();
+        String reply_time = CommonUtil.getCurrentTimeStr();
+        String floor = isCommentOtherUser ? "0": "";
+        String serial_no = SerialNumberGenerater.getInstance().generaterNextNumber();
+
+        HashMap<String, Object> condMap = new HashMap<>();
+        condMap.put("serial_no", serial_no);
+        condMap.put("bug_serial", bug_serial);
+        condMap.put("content", content);
+        condMap.put("reply_user", reply_user);
+        condMap.put("reply_time", reply_time);
+        condMap.put("about_serial", about_serial);
+        condMap.put("about_user", about_user);
+        condMap.put("floor", floor);
+
+        int effect = bugListDao.insertNewComment(condMap);
+        if (effect > 0) {
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+        } else {
+            responseBean.setRetCode(SystemContants.HANDLE_FAIL);
+            responseBean.setRetMsg("未知错误");
+        }
     }
 
     /**

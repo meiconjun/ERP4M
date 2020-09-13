@@ -1,5 +1,6 @@
 var buglist_tableInst = null;
 var buglist_curr = 1;
+var iframeWindowObj;
 $(document).ready(function () {
     try {
         let buttonMap = commonGetAuthField('O02000');
@@ -76,7 +77,7 @@ $(document).ready(function () {
                         } else if (data.severity == '3') {
                             color = '#ec3027';
                         }
-                        return "<a style='color: " + color + "' href='#' style='cursor:pointer' title='" + data.bug_name + "' onclick='buglist_showDetail(" + commonFormatObj(data) + ")'>" + data.bug_name + "</a>";
+                        return "<a style='color: " + color + ";cursor:pointer;' href='#' title='" + data.bug_name + "' onclick='buglist_showDetail(" + commonFormatObj(data) + ")'>" + data.bug_name + "</a>";
                     }
                 }
                 , { field: 'bug_status',
@@ -204,7 +205,9 @@ function buglist_showDetail(data) {
         content: 'static/html/other/bugMainPage.html',//内容，因为是iframe层，得另写一个完整的html页面
         success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
 
-            let body = layer.getChildFrame('body', index);// 获取iframe body dom 用于操作
+            let body = layui.layer.getChildFrame('body', index);// 获取iframe body dom 用于操作
+
+            iframeWindowObj = $("#bugListDetailIframe").children()[0].contentWindow; //弹框Iframe层的window对象,将tinyEditor对象存到这里 方便进行引用
             $(body).find("#bugMainPage_header").attr("src", "data:image/jpg;base64," + user_herder);// 作者头像
             $(body).find("#bugMainPage_username").html(user_name);// 作者用户名
             $(body).find("#bugMainPage_lastModiTime").html("最后修改于 - " + commonFormatDate(data.last_modi_time));// 最后修改时间
@@ -214,8 +217,40 @@ function buglist_showDetail(data) {
             $(body).find("#bugMainPage_content").html(data.content);// content回显
             // 初始化评论编辑器操作在html内
             $(body).find("#bugMainPage_userHeader").attr("src", "data:image/jpg;base64," + user_info.picture);// content回显
+            if (data.create_user == user_info.user_no) {
+                //当前用户是发帖人，支持修改帖子内容
+                $(body).find("#bugMainPage_severity").after("<button class=\"layui-btn layui-btn-xs layui-btn-warm\" id='bugMainPageEdit' type=\"button\" style=\"float: right;\">编辑</button>" +
+                                                            "<button class=\"layui-btn layui-btn-xs\" id='bugMainPageSave' type=\"button\" style=\"float: right;display: none;\">保存</button>");
+                $(body).find("#bugMainPageEdit").click(function () {
+                    $(body).find("#bugMainPage_content").html('').hide();
+                    iframeWindowObj.editor2.show();
+                    iframeWindowObj.editor2.setContent(data.content);
+                    $(body).find("#bugMainPageEdit").hide();
+                    $(body).find("#bugMainPageSave").show();
+                });
+                $(body).find("#bugMainPageSave").click(function () {
+                    let newContent = iframeWindowObj.editor2.getContent();
+                    let editRet = commonAjax("buglist.do", JSON.stringify({
+                        "beanList": [{}],
+                        "operType": "updateContent",
+                        "paramMap": {
+                            "serial_no": data.serial_no,
+                            "content": newContent
+                        }
+                    }));
+                    if (editRet.retCode == HANDLE_SUCCESS) {
+                        commonOk("更新成功");
+                        iframeWindowObj.editor2.setContent("");
+                        iframeWindowObj.editor2.hide();
+                        $(body).find("#bugMainPage_content").html(newContent).show();
+                        $(body).find("#bugMainPageEdit").show();
+                        $(body).find("#bugMainPageSave").hide();
+                    } else {
+                        commonError("更新失败:" + editRet.retMsg);
+                    }
 
-
+                });
+            }
             /**
              * 载入评论
              */
@@ -243,10 +278,11 @@ function buglist_showDetail(data) {
                             "                      <span class=\"username\">\n" + commentList[i].user_name +
                             "                        <span class=\"text-muted pull-right\">" + commonFormatDate(commentList[i].reply_time) + "<b> #" + commentList[i].floor + "</b>" + "</span>\n" +
                             "                      </span>\n";
-                            if (!commonBlank(commentList[i].about_serial)) {
-                                allComment += "<span class=\"username\">回复 @" + commonFormatUserNo(commentList[i].about_user, true) + "</span>";
-                            }
-                        allComment += commentList[i].content + /** 评论内容*/
+                        allComment += "<div>" + commentList[i].content + "</div>" + /** 评论内容*/
+                            "<div class=\"pull-right text-muted\" >" +
+                            "   <a href='#' onclick='addCommentUserAndMark(\"" + commentList[i].serial_no + "\", \"" + commentList[i].reply_user + "\")'>评论</a>" +
+                            "   <a href='#' onclick='getCommentUserHistory(\"" + commentList[i].serial_no + "\")'>查看对话</a>" +
+                            "</div>" +
                             "                </div>\n" +
                             "            </div>";
                     }
@@ -282,6 +318,43 @@ function buglist_showDetail(data) {
             // 初始化加载评论 每页15条
             reload_comments(1, 15);
 
+            //  回复提交
+            $(body).find("#bugMainPage_submit").click(function () {
+                let isCommentOtherUser = false;
+                let $content = $(body).find("#bugMainPage_commentTextArea").find("div[name='aboutDiv']");
+                if ($content != undefined && $content != null && $content.length > 0) {
+                    isCommentOtherUser = true;
+                }
+                layui.layer.confirm("是否确认提交回复？", function(index) {
+                    layui.layer.load();//loading
+                    let retData = commonAjax("buglist.do", JSON.stringify({
+                        "beanList": [{
+                        }],
+                        "operType": "comment",
+                        "paramMap": {
+                            "bug_serial": data.serial_no,
+                            "isCommentOtherUser": isCommentOtherUser,
+                            "content": $(body).find("#bugMainPage_commentTextArea").val(),
+                            "about_serial": isCommentOtherUser ? $($content).attr("serialNo") : '',
+                            "about_user": isCommentOtherUser ? $($content).attr("replyUser") : ''
+                        }
+                    }));
+                    layui.layer.closeAll('loading');
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        commonOk("回复成功！");
+                        // 刷新评论
+                        reload_comments(1, 15);
+                        // 清空评论内容
+                        iframeWindowObj.editor1.setContent('');
+                    } else {
+                        commonError("回复失败！" + retData.retMsg);
+                    }
+                });
+                return false;
+            });
+
         }
     });
 }
+
+

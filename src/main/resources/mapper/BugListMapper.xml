@@ -41,4 +41,32 @@
         </if>
         order by a.floor
     </select>
+
+    <insert id="insertNewComment" parameterType="java.util.HashMap">
+        insert into bug_list_reply_tb
+        (serial_no, bug_serial, floor, content, reply_user, reply_time, about_serial, about_user)
+        values (#{serial_no}, #{bug_serial},
+        <choose>
+            <when test="floor != null and floor != ''">
+                #{floor},
+            </when>
+            <otherwise>
+                (select case when (max(b.floor) + 1) is null then '1' else (max(b.floor) + 1) end  from bug_list_reply_tb b where b.bug_serial = #{bug_serial}), /** 查询当前帖子最大楼层号+1*/
+            </otherwise>
+        </choose>
+        #{content}, #{reply_user}, #{reply_time}, #{about_serial}, #{about_user}
+        )
+    </insert>
+
+    <select id="selectFloorComment" parameterType="java.lang.String" resultType="java.util.HashMap">
+        select * from bug_list_reply_tb
+        where about_serial = #{about_serial}
+        order by reply_time desc
+    </select>
+
+    <update id="updateBugContent" parameterType="java.util.HashMap">
+        update bug_list_main_tb
+        set content = #{content}, last_modi_time = #{last_modi_time}
+        where serial_no = #{serial_no}
+    </update>
 </mapper>
