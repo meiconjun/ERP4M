@@ -320,12 +320,18 @@ function buglist_showDetail(data) {
 
             //  回复提交
             $(body).find("#bugMainPage_submit").click(function () {
-                let isCommentOtherUser = false;
-                let $content = $(body).find("#bugMainPage_commentTextArea").find("div[name='aboutDiv']");
-                if ($content != undefined && $content != null && $content.length > 0) {
-                    isCommentOtherUser = true;
+                if (commonBlank($(body).find("#bugMainPage_commentTextArea").val())) {
+                    commonInfo("评论内容为空");
+                    return;
                 }
-                layui.layer.confirm("是否确认提交回复？", function(index) {
+                let isCommentOtherUser = false;
+                let $content = $(iframeWindowObj.editor1.getContent());
+                if ($content != undefined && $content != null && $content.length > 0) {
+                    if ($content[0].attributes["name"].value == 'aboutDiv') {
+                        isCommentOtherUser = true;
+                    }
+                }
+                layui.layer.confirm("是否确认提交评论？", function(index) {
                     layui.layer.load();//loading
                     let retData = commonAjax("buglist.do", JSON.stringify({
                         "beanList": [{
@@ -335,8 +341,8 @@ function buglist_showDetail(data) {
                             "bug_serial": data.serial_no,
                             "isCommentOtherUser": isCommentOtherUser,
                             "content": $(body).find("#bugMainPage_commentTextArea").val(),
-                            "about_serial": isCommentOtherUser ? $($content).attr("serialNo") : '',
-                            "about_user": isCommentOtherUser ? $($content).attr("replyUser") : ''
+                            "about_serial": isCommentOtherUser ? sessionStorage.getItem("buglist_about_serialNo") : '',
+                            "about_user": isCommentOtherUser ? sessionStorage.getItem("buglist_about_replyUser") : ''
                         }
                     }));
                     layui.layer.closeAll('loading');

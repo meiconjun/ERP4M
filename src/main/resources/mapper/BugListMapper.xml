@@ -39,6 +39,7 @@
         <if test="floor != null and floor != ''">
             and a.floor = #{floor}
         </if>
+        and (about_serial is null or about_serial = '')
         order by a.floor
     </select>
 

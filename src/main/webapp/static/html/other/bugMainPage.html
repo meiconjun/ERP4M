@@ -160,7 +160,8 @@
         },
         init_instance_callback : function(editor) {
             window.editor1 = editor;//存到当前iframe中
-        }
+        },
+        extended_valid_elements: "div[name|serialNo|replyUser]"
     });
     tinymce.init({
         selector:  "#bugMainPage_editDiv",
@@ -219,9 +220,13 @@
     });
 
     function addCommentUserAndMark(serial_no, reply_user) {
+        sessionStorage.setItem("buglist_about_serialNo", serial_no);
+        sessionStorage.setItem("buglist_about_replyUser", reply_user);
         window.editor1.setContent('<div name="aboutDiv" serialNo="' + serial_no + '" replyUser="' + reply_user + '"><strong>' + '@' + commonFormatUserNo(reply_user, true) + '</strong></div><br>' +
             window.editor1.getContent()
         );
+        console.log(document.body.children[0]);
+        document.body.children[0].scrollIntoView(false);// 滚动到最底部
     }
 
     /**
