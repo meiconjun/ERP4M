@@ -143,7 +143,7 @@
                     }));
                     layui.layer.closeAll('loading');
                     if (retData.retCode == HANDLE_SUCCESS) {
-                        layui.layer.close(layui.layer.index);// 关闭当前弹出层
+                        layui.layer.closeAll();
                         commonOk("录入成功！");
                     } else {
                         commonError("操作失败！" + retData.retMsg);

@@ -280,8 +280,8 @@ function buglist_showDetail(data) {
                             "                      </span>\n";
                         allComment += "<div>" + commentList[i].content + "</div>" + /** 评论内容*/
                             "<div class=\"pull-right text-muted\" >" +
-                            "   <a href='#' onclick='addCommentUserAndMark(\"" + commentList[i].serial_no + "\", \"" + commentList[i].reply_user + "\")'>评论</a>" +
-                            "   <a href='#' onclick='getCommentUserHistory(\"" + commentList[i].serial_no + "\")'>查看对话</a>" +
+                            "   <a href='#' onclick='parent.addCommentUserAndMark(\"" + data.serial_no + "\", \"" + commentList[i].serial_no + "\", \"" + commentList[i].reply_user + "\")'>评论</a>" +
+                            "   <a href='#' onclick='parent.getCommentUserHistory(\"" + commentList[i].serial_no + "\")'>查看对话</a>" +
                             "</div>" +
                             "                </div>\n" +
                             "            </div>";
@@ -339,7 +339,7 @@ function buglist_showDetail(data) {
                         "operType": "comment",
                         "paramMap": {
                             "bug_serial": data.serial_no,
-                            "isCommentOtherUser": isCommentOtherUser,
+                            "isCommentOtherUser": false,
                             "content": $(body).find("#bugMainPage_commentTextArea").val(),
                             "about_serial": isCommentOtherUser ? sessionStorage.getItem("buglist_about_serialNo") : '',
                             "about_user": isCommentOtherUser ? sessionStorage.getItem("buglist_about_replyUser") : ''
@@ -363,4 +363,107 @@ function buglist_showDetail(data) {
     });
 }
 
+function addCommentUserAndMark(bug_serial, serial_no, reply_user) {
+    /*sessionStorage.setItem("buglist_about_serialNo", serial_no);
+    sessionStorage.setItem("buglist_about_replyUser", reply_user);
+    iframeWindowObj.editor1.setContent('<div name="aboutDiv" serialNo="' + serial_no + '" replyUser="' + reply_user + '"><strong>' + '@' + commonFormatUserNo(reply_user, true) + '</strong></div><br>' +
+        iframeWindowObj.editor1.getContent()
+    );*/
+    // 打开新弹框
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['500px', '400px'],// 宽高
+        title: '评论用户',// 标题
+        content: "<div class=\"comm-dialog\" >\n" +
+            "    <form class=\"layui-form layui-form-pane\" lay-filter=\"buglist_commentUserFrm\" id=\"buglist_commentUserFrm\" action=\"\">\n" +
+            "        <div class=\"layui-form-item layui-form-text\">\n" +
+            "            <label class=\"layui-form-label\">评论内容</label>\n" +
+            "            <div class=\"layui-input-block\">\n" +
+            "                <textarea name=\"buglist_commentUser_content\" rows='10' id=\"buglist_commentUser_content\" required lay-verify=\"required\" class=\"layui-textarea\" ></textarea>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "        <div class=\"layui-form-item comm-dialog-button\">\n" +
+            "            <button class=\"layui-btn\" id=\"buglist_commentUser_submit\" lay-submit lay-filter=\"buglist_commentUser_submit\">提交</button>\n" +
+            "        </div>\n" +
+            "    </form>\n" +
+            "</div>",
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            layui.form.render();
+            layui.form.on('submit(buglist_commentUser_submit)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
+                if (commonBlank($("#buglist_commentUser_content").val())) {
+                    commonInfo("请输入评论内容！");
+                    return;
+                }
+                layui.layer.confirm("是否确认提交？", function(index) {
+                    let retData = commonAjax("personalDoc.do", JSON.stringify({
+                        "beanList": [{}],
+                        "operType": "comment",
+                        "paramMap": {
+                            "bug_serial": bug_serial,
+                            "isCommentOtherUser": true,
+                            "content": $("#buglist_commentUser_content").val(),
+                            "about_serial": serial_no,
+                            "about_user": reply_user
+                        }
+                    }));
+                    if (retData.retCode == HANDLE_SUCCESS) {
+                        layui.layer.close(index);
+                        commonOk("评论成功!");
+                    } else {
+                        commonError(retData.retMsg);
+                    }
+                });
+                return false;
+            });
+        }
+    });
+}
 
+/**
+ * 弹框展示楼层回复
+ * @param serial_no
+ */
+function getCommentUserHistory(serial_no) {
+    let retData = commonAjax("buglist.do", JSON.stringify({
+        "beanList": [],
+        "operType": "getFloorCommentHistory",
+        "paramMap": {
+            "serial_no": serial_no
+        }
+    }))
+    if (retData.retCode == HANDLE_SUCCESS) {
+        let retList = retData.retMap.list;
+        if (retList.length == 0) {
+            commonInfo("暂无回复");
+        } else {
+            layui.layer.open({
+                type: 1,// 页面层
+                area: ['500px', '500px'],// 宽高
+                title: '对话',// 标题
+                content: "<div class=\"box-comments\" name='box-comment-div'></div>",
+                success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+                    let allComment = "";
+                    for (let i = 0; i < retList.length; i++) {
+                        allComment += "<div class=\"box-comment\" id='" + retList[i].serial_no + "'>\n" +
+                            "                <img class=\"img-circle img-sm\" src=\"" + "data:image/jpg;base64," + retList[i].picture + "\" alt=\"用户头像\">\n" +
+                            "\n" +
+                            "                <div class=\"comment-text\">\n" +
+                            "                      <span class=\"username\">\n" + retList[i].user_name +
+                            "                        <span class=\"text-muted pull-right\">" + commonFormatDate(retList[i].reply_time) + "</span>\n" +
+                            "                      </span>\n";
+                        allComment += "<div>" + retList[i].content + "</div>" + /** 评论内容*/
+                            "<div class=\"pull-right text-muted\" >" +
+                            "   <a href='#' onclick='addCommentUserAndMark(\"" + retList[i].bug_serial + "\", \"" + retList[i].serial_no + "\", \"" + retList[i].reply_user + "\")'>评论</a>" +
+                            "   <a href='#' onclick='getCommentUserHistory(\"" + retList[i].serial_no + "\")'>查看对话</a>" +
+                            "</div>" +
+                            "                </div>\n" +
+                            "            </div>";
+                    }
+                    $(layero).find("div[name='box-comment-div']").html(allComment);
+                }
+            });
+        }
+    } else {
+        commonError("获取回复失败！");
+    }
+}
