@@ -3930,9 +3930,10 @@ table.text-center th {
 .user-block.user-block-sm img {
   float: left;
 }
-.img-sm,
-.box-comments .box-comment img,
+.img-sm/*,
+.box-comments .box-comment img*/,
 .user-block.user-block-sm img {
+  /** 优化-评论content图片按实际比例展示 */
   width: 30px !important;
   height: 30px !important;
 }

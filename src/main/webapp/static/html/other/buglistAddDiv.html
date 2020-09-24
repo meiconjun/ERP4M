@@ -143,8 +143,9 @@
                     }));
                     layui.layer.closeAll('loading');
                     if (retData.retCode == HANDLE_SUCCESS) {
-                        layui.layer.closeAll();
-                        commonOk("录入成功！");
+                        // 因为父窗口和iframe中的layui是不同对象，弹层是在父窗口打开的，只能操作父窗口的layui
+                        parent.layui.layer.closeAll();
+                        parent.commonOk("录入成功！");
                     } else {
                         commonError("操作失败！" + retData.retMsg);
                     }

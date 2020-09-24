@@ -5404,8 +5404,8 @@ fieldset[disabled] .btn-yahoo.focus {
 .user-block.user-block-sm img {
   float: left;
 }
-.img-sm,
-.box-comments .box-comment img,
+.img-sm/*,
+.box-comments .box-comment img*/,
 .user-block.user-block-sm img {
   width: 30px !important;
   height: 30px !important;

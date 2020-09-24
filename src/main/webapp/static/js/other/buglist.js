@@ -251,72 +251,9 @@ function buglist_showDetail(data) {
 
                 });
             }
-            /**
-             * 载入评论
-             */
-            function reload_comments(curr, limit) {
-                let commentData = commonAjax("buglist.do", JSON.stringify({
-                    "beanList": [{
-                    }],
-                    "operType": "queryComments",
-                    "paramMap": {
-                        'curPage': String(curr),
-                        'limit': String(limit),
-                        "serial_no": data.serial_no
-                    }
-                }));
-                if (commentData.retCode == HANDLE_SUCCESS) {
-                    let total_comment_count = commentData.retMap.total;
-                    $(body).find("#bugMainPage_commentCount").html(total_comment_count + " 评论");// content回显
-                    let commentList = commentData.retMap.list;
-                    let allComment = "";
-                    for (let i = 0; i < commentList.length; i++) {
-                        allComment += "<div class=\"box-comment\" id='" + commentList[i].serial_no + "'>\n" +
-                            "                <img class=\"img-circle img-sm\" src=\"" + "data:image/jpg;base64," + commentList[i].picture + "\" alt=\"用户头像\">\n" +
-                            "\n" +
-                            "                <div class=\"comment-text\">\n" +
-                            "                      <span class=\"username\">\n" + commentList[i].user_name +
-                            "                        <span class=\"text-muted pull-right\">" + commonFormatDate(commentList[i].reply_time) + "<b> #" + commentList[i].floor + "</b>" + "</span>\n" +
-                            "                      </span>\n";
-                        allComment += "<div>" + commentList[i].content + "</div>" + /** 评论内容*/
-                            "<div class=\"pull-right text-muted\" >" +
-                            "   <a href='#' onclick='parent.addCommentUserAndMark(\"" + data.serial_no + "\", \"" + commentList[i].serial_no + "\", \"" + commentList[i].reply_user + "\")'>评论</a>" +
-                            "   <a href='#' onclick='parent.getCommentUserHistory(\"" + commentList[i].serial_no + "\")'>查看对话</a>" +
-                            "</div>" +
-                            "                </div>\n" +
-                            "            </div>";
-                    }
-                    //----
-                    if (!commonBlank(allComment)) {
-                        $(body).find("#bugMainPage_commentContent").html(allComment);// content回显
-                    } else {
-                        $(body).find("#bugMainPage_commentContent").html("暂无评论");
-                    }
-                    layui.laypage.render({
-                        elem : $(body).find("#bugMainPage_commentPage"),
-                        limit : limit,
-                        groups : 5,
-                        curr : curr,
-                        count : total_comment_count,
-                        prev : '上一页',
-                        next : '下一页',
-                        first : '首页',
-                        last : '尾页',
-                        theme: '#626465',
-                        layout : ['prev', 'first', 'page', 'last', 'next', 'count'],
-                        jump : function(obj, first){
-                            //obj包含了当前分页的所有参数，比如：
-                            if (!first) {
-                                reload_comments(obj.curr, obj.limit)
-                            }
-                        }
-                    });
-                } else {
-                    commonError("加载评论失败");
-                }
-            }
+
             // 初始化加载评论 每页15条
-            reload_comments(1, 15);
+            iframeWindowObj.reload_comments(1, 15, data);
 
             //  回复提交
             $(body).find("#bugMainPage_submit").click(function () {
@@ -325,12 +262,12 @@ function buglist_showDetail(data) {
                     return;
                 }
                 let isCommentOtherUser = false;
-                let $content = $(iframeWindowObj.editor1.getContent());
+                /*let $content = $(iframeWindowObj.editor1.getContent());
                 if ($content != undefined && $content != null && $content.length > 0) {
                     if ($content[0].attributes["name"].value == 'aboutDiv') {
                         isCommentOtherUser = true;
                     }
-                }
+                }*/
                 layui.layer.confirm("是否确认提交评论？", function(index) {
                     layui.layer.load();//loading
                     let retData = commonAjax("buglist.do", JSON.stringify({
@@ -347,13 +284,13 @@ function buglist_showDetail(data) {
                     }));
                     layui.layer.closeAll('loading');
                     if (retData.retCode == HANDLE_SUCCESS) {
-                        commonOk("回复成功！");
+                        commonOk("评论成功！");
                         // 刷新评论
-                        reload_comments(1, 15);
+                        iframeWindowObj.reload_comments(1, 15, data);
                         // 清空评论内容
                         iframeWindowObj.editor1.setContent('');
                     } else {
-                        commonError("回复失败！" + retData.retMsg);
+                        commonError("评论失败！" + retData.retMsg);
                     }
                 });
                 return false;
@@ -387,7 +324,7 @@ function addCommentUserAndMark(bug_serial, serial_no, reply_user) {
             "        </div>\n" +
             "    </form>\n" +
             "</div>",
-        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+        success: function (layero, index1) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
             layui.form.render();
             layui.form.on('submit(buglist_commentUser_submit)', function(data){// 绑定提交按钮点击回调事件，只有表单验证通过会进入
                 if (commonBlank($("#buglist_commentUser_content").val())) {
@@ -395,7 +332,7 @@ function addCommentUserAndMark(bug_serial, serial_no, reply_user) {
                     return;
                 }
                 layui.layer.confirm("是否确认提交？", function(index) {
-                    let retData = commonAjax("personalDoc.do", JSON.stringify({
+                    let retData = commonAjax("buglist.do", JSON.stringify({
                         "beanList": [{}],
                         "operType": "comment",
                         "paramMap": {
@@ -407,8 +344,8 @@ function addCommentUserAndMark(bug_serial, serial_no, reply_user) {
                         }
                     }));
                     if (retData.retCode == HANDLE_SUCCESS) {
-                        layui.layer.close(index);
-                        commonOk("评论成功!");
+                        layui.layer.close(index1);
+                        commonOk("回复成功!");
                     } else {
                         commonError(retData.retMsg);
                     }
@@ -440,7 +377,7 @@ function getCommentUserHistory(serial_no) {
                 type: 1,// 页面层
                 area: ['500px', '500px'],// 宽高
                 title: '对话',// 标题
-                content: "<div class=\"box-comments\" name='box-comment-div'></div>",
+                content: "<div class=\"box-footer box-comments\" name='box-comment-div'></div>",
                 success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
                     let allComment = "";
                     for (let i = 0; i < retList.length; i++) {
@@ -453,7 +390,7 @@ function getCommentUserHistory(serial_no) {
                             "                      </span>\n";
                         allComment += "<div>" + retList[i].content + "</div>" + /** 评论内容*/
                             "<div class=\"pull-right text-muted\" >" +
-                            "   <a href='#' onclick='addCommentUserAndMark(\"" + retList[i].bug_serial + "\", \"" + retList[i].serial_no + "\", \"" + retList[i].reply_user + "\")'>评论</a>" +
+                            "   <a href='#' onclick='addCommentUserAndMark(\"" + retList[i].bug_serial + "\", \"" + retList[i].serial_no + "\", \"" + retList[i].reply_user + "\")'>回复</a>" +
                             "   <a href='#' onclick='getCommentUserHistory(\"" + retList[i].serial_no + "\")'>查看对话</a>" +
                             "</div>" +
                             "                </div>\n" +

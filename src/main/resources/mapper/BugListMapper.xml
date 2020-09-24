@@ -40,7 +40,7 @@
             and a.floor = #{floor}
         </if>
         and (about_serial is null or about_serial = '')
-        order by a.floor
+        order by a.floor + 0 /* 转为数字再排列*/
     </select>
 
     <insert id="insertNewComment" parameterType="java.util.HashMap">
@@ -52,7 +52,7 @@
                 #{floor},
             </when>
             <otherwise>
-                (select case when (max(b.floor) + 1) is null then '1' else (max(b.floor) + 1) end  from bug_list_reply_tb b where b.bug_serial = #{bug_serial}), /** 查询当前帖子最大楼层号+1*/
+                (select case when (max(b.floor + 0) + 1) is null then '1' else (max(b.floor + 0) + 1) end  from bug_list_reply_tb b where b.bug_serial = #{bug_serial}), /** 查询当前帖子最大楼层号+1*/
             </otherwise>
         </choose>
         #{content}, #{reply_user}, #{reply_time}, #{about_serial}, #{about_user}
