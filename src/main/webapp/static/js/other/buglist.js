@@ -63,21 +63,18 @@ $(document).ready(function () {
                 };
             },
             cols : [[
+                {//复选框
+                    type : 'checkbox',
+                    fixed: 'left',
+                    width: 40,
+                },
                 {
                     field: 'bug_name',
                     title: 'BUG名称',
                     align : 'center',
                     width: '60%',
                     templet : function (data) {
-                        let color = "";
-                        if (data.severity == '1') {// 根据严重级别标识颜色
-                            color = '#23ca30';
-                        } else if (data.severity == '2') {
-                            color = '#d6d133';
-                        } else if (data.severity == '3') {
-                            color = '#ec3027';
-                        }
-                        return "<a style='color: " + color + ";cursor:pointer;' href='#' title='" + data.bug_name + "' onclick='buglist_showDetail(" + commonFormatObj(data) + ")'>" + data.bug_name + "</a>";
+                        return "<a style='cursor:pointer;' href='#' title='" + data.bug_name + "' onclick='buglist_showDetail(" + commonFormatObj(data) + ")'>" + data.bug_name + "</a>";
                     }
                 }
                 , { field: 'bug_status',
@@ -92,7 +89,15 @@ $(document).ready(function () {
                     title: '严重级别',
                     align : 'center',
                     templet : function (data) {
-                        return commonFormatValue(FIELD_BUG_SEVERITY, data.severity, false);
+                        let color = "";
+                        if (data.severity == '1') {// 根据严重级别标识颜色
+                            color = '#23ca30';
+                        } else if (data.severity == '2') {
+                            color = '#d6d133';
+                        } else if (data.severity == '3') {
+                            color = '#ec3027';
+                        }
+                        return "<span style='color: " + color + ";' title='" + commonFormatValue(FIELD_BUG_SEVERITY, data.severity, true) + "'>" + commonFormatValue(FIELD_BUG_SEVERITY, data.severity, false) + "</span>";
                     }
                 }
                 , {
@@ -118,6 +123,9 @@ $(document).ready(function () {
 
         layui.form.render();// 此步是必须的，否则无法渲染一些表单元素
 
+        if (buttonStr.indexOf("buglist_deleteBtn") == -1) {
+            $("#buglist_deleteBtn").hide();
+        }
         //暂不做权限控制
         $("#buglist_queryBtn").click(function () {
             buglist_queryOperation('1', FIELD_EACH_PAGE_NUM);
@@ -125,6 +133,10 @@ $(document).ready(function () {
 
         $("#buglist_addBtn").click(function () {
             buglist_addBtnOperation();
+        });
+
+        $("#buglist_deleteBtn").click(function () {
+            buglist_deleteBtnOperation();
         });
     } catch (e) {
         console.error(e.message, e);
@@ -214,7 +226,7 @@ function buglist_showDetail(data) {
             $(body).find("#bugMainPage_severity").html("严重级别 - " + commonFormatValue(FIELD_BUG_SEVERITY, data.severity, true) + " |");
             $(body).find("#bugMainPage_priority").html(" 优先级 - " + commonFormatValue(FIELD_BUG_PRIORITY, data.priority, true) + " |");
             $(body).find("#bugMainPage_status").html(" 状态 - " + commonFormatValue(FIELD_BUG_STATUS, data.bug_status, true));
-            $(body).find("#bugMainPage_content").html(data.content);// content回显
+            $(body).find("#bugMainPage_editDiv").html(data.content);// content回显
             // 初始化评论编辑器操作在html内
             $(body).find("#bugMainPage_userHeader").attr("src", "data:image/jpg;base64," + user_info.picture);// content回显
             if (data.create_user == user_info.user_no) {
@@ -222,9 +234,10 @@ function buglist_showDetail(data) {
                 $(body).find("#bugMainPage_severity").after("<button class=\"layui-btn layui-btn-xs layui-btn-warm\" id='bugMainPageEdit' type=\"button\" style=\"float: right;\">编辑</button>" +
                                                             "<button class=\"layui-btn layui-btn-xs\" id='bugMainPageSave' type=\"button\" style=\"float: right;display: none;\">保存</button>");
                 $(body).find("#bugMainPageEdit").click(function () {
-                    $(body).find("#bugMainPage_content").html('').hide();
-                    iframeWindowObj.editor2.show();
-                    iframeWindowObj.editor2.setContent(data.content);
+                    // $(body).find("#bugMainPage_content").html('').hide();
+                    // iframeWindowObj.editor2.show();
+                    // iframeWindowObj.editor2.setContent(data.content);
+                    iframeWindowObj.edit_comment(data.content);
                     $(body).find("#bugMainPageEdit").hide();
                     $(body).find("#bugMainPageSave").show();
                 });
@@ -240,9 +253,12 @@ function buglist_showDetail(data) {
                     }));
                     if (editRet.retCode == HANDLE_SUCCESS) {
                         commonOk("更新成功");
-                        iframeWindowObj.editor2.setContent("");
-                        iframeWindowObj.editor2.hide();
-                        $(body).find("#bugMainPage_content").html(newContent).show();
+                        // iframeWindowObj.editor2.setContent("");
+                        // iframeWindowObj.editor2.hide();
+                        // $(body).find("#bugMainPage_content").html(newContent).show();
+                        // 销毁编辑器
+                        iframeWindowObj.editor2.destroy();
+                        data.content = newContent;
                         $(body).find("#bugMainPageEdit").show();
                         $(body).find("#bugMainPageSave").hide();
                     } else {
@@ -402,5 +418,30 @@ function getCommentUserHistory(serial_no) {
         }
     } else {
         commonError("获取回复失败！");
+    }
+}
+
+/**
+ * 删除
+ */
+function buglist_deleteBtnOperation() {
+    let checkData = layui.table.checkStatus("buglist_tableObj").data;// 获取选中数据
+    if (checkData.length == 0) {
+        commonInfo("请选择需要删除的BUG信息");
+        return;
+    } else {
+        layui.layer.confirm("是否确认删除选中的BUG信息？", function(index) {
+            let retData = commonAjax("buglist.do", JSON.stringify({
+                "beanList" : checkData,
+                "operType" : "delete",
+                "paramMap" : {}
+            }));
+            if (retData.retCode == HANDLE_SUCCESS) {
+                commonOk("删除成功");
+                buglist_queryOperation('1', FIELD_EACH_PAGE_NUM);
+            } else {
+                commonError(retData.retMsg);
+            }
+        });
     }
 }

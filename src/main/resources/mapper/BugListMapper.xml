@@ -60,9 +60,9 @@
     </insert>
 
     <select id="selectFloorComment" parameterType="java.lang.String" resultType="java.util.HashMap">
-        select * from bug_list_reply_tb
-        where about_serial = #{about_serial}
-        order by reply_time desc
+        select a.*, b.user_name, b.picture  from bug_list_reply_tb a, sys_user_tb b
+        where a.about_serial = #{about_serial}
+        order by a.reply_time desc
     </select>
 
     <update id="updateBugContent" parameterType="java.util.HashMap">
@@ -70,4 +70,9 @@
         set content = #{content}, last_modi_time = #{last_modi_time}
         where serial_no = #{serial_no}
     </update>
+
+    <delete id="deleteBugInfo" parameterType="java.lang.String">
+        delete from bug_list_main_tb
+        where serial_no = #{serial_no}
+    </delete>
 </mapper>

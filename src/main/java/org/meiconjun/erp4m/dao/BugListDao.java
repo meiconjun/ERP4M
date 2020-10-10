@@ -44,4 +44,8 @@ public interface BugListDao {
      * 更新bug内容
      */
     int updateBugContent(HashMap<String, Object> condMap);
+    /**
+     * 删除bug
+     */
+    int deleteBugInfo(@Param("serial_no") String serial_no);
 }

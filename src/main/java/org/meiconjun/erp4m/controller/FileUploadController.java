@@ -237,18 +237,23 @@ public class FileUploadController {
     @ResponseBody
     @RequestMapping(value = "/bugListFileUpload.do", method = RequestMethod.POST)
     public String tinyMceFileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
-        String fileRootPath = System.getProperty("contextRootPath");
-        String filePath = "/" + "mediaFile" + "/" + "bugList" + "/" + CommonUtil.getCurrentDateStr() + "/";
+        //TODO 目前文件服务器和应用服务器在一起，直接操作本地文件即可，但后续需改为FTP形式
+        String nginxFilePath = PropertiesUtil.getProperty("nginxFilePath");// nginx文件代理位置
+        String nginxServerIp = PropertiesUtil.getProperty("nginxServerIp");// nginx文件代理服务器IP
+        String nginxServerPort = PropertiesUtil.getProperty("nginxServerPort");// nginx文件代理服务器端口
+        String nginxServerRoot = PropertiesUtil.getProperty("nginxServerRoot");// nginx文件代理服务器监听路径
+
+        String filePath = "bugList" + File.separator + CommonUtil.getCurrentDateStr() + File.separator;
         String orgName = img.getOriginalFilename();
         filePath += SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
-
-        File file = new File(fileRootPath + filePath);
+        logger.debug("文件存储位置[{}]", filePath);
+        File file = new File(nginxFilePath + File.separator + filePath);
         if (!file.exists()) {
             file.mkdirs();
         }
         img.transferTo(file);
         HashMap<String, String> dataMap = new HashMap<String, String>();
-        dataMap.put("location",  "../../.." +
+        dataMap.put("location",  "http://" + nginxServerIp + ":" + nginxServerPort + "/" + nginxServerRoot + "/" +
                  filePath);
         return CommonUtil.objToJson(dataMap);
     }

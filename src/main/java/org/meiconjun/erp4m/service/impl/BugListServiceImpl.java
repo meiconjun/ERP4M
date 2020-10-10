@@ -55,8 +55,26 @@ public class BugListServiceImpl implements BugListService {
             getFloorCommentHistoryOperation(requestBean, responseBean);
         } else if ("updateContent".equals(operType)) {
             updateContentOperation(requestBean, responseBean);
+        } else if ("delete".equals(operType)) {
+            deleteOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 删除，支持批量
+     * @param requestBean
+     * @param responseBean
+     */
+    private void deleteOperation(RequestBean requestBean, ResponseBean responseBean) {
+        List<BugBean> beanList = requestBean.getBeanList();
+        for (BugBean bug : beanList) {
+            int effect = bugListDao.deleteBugInfo(bug.getSerial_no());
+            if (effect > 0) {
+                logger.info("删除BUG[{}]成功", bug.getBug_name());
+            }
+        }
+        responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
     }
 
     /**
@@ -92,7 +110,21 @@ public class BugListServiceImpl implements BugListService {
         String serial_no = (String) paramMap.get("serial_no");
 
         List<HashMap<String, Object>> list = bugListDao.selectFloorComment(serial_no);
-
+        // 将每个回复人的头像转为base64字符串
+        ListIterator li = list.listIterator();
+        while (li.hasNext()) {
+            HashMap<String, String> map = (HashMap<String, String>)li.next();
+            String picture = PropertiesUtil.getProperty("fileSavePath") + map.get("picture");
+            File file = new File(picture);
+            String imgBase64 = null;
+            try {
+                imgBase64 = CommonUtil.fileToBase64(file);
+            } catch (IOException e) {
+                logger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
+            }
+            map.put("picture", imgBase64);
+            li.set(map);
+        }
         Map retMap = new HashMap();
         retMap.put("list", list);
         responseBean.setRetMap(retMap);
