@@ -36,16 +36,25 @@
     <div>
         <div id="buglist_page" class="table-footer-left"></div>
         <div class="table-footer-right">
-            <a class="layui-btn layui-btn-sm layui-btn-normal" id="buglist_addBtn">提交BUG</a>
-            <a class="layui-btn layui-btn-sm layui-btn-danger" id="buglist_deleteBtn">删除BUG</a>
+            <a class="layui-btn layui-btn-sm layui-btn-normal" id="buglist_addBtn">BUG提交</a>
+            <a class="layui-btn layui-btn-sm layui-btn-warm" id="buglist_editBtn">状态更新</a>
+            <a class="layui-btn layui-btn-sm layui-btn-danger" id="buglist_deleteBtn">删除</a>
         </div>
     </div>
 </div>
 
 
 
-<div class="comm-dialog" id="bugDetail_div"  hidden="hidden">
-
+<div class="comm-dialog" id="bugStatus_div"  hidden="hidden">
+    <form class="layui-form " lay-filter="bugStatus_frm" id="roleConfig_addFrm" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <select name="bugStatus_status" id="bugStatus_status" required lay-verify="required">
+                </select>
+            </div>
+        </div>
+    </form>
 </div>
 
 <script src="static/js/other/buglist.js"></script>

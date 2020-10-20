@@ -75,4 +75,10 @@
         delete from bug_list_main_tb
         where serial_no = #{serial_no}
     </delete>
+
+    <update id="updateBugStatus" parameterType="java.lang.String">
+        update bug_list_main_tb
+        set bug_status = #{bug_status}
+        where serial_no = #{serial_no}
+    </update>
 </mapper>

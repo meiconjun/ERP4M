@@ -134,7 +134,9 @@ $(document).ready(function () {
         $("#buglist_addBtn").click(function () {
             buglist_addBtnOperation();
         });
-
+        $("#buglist_editBtn").click(function () {
+            buglist_editBtnOperation();
+        });
         $("#buglist_deleteBtn").click(function () {
             buglist_deleteBtnOperation();
         });
@@ -261,6 +263,7 @@ function buglist_showDetail(data) {
                         data.content = newContent;
                         $(body).find("#bugMainPageEdit").show();
                         $(body).find("#bugMainPageSave").hide();
+                        buglist_queryOperation('1', FIELD_EACH_PAGE_NUM);
                     } else {
                         commonError("更新失败:" + editRet.retMsg);
                     }
@@ -444,4 +447,51 @@ function buglist_deleteBtnOperation() {
             }
         });
     }
+}
+
+/**
+ * bug状态更新
+ */
+function buglist_editBtnOperation() {
+    let checkData = layui.table.checkStatus("buglist_tableObj").data;// 获取选中数据
+    if (checkData.length == 0) {
+        commonInfo("请选择需要更新状态的BUG");
+        return;
+    }
+    if (checkData.length > 1) {
+        commonInfo("只能操作一条数据");
+        return;
+    }
+    layui.layer.open({
+        type: 1,// 页面层
+        area: ['475px', '330px'],// 宽高
+        title: '状态更新',// 标题
+        content: $("#bugStatus_div"),//内容，直接取dom对象
+        btn: ['提交'],
+        yes: function (index, layero) {
+            //确认按钮的回调，提交表单
+            layui.layer.confirm("是否确认提交？", function(index2) {
+                let retData = commonAjax("buglist.do", JSON.stringify({
+                    "beanList" : [{
+                        "serial_no" : checkData[0].serial_no,
+                        "bug_status" : $("#bugStatus_status").val(),
+                    }],
+                    "operType" : "updateStatus",
+                    "paramMap" : {}
+                }));
+                if (retData.retCode == HANDLE_SUCCESS) {
+                    commonOk("更新成功");
+                    layui.layer.close(index);
+                    buglist_queryOperation('1', FIELD_EACH_PAGE_NUM);
+                } else {
+                    commonError(retData.retMsg);
+                }
+            });
+        },
+        success: function (layero, index) {//层弹出后的成功回调方法(当前层DOM,当前层索引)
+            // 渲染弹框元素
+            commonPutNormalSelectOpts(FIELD_BUG_STATUS, "bugStatus_status", checkData[0].bug_status, true);
+            layui.form.render();
+        }
+    });
 }

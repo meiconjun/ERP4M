@@ -48,4 +48,8 @@ public interface BugListDao {
      * 删除bug
      */
     int deleteBugInfo(@Param("serial_no") String serial_no);
+    /**
+     * 更新bug状态
+     */
+    int updateBugStatus(@Param("serial_no") String serial_no, @Param("bug_status")String bug_status);
 }

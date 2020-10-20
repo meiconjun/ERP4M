@@ -57,8 +57,30 @@ public class BugListServiceImpl implements BugListService {
             updateContentOperation(requestBean, responseBean);
         } else if ("delete".equals(operType)) {
             deleteOperation(requestBean, responseBean);
+        } else if ("updateStatus".equals(operType)) {
+            updateStatusOperation(requestBean, responseBean);
         }
         return responseBean;
+    }
+
+    /**
+     * 更新bug状态
+     * @param requestBean
+     * @param responseBean
+     */
+    private void updateStatusOperation(RequestBean requestBean, ResponseBean responseBean) {
+        BugBean bugBean = (BugBean) requestBean.getBeanList().get(0);
+        String serial_no = bugBean.getSerial_no();
+        String bug_status = bugBean.getBug_status();
+
+        int effect = bugListDao.updateBugStatus(serial_no, bug_status);
+        if (effect > 0) {
+            responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
+            responseBean.setRetMsg("更新成功");
+        } else {
+            responseBean.setRetCode(SystemContants.HANDLE_FAIL);
+            responseBean.setRetMsg("更新失败，请稍后重试");
+        }
     }
 
     /**

@@ -114,7 +114,7 @@
         // height: 900, //编辑器高度
         min_height: 300,
         placeholder: '发表评论',
-        plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
+        plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
         toolbar: 'undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link | alignleft aligncenter alignright alignjustify outdent indent | \
                      styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
                      table image media charmap emoticons hr insertdatetime print preview | bdmap indent2em lineheight formatpainter axupimgs',
@@ -154,7 +154,7 @@
                 xhr.send(formData);
             }
         },
-        file_picker_types: 'file image media',
+        file_picker_types: 'image media',
         setup: function(editor){
             editor.on('change',function(){ editor.save(); });
         },
@@ -173,7 +173,7 @@
             // height: 900, //编辑器高度
             min_height: 600,
             placeholder: '发表评论',
-            plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media template code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
+            plugins: 'print preview searchreplace autolink directionality visualblocks visualchars fullscreen image link media code codesample table charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists wordcount imagetools textpattern help emoticons autosave autoresize',
             toolbar: 'undo redo restoredraft | cut copy paste pastetext | forecolor backcolor bold italic underline strikethrough link | alignleft aligncenter alignright alignjustify outdent indent | \
                      styleselect formatselect fontselect fontsizeselect | bullist numlist | blockquote subscript superscript removeformat | \
                      table image media charmap emoticons hr insertdatetime print preview | bdmap indent2em lineheight formatpainter axupimgs',
@@ -213,7 +213,7 @@
                     xhr.send(formData);
                 }
             },
-            file_picker_types: 'file image media',
+            file_picker_types: 'image media',
             setup: function(editor){
                 editor.on('change',function(){ editor.save(); });
             },
