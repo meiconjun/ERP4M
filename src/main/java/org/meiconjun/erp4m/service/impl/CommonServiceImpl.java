@@ -10,6 +10,7 @@ import org.meiconjun.erp4m.dao.MessageDao;
 import org.meiconjun.erp4m.dao.TaskDao;
 import org.meiconjun.erp4m.service.CommonService;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.JedisUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,26 @@ public class CommonServiceImpl implements CommonService {
      * @param responseBean
      */
     private void getProjectListOperation(RequestBean requestBean, ResponseBean responseBean) {
-        List<HashMap<String, String>> projectList = commonDao.selectProjectList();
+        List<HashMap<String, String>> projectList = null;
+        boolean flag = false;
+        boolean redisFlag = JedisUtil.isRedisEnable();
+        if (redisFlag) {
+            if (JedisUtil.isContainsKey("projectList")) {
+                String result = JedisUtil.getStrValue("projectList");
+                if (!CommonUtil.isStrBlank(result)) {
+                    logger.info("成功获取[projectList]Redis缓存");
+                    flag = true;
+                    projectList = (List)CommonUtil.jsonToObj(result, List.class);
+                }
+            }
+        }
+        if (!flag){
+            projectList = commonDao.selectProjectList();
+            if (redisFlag) {
+                logger.info("缓存中没有projectList或数据为空，重新进行查询");
+                JedisUtil.setStringValue("projectList", CommonUtil.objToJson(projectList), 360);
+            }
+        }
         Map<String, Object> retMap = new HashMap<>();
         retMap.put("list", projectList);
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);

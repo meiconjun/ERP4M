@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
 		http://www.springframework.org/schema/context
@@ -87,6 +87,44 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
+    <!-- jedis连接池配置-->
+    <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最大空闲数 -->
+        <property name="maxIdle" value="20"></property>
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="50"></property>
+        <!-- 最大等待时间 -->
+        <property name="maxWaitMillis" value="20000"></property>
+    </bean>
+    <!--spring-data-redis2.0以上的配置-->
+    <bean id="redisStandaloneConfiguration" class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+        <!-- Redis服务地址-->
+        <property name="hostName" value="localhost"></property>
+        <!-- 端口-->
+        <property name="port" value="6379"/>
+    </bean>
+    <!--配置jedis链接工厂 spring-data-redis2.0中
+            建议改为构造器传入一个RedisStandaloneConfiguration  单机
+                                RedisSentinelConfiguration  主从复制
+                                RedisClusterConfiguration  集群-->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <constructor-arg name="standaloneConfig" ref="redisStandaloneConfiguration"></constructor-arg>
+    </bean>
+    <!--用于java与json的序列化和反序列化-->
+    <bean id="jackson2JsonRedisSerializer" class="org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer"/>
+    <!-- 字符串的序列化 -->
+    <bean id="stringRedisSerializer" class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+    <!-- 映射序列化的java对象到redis -->
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+          p:connectionFactory-ref="jedisConnectionFactory"
+          p:keySerializer-ref="stringRedisSerializer"
+          p:valueSerializer-ref="jackson2JsonRedisSerializer"
+          p:hashKeySerializer-ref="stringRedisSerializer"
+          p:hashValueSerializer-ref="jackson2JsonRedisSerializer"/>
+
+    <!-- 所有键与值都是 String 类型的 RedisTemplate -->
+    <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
+          p:connectionFactory-ref="jedisConnectionFactory"/>
     <!-- 6.开启事务注解-->
     <tx:annotation-driven></tx:annotation-driven>
 

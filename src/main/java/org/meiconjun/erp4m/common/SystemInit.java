@@ -20,6 +20,7 @@ public class SystemInit {
 
     private Logger logger = LoggerFactory.getLogger(SystemInit.class);
 
+    // PostConstruct注解的方法会在Spring启动后自动执行
     @PostConstruct
     private void execute() throws Exception {
         logger.info("---------------------执行初始化操作----------------------");

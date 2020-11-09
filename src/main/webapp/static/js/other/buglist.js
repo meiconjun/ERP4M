@@ -462,6 +462,10 @@ function buglist_editBtnOperation() {
         commonInfo("只能操作一条数据");
         return;
     }
+    if (user_info.user_no != checkData[0].create_user) {
+        commonInfo("只能修改自己提交的BUG");
+        return;
+    }
     layui.layer.open({
         type: 1,// 页面层
         area: ['475px', '330px'],// 宽高
