@@ -1,0 +1,110 @@
+#核心配置文件
+
+#===============数据库相关配置 begin============
+database-config:
+  jdbc:
+    driver: com.mysql.jdbc.Driver
+    url: jdbc:mysql://cdb-6qtkxl4y.cd.tencentcdb.com:10149/erp4m?useSSL=true&characterEncoding=utf-8
+    username: erp4m
+    password: 2465732jikuY
+    #别名方式，扩展插件，监控统计用的filter:stat，日志用的filter:log4j，防御sql注入的filter:wall
+    filters: stat
+    #最大连接数
+    maxActive: 300
+    #初始化连接数
+    initialSize: 2
+    #获取连接最大等待时间
+    maxWait: 60000
+    #最小连接数
+    minIdle: 1
+    #检测连接有效性的时间间隔
+    timeBetweenEvictionRunsMillis: 60000
+    #连接保持空闲而不被驱逐的最长时间
+    minEvictableIdleTimeMillis: 300000
+    #连接有效性，检测sql
+    validationQuery: SELECT 'x'
+    #定时检测空闲连接有效性
+    testWhileIdle: true
+    #检测获取的连接的有效性
+    testOnBorrow: false
+    #检测要归还的连接的有效性
+    testOnReturn: false
+    #是否缓存preparedStatement，即PSCache。PSCache对支持游标的数据库性能提升巨大，比如说oracle。在mysql下建议关闭。
+    poolPreparedStatements: false
+    maxPoolPreparedStatementPerConnectionSize: 50
+#===============数据库相关配置 end============
+
+#===============log4j相关配置 begin=================
+
+#%m 输出代码中指定的消息
+#%p 输出优先级，即DEBUG，INFO，WARN，ERROR，FATAL
+#%r 输出自应用启动到输出该log信息耗费的毫秒数
+#%c 输出所属的类目，通常就是所在类的全名
+#%t 输出产生该日志事件的线程名
+#%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n”
+#%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：%d{yyy MMM dd HH:mm:ss,SSS}，输出类似：2002年10月18日 22：10：28，921
+#%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。举例：Testlog4.main(TestLog4.java:10)
+log4j:
+  #打印debug级别以上日志，输出位置包括stdout，D，E
+  rootLogger: debug,stdout,D,E
+  appender:
+    #输出到控制台  [%-5p] 意为左对齐 5p则右对齐
+    stdout: org.apache.log4j.ConsoleAppender
+      Target: System.out
+      layout: org.apache.log4j.PatternLayout
+        ConversionPattern: [%-5p] %d{yyyy-MM-dd HH:mm:ss,SSS} method:%l%n%m%n
+    #输出DEBUG级别以上的日志到=E://logs/log.log
+    D: org.apache.log4j.DailyRollingFileAppender
+      File: ./log4j/logs/log.log
+      Append: true
+      Threshold: DEBUG
+      layout: org.apache.log4j.PatternLayout
+        ConversionPattern: %-d{yyyy-MM-dd HH:mm:ss} [ %t:%r ] - [ %p ] %m%n
+    ### 输出ERROR 级别以上的日志到=E://logs/error.log ###
+    E: org.apache.log4j.DailyRollingFileAppender
+      File: ./log4j/logs/error.log
+      Append: true
+      Threshold: ERROR
+      layout: org.apache.log4j.PatternLayout
+        ConversionPattern: %-d{yyyy-MM-dd HH:mm:ss}  [ %t:%r ] - [ %p ]  %m%n
+  #关闭quartz不断刷的DEBUG日志
+  logger:
+    org:
+      quartz: INFO
+
+#===============log4j相关配置 end=================
+
+#===============项目相关业务配置 begin=================
+custom-config:
+  #项目文件存放根路径
+  fileSavePath: G:\\erpFile\\
+  #nginx代理文件存放根目录
+  nginxFilePath: G:\\erpFile\\mediaFile
+  #nginx代理服务器IP
+  nginxServerIp: localhost
+  #nginx代理服务器PORT
+  nginxServerPort: 80
+  #nginx代理路径
+  nginxServerRoot: media
+  #新建用户初始密码
+  defaultPassword: 123456
+
+  #项目部署名称
+  projectDeployedName: ERP4M
+
+#===============项目相关业务配置 end=================
+
+#===============redis相关配置 begin=================
+redis-config:
+  #是否启用redis on-是 其它-否
+  redisEnable: on
+  #最大空闲数
+  redisPoolMaxIdle: 20
+  #最大连接数
+  redisPoolMaxTotal: 50
+  #最大等待毫秒数
+  redisPoolMaxWaitMillis: 30000
+  #redis服务器IP
+  redisServerIp: localhost
+
+#===============redis相关配置 end=================

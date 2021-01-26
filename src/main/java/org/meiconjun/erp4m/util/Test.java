@@ -1,5 +1,6 @@
 package org.meiconjun.erp4m.util;
 
+import cn.hutool.core.util.IdUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -26,7 +27,8 @@ import java.util.*;
  * @date 2020/4/518:43
  */
 public class Test {
-
+    private Stack<Integer> pushStack = new Stack();
+    private Stack<Integer> popStack = new Stack();
     /*public static long getBetweenDays(String begin_date, String end_date) throws ParseException {
         SimpleDateFormat sd = new SimpleDateFormat("yyyyMMdd");
         Date beginDate = sd.parse(begin_date);
@@ -60,68 +62,12 @@ public class Test {
         workbook.close();
     }*/
     public static void main(String[] args) throws ParseException, IOException {
-        /*RequestBean<User> requestBean = new RequestBean<User>();
-        User m = new User();
-        m.setUser_no("AaaAss");
-        Map m2 = new HashMap();
-        m2.put("a", "12323213321421444");
-        List<User> l = new ArrayList<User>();
-        l.add(m);
-        requestBean.setBeanList(l);
-        requestBean.setOperType("aaaaa");
-        requestBean.setParamMap(m2);
+        LinkedList<int[]> lList = new LinkedList();
 
-        String json = CommonUtil.objToJson(requestBean);
 
-        RequestBean bean = (RequestBean) CommonUtil.jsonToObj(json, RequestBean.class);
 
-        System.out.println(CommonUtil.formatJson(CommonUtil.objToJson(bean)));*/
-        /*String aaa = "{\n" +
-                "        'beanList' : [{\n" +
-                "            \"user_no\" : user_no,\n" +
-                "            'pass_word' : pass_word\n" +
-                "        }],\n" +
-                "        'operType' : 'login',\n" +
-                "        'paramMap' : {}\n" +
-                "    }";
-        Gson gson = new Gson();
-        RequestBean re = (RequestBean) gson.fromJson(aaa, new TypeToken<RequestBean<User>>(){}.getType());
-        User u = (User) re.getBeanList().get(0);*/
-        /*SerialNumberGenerater se = SerialNumberGenerater.getInstance();
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());
-        System.out.println(se.generaterNextNumber());*/
-        /*List<String> list = new ArrayList<String>();
-        list.add("aa");
-        list.add("bb");s
-        System.out.println(list.contains("aa"));*/
-//        String date = "20200531";
-//        System.out.println(formatDateString(date, "yyyy-MM-dd HH:mm:ss"));
-//        numOfSubarrays(new int[]{100,100,99,99});
-//        System.out.println(Math.pow(10, 9) + 7);
-//        "11".substring(0, 1);
-//        System.out.println(method_3("0100111010", "01"));
-//        System.out.println(1/2);
-        /*ListNode l1 = new ListNode(2);
-        l1.next = new ListNode(4);
-        l1.next.next = new ListNode(3);
-        ListNode l2 = new ListNode(5);
-        l2.next = new ListNode(6);
-        l2.next.next = new ListNode(4);
-        addTwoNumbers(l1, l2);*/
-        /*BigDecimal dou = new BigDecimal("1000000000000000000000000000001");
-        BigDecimal dou2 = new BigDecimal("564");
-        BigDecimal sum = dou.add(dou2);
-        System.out.println(sum);*/
-//        lengthOfLongestSubstring("abcabcbb");
-        int ii = "123".charAt(1) - '0';
-        System.out.println(ii);
-        char[] arr = {'a', 'A'};
-        System.out.println(Character.toUpperCase(arr[0]) == arr[1]);
+        System.out.println("链表的第一个元素是 : " + lList.getFirst());
+        System.out.println("链表最后一个元素是 : " + lList.getLast());
     }
     public static int method_3(String string, String a) {
         int number = 0;
@@ -337,5 +283,58 @@ public class Test {
             retList.add(tempList);
         }
         return retList;
+    }
+
+    class StackOfPlates {
+        List<Stack<Integer>> stackList= new ArrayList();
+        List<Integer> countList = new ArrayList();
+        int count = 0;
+        int max = 0;
+        public StackOfPlates(int cap) {
+            max = cap;
+            stackList.add(new Stack<Integer>());
+            countList.add(0);
+        }
+
+        public void push(int val) {
+            if (countList.get(count) < max) {
+                count++;
+                stackList.add(new Stack<Integer>());
+                countList.add(0);
+            }
+            stackList.get(count).push(val);
+            int temp = countList.get(count) + 1;
+            countList.set(count, temp);
+        }
+
+        public int pop() {
+            if (count < 0) {
+                return -1;
+            }
+            int retVal = stackList.get(count).pop();
+            int temp = countList.get(count) - 1;
+            countList.set(count, temp);
+            if (stackList.get(count).empty()) {
+                stackList.remove(count);
+                countList.remove(count);
+                count--;
+            }
+            return retVal;
+        }
+
+        public int popAt(int index) {
+            if (stackList.get(index) == null) {
+                return -1;
+            }
+            int retVal = stackList.get(index).pop();
+            int temp = countList.get(index) - 1;
+            countList.set(index, temp);
+            if (stackList.get(index).empty()) {
+                stackList.remove(index);
+                countList.remove(index);
+                count--;
+            }
+            return retVal;
+        }
     }
 }
