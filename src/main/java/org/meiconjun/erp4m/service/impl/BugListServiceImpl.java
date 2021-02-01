@@ -9,6 +9,7 @@ import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.dao.BugListDao;
 import org.meiconjun.erp4m.service.BugListService;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.LogUtil;
 import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
@@ -31,7 +32,8 @@ import java.util.*;
 @Service("bugListServiceImpl")
 @Transactional
 public class BugListServiceImpl implements BugListService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private Logger businessLogger = LogUtil.getBusinessLogger();
+    private Logger exceptionLogger = LogUtil.getExceptionLogger();
 
     @Resource
     private BugListDao bugListDao;
@@ -93,7 +95,7 @@ public class BugListServiceImpl implements BugListService {
         for (BugBean bug : beanList) {
             int effect = bugListDao.deleteBugInfo(bug.getSerial_no());
             if (effect > 0) {
-                logger.info("删除BUG[{}]成功", bug.getBug_name());
+                businessLogger.info("删除BUG[{}]成功", bug.getBug_name());
             }
         }
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
@@ -142,7 +144,7 @@ public class BugListServiceImpl implements BugListService {
             try {
                 imgBase64 = CommonUtil.fileToBase64(file);
             } catch (IOException e) {
-                logger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
+                exceptionLogger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
             }
             map.put("picture", imgBase64);
             li.set(map);
@@ -211,7 +213,7 @@ public class BugListServiceImpl implements BugListService {
             try {
                 imgBase64 = CommonUtil.fileToBase64(file);
             } catch (IOException e) {
-                logger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
+                exceptionLogger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
             }
             map.put("picture", imgBase64);
             li.set(map);
@@ -235,7 +237,7 @@ public class BugListServiceImpl implements BugListService {
         try {
             imgBase64 = CommonUtil.fileToBase64(file);
         } catch (IOException e) {
-            logger.error("加载发帖人头像异常：" + e.getMessage(), e);
+            exceptionLogger.error("加载发帖人头像异常：" + e.getMessage(), e);
         }
         userMap.put("picture", imgBase64);
         Map retMap = new HashMap();

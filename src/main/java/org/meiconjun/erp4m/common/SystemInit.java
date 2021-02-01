@@ -22,7 +22,7 @@ public class SystemInit {
 
     // PostConstruct注解的方法会在Spring启动后自动执行
     @PostConstruct
-    private void execute() throws Exception {
+    public void execute() throws Exception {
         logger.info("---------------------执行初始化操作----------------------");
         // do something
         initScheduler();
