@@ -49,7 +49,7 @@ public class ButtonController extends BaseController {
         } catch (Exception e) {
             responseBean.setRetCode(SystemContants.HANDLE_FAIL);
             responseBean.setRetMsg(e.getMessage());
-            logger.error("调用后台服务异常:" + e.getMessage(), e);
+            errorLogger.error("调用后台服务异常:" + e.getMessage(), e);
         }
         return responseBean;
     }

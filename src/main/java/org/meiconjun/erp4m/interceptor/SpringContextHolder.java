@@ -14,7 +14,7 @@ import org.springframework.context.ApplicationContextAware;
  * @Description: 将容器上下文存为静态变量，方便获取
  * @date 2020/5/19 22:19
  */
-public class SpringContextHolder implements ApplicationContextAware, DisposableBean {
+public class SpringContextHolder{
     //上下文
     private static ApplicationContext applicationContext = null;
     private static Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
@@ -26,6 +26,10 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
     public static ApplicationContext getApplicationContext () {
         assertContextInjected();
         return applicationContext;
+    }
+
+    public static void setApplicationContext(ApplicationContext applicationContext1) {
+        applicationContext = applicationContext1;
     }
 
     /**
@@ -52,7 +56,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
                 + applicationContext);
         applicationContext = null;
     }
-
+/*
     @Override
     public void destroy() throws Exception {
         SpringContextHolder.clearHolder();
@@ -64,7 +68,7 @@ public class SpringContextHolder implements ApplicationContextAware, DisposableB
             logger.warn("SpringContextHolder中的ApplicationContext被覆盖, 原有ApplicationContext为:" + SpringContextHolder.applicationContext);
         }
         SpringContextHolder.applicationContext = applicationContext;
-    }
+    }*/
 
     private static void assertContextInjected() {
         if (applicationContext == null) {

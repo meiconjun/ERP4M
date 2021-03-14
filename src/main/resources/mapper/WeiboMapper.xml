@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.meiconjun.erp4m.dao.WeiboDao">
+    <select id="selectCommentCount" parameterType="java.util.HashMap" resultType="java.lang.Integer">
+        select count(0) from weibo_crawler_comment_tb
+        where weibo_id = #{weibo_id} and comment_id = #{comment_id}
+    </select>
+
+    <insert id="insertComment" parameterType="java.util.HashMap">
+        insert into weibo_crawler_comment_tb(user_id, weibo_id, comment_id, pic_url)
+        values(#{user_id}, #{weibo_id}, #{comment_id}, #{pic_url})
+    </insert>
+
+    <update id="updateUrl" parameterType="java.util.HashMap">
+        update weibo_crawler_comment_tb
+        set pic_url = #{pic_url}
+        where weibo_id = #{weibo_id} and comment_id = #{comment_id}
+    </update>
+</mapper>

@@ -1,14 +1,31 @@
 package org.meiconjun.erp4m.util;
 
+import cn.hutool.Hutool;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.meiconjun.erp4m.bean.MenuBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.User;
+import org.meiconjun.erp4m.job.WuneriguiDailyMail;
+import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.misc.Request;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,314 +44,117 @@ import java.util.*;
  * @date 2020/4/518:43
  */
 public class Test {
+    private static Logger logger = LoggerFactory.getLogger(Test.class);
+    private static String mailFrom = "baoshiki@vip.qq.com";// 指明邮件的发件人
+    private static String password_mailFrom = "fsehrqwsewmtbbcc";// 指明邮件的发件人登陆密码
+    //    private static String mailTo = "baoshiki@vip.qq.com"; // 指明邮件的收件人
+    private static String mail_host = "smtp.qq.com"; // 邮件的服务器域名
+    private static String[] mailToArr = {"baoshiki@vip.qq.com", "260535105@qq.com"};
+    private static String basePath = "D:\\";
+    private static String curDate = "";
+
     private Stack<Integer> pushStack = new Stack();
     private Stack<Integer> popStack = new Stack();
-    /*public static long getBetweenDays(String begin_date, String end_date) throws ParseException {
-        SimpleDateFormat sd = new SimpleDateFormat("yyyyMMdd");
-        Date beginDate = sd.parse(begin_date);
-        Date endDate = sd.parse(end_date);
 
-        return (endDate.getTime() - beginDate.getTime()) / (1000*60*60*24);
-    }
-    public static String formatDateString(String date, String format) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date d = sdf.parse(date);
-        SimpleDateFormat sdf2 = new SimpleDateFormat(format);
-        return  sdf2.format(d);
+    public static void main(String[] args) throws ParseException, IOException, ZipException, JobExecutionException {
+//        File file = new File("D:\\20210228");
+//        ZipUtil.fileFolderToZip(file, "D:\\20210228.zip", 47185920);
+//        mailTest();
+        System.out.println(DateUtil.format(DateUtil.yesterday(), "yyyyMMdd"));
     }
 
-    public static void poiTest() throws IOException {
-        List<String> headList = new ArrayList<>();
-        headList.add("用户号");
-        headList.add("用户名");
-        headList.add("部门");
-        List<String[]> dataList = new ArrayList<>();
-        dataList.add(new String[]{"00001", "张三", "主板设计部"});
-        dataList.add(new String[]{"00002", "李四", "测试部"});
 
-        Workbook workbook = ExcelUtil.exportExcel(headList, dataList);
+    private static void mailTest() {
+        curDate = "20210228";
+        File todayFile = new File(basePath + curDate);
 
-        File file = new File("D:\\testExcel.xlsx");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        workbook.write(fileOutputStream);
-        fileOutputStream.flush();
-        fileOutputStream.close();
-        workbook.close();
-    }*/
-    public static void main(String[] args) throws ParseException, IOException {
-        LinkedList<int[]> lList = new LinkedList();
+        if (todayFile.exists()) {
+            String zipFile = basePath + curDate + ".zip";
+            try {
+                ZipUtil.fileFolderToZip(todayFile, zipFile, 47185920);
 
+                // 发送邮件
+                Properties prop = new Properties();
+                prop.setProperty("mail.host", mail_host);// 需要修改
+                prop.setProperty("mail.transport.protocol", "smtp");
+                prop.setProperty("mail.smtp.auth", "true");
 
-
-        System.out.println("链表的第一个元素是 : " + lList.getFirst());
-        System.out.println("链表最后一个元素是 : " + lList.getLast());
-    }
-    public static int method_3(String string, String a) {
-        int number = 0;
-        while (string.indexOf(a) >= 0) {
-            int beginIndex = string.indexOf(a);
-            /*在string中剔除字符串a。
-            但是要注意jajaveve的情况，在第一次去除字符串java后，java前面的字符为"ja"，后面的字符为“va”
-            又重新组合为java。故，在连接前后字符串时，加入其它替换字符，本方法中，采用空格字符。
-            */
-            string = string.substring(0, beginIndex) + " " + string.substring(beginIndex + a.length());
-            number++;
-        }
-        return number;
-    }
-    public static int numOfSubarrays(int[] arr) {
-        int bNum = 1 << arr.length;
-        int count = 0;
-        for (int mark = 0; mark < bNum; mark++) {
-            List<Integer> arr1 = new ArrayList();
-            int innerCount = 0;
-            for (int i = arr.length - 1; i >=0 ; i--) {
-                if (((1<<i) & mark) != 0) {
-                    arr1.add(arr[i]);
-                    innerCount += arr[i];
+                File files = new File(basePath);
+                String[] names = files.list();
+                int partCount = 0;
+                for (int i = 1; i <= names.length; i++) {
+                    if (names[i].startsWith(curDate + ".z")) {
+                        partCount++;
+                        // 使用JavaMail发送邮件的5个步骤
+                        // 1、创建session
+                        Session session = Session.getInstance(prop);
+                        // 开启Session的debug模式，这样就可以查看到程序发送Email的运行状态
+                        session.setDebug(true);
+                        // 2、通过session得到transport对象
+                        Transport ts = session.getTransport();
+                        // 3、连上邮件服务器，需要发件人提供邮箱的用户名和密码进行验证
+                        ts.connect(mail_host, mailFrom, password_mailFrom);// 需要修改
+                        // 4、创建邮件
+                        Message message = createAttachMail(session, "无内鬼日报-" + curDate + "-part" + partCount, basePath + names[i]);
+                        // 5、发送邮件
+                        ts.sendMessage(message, message.getAllRecipients());
+                        ts.close();
+                    }
                 }
-
+            } catch (ZipException e) {
+                logger.error("[" + curDate + "]没有无内鬼文件压缩失败", e);
+            } catch ( MessagingException e) {
+                logger.error("[" + curDate + "]没有无内鬼邮件发送失败", e);
+            } catch (Exception e) {
+                logger.error("[" + curDate + "]没有无内鬼邮件发送失败", e);
             }
-            System.out.println(arr1);
-            System.out.println(innerCount);
-            if ((innerCount % 2) != 0) {
-                count++;
-            }
-        }
-        int ii = (int)Math.pow(10, 9) + 7;
-        return count;
-    }
-
-    public static int numOfSubarrays2(int[] arr) {
-        int count = 0;
-        for (int i = 0; i < arr.length; i++) {
-            int innerCount = 0;
-            for (int j = i; j < arr.length; j++) {
-                innerCount += arr[j];
-                if ((innerCount % 2) != 0) {
-                    count ++;
-                }
-            }
-        }
-        int ii = (int)Math.pow(10, 9) + 7;
-        return count % ii;
-    }
-
-    public static String restoreString(String s, int[] indices) {
-        char[] ss = s.toCharArray();
-        StringBuffer sb = new StringBuffer();
-        sb.append("a", 0, 1);
-        System.out.println(sb.toString());
-        return null;
-    }
-
-    public static ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        StringBuilder sb1 = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-        do {
-            sb1.insert(0, l1.val);
-            l1 = l1.next;
-        } while (l1 != null);
-        do {
-            sb2.insert(0, l2.val);
-            l2 = l2.next;
-        } while (l2 != null);
-        BigDecimal num1 = new BigDecimal(sb1.toString());
-        BigDecimal num2 = new BigDecimal(sb2.toString());
-        String sumStr_ = num1.add(num2).toString();
-        char[] sumStr = sumStr_.toCharArray();
-        ListNode head = new ListNode(Integer.valueOf(String.valueOf(sumStr[0])));
-        for (int i = 1; i < sumStr.length; i++) {
-            ListNode tempNode = new ListNode(Integer.valueOf(String.valueOf(sumStr[i])));
-            tempNode.next = head;
-            head = tempNode;
-        }
-        return head;
-    }
-
-    public static class ListNode {
-          int val;
-          ListNode next;
-          ListNode(int x) { val = x; }
-  }
-
-     /*public static class TreeNode {
-         int val;
-         TreeNode left;
-         TreeNode right;
-         TreeNode(int x) { val = x; }
-     }
-    public int maxDepth(TreeNode root) {
-        // 思路：利用一个队列遍历二叉树，并记录最大层数，该层数就是最长路径
-        List<TreeNode> tnList = new ArrayList<TreeNode>();
-        int level = 0;// 层级计数器
-        int rear = -1;//队列尾指针，负责将树节点入队
-        int current = -1;//队列遍历指针
-        int last = 0;//记录当前遍历层的最后节点位置
-        tnList.add(root);//根节点入队
-        ++rear;
-        TreeNode temp;
-        while (current < rear) {// 遍历队列
-            temp = tnList.get(++current);
-            if (temp.left != null) { //左子树入队
-                tnList.add(temp.left);
-                ++rear;
-            }
-            if (temp.right != null) {//右子树入队
-                tnList.add(temp.right);
-                ++rear;
-            }
-            if (current == last) {// 当前层遍历至最后一个节点，同时入队指针也讲下一层全部入队
-                ++level;
-                last = rear;
-            }
-        }
-        return level;
-    }*/
-
-    public static int lengthOfLongestSubstring(String s) {
-        char[] charArr = s.toCharArray();
-        int countLast = 0;
-        int countThis = 0;
-        int mark = 0;
-        String resStr = "";
-        while (mark < charArr.length) {
-            if (resStr.indexOf(charArr[mark]) == -1) {
-                resStr += charArr[mark];
-                ++countThis;
-            } else {
-                resStr = resStr.substring(resStr.indexOf(charArr[mark]) + 1) + charArr[mark];
-                System.out.println(resStr);
-                System.out.println(countThis);
-                countThis = resStr.length();
-                if (countThis >= countLast) {
-                    countLast = countThis;
-                }
-            }
-            ++mark;
-        }
-        return countLast;
-    }
-
-    /**
-     * Definition for a binary tree node.
-     * public class TreeNode {
-     *     int val;
-     *     TreeNode left;
-     *     TreeNode right;
-     *     TreeNode() {}
-     *     TreeNode(int val) { this.val = val; }
-     *     TreeNode(int val, TreeNode left, TreeNode right) {
-     *         this.val = val;
-     *         this.left = left;
-     *         this.right = right;
-     *     }
-     * }
-     */
-    class Solution {
-        public void flatten(TreeNode root) {
-
+        } else {
+            logger.error("[" + curDate + "]没有无内鬼新文件");
         }
     }
-    public static class TreeNode {
-         int val;
-         TreeNode left;
-         TreeNode right;
-         TreeNode() {}
-         TreeNode(int val) { this.val = val; }
-         TreeNode(int val, TreeNode left, TreeNode right) {
-             this.val = val;
-             this.left = left;
-             this.right = right;
-         }
-     }
-    public void flatten(TreeNode root) {
-    }
 
-    public String addStrings(String num1, String num2) {
-        int pointer1 = num1.length() - 1;
-        int pointer2 = num2.length() - 1;
-        int carry = 0;// 进位
-        StringBuilder sb = new StringBuilder();
-        while (pointer1 >= 0 || pointer2 >= 0 || carry > 0) {
-            int n1 = pointer1 >= 0 ? num1.charAt(pointer1) : 0;
-            int n2 = pointer2 >= 0 ? num2.charAt(pointer2) : 0;
-            int result = n1 + n2 + carry;
-            carry = result / 10;
-            sb.insert(0, result % 10);
-            pointer1--;
-            pointer2--;
-        }
-        return sb.toString();
-    }
+    private static MimeMessage createAttachMail(Session session, String title, String fileName) throws Exception {
+        MimeMessage message = new MimeMessage(session);
 
-    public List<List<Integer>> generate(int numRows) {
-        List<List<Integer>> retList = new ArrayList<>();
-        for (int i = 1; i <= numRows; i++) {
-            List<Integer> tempList = new ArrayList<>();
-            for (int j = 1; j<= i; j++) {
-                int num = 1;
-                if (j != 1 && j != i) {
-                    List<Integer> tempList2 = retList.get(i-2);
-                    num = tempList2.get(j - 2) + tempList2.get(j - 1);
-                }
-                tempList.add(num);
-            }
-            retList.add(tempList);
-        }
-        return retList;
-    }
+        // 设置邮件的基本信息
+        message.setFrom(new InternetAddress(mailFrom));	// 发件人
 
-    class StackOfPlates {
-        List<Stack<Integer>> stackList= new ArrayList();
-        List<Integer> countList = new ArrayList();
-        int count = 0;
-        int max = 0;
-        public StackOfPlates(int cap) {
-            max = cap;
-            stackList.add(new Stack<Integer>());
-            countList.add(0);
-        }
+        // 邮件标题
+        message.setSubject(title);
 
-        public void push(int val) {
-            if (countList.get(count) < max) {
-                count++;
-                stackList.add(new Stack<Integer>());
-                countList.add(0);
-            }
-            stackList.get(count).push(val);
-            int temp = countList.get(count) + 1;
-            countList.set(count, temp);
+        // 创建邮件正文，为了避免邮件正文中文乱码问题，需要使用charset=UTF-8指明字符编码
+        MimeBodyPart text = new MimeBodyPart();
+        text.setContent("宁好", "text/html;charset=UTF-8");
+        InternetAddress[] ia = new InternetAddress[mailToArr.length];
+        for (int i = 0; i < mailToArr.length; i++) {
+            ia[i] = new InternetAddress(mailToArr[i]);
         }
+        message.setRecipients(Message.RecipientType.TO, ia);// 收件人
 
-        public int pop() {
-            if (count < 0) {
-                return -1;
-            }
-            int retVal = stackList.get(count).pop();
-            int temp = countList.get(count) - 1;
-            countList.set(count, temp);
-            if (stackList.get(count).empty()) {
-                stackList.remove(count);
-                countList.remove(count);
-                count--;
-            }
-            return retVal;
-        }
+        // 创建容器描述数据关系
+        MimeMultipart mp = new MimeMultipart();
+        mp.addBodyPart(text);
+        mp.setSubType("mixed");
 
-        public int popAt(int index) {
-            if (stackList.get(index) == null) {
-                return -1;
-            }
-            int retVal = stackList.get(index).pop();
-            int temp = countList.get(index) - 1;
-            countList.set(index, temp);
-            if (stackList.get(index).empty()) {
-                stackList.remove(index);
-                countList.remove(index);
-                count--;
-            }
-            return retVal;
-        }
+        // 获取文件列表
+//        File files = new File(basePath);
+//        String[] names = files.list();
+//        for (String s : names) {
+//            if (s.startsWith(curDate + ".z")) {
+                MimeBodyPart attach = new MimeBodyPart();
+                DataHandler dh = new DataHandler(new FileDataSource(fileName));// 需要修改
+                attach.setDataHandler(dh);
+                attach.setFileName(dh.getName());
+                mp.addBodyPart(attach);
+//            }
+//        }
+        // 创建邮件附件
+        message.setSentDate(new Date());
+        message.setContent(mp);
+        message.saveChanges();
+        // 将创建的Email写入到F盘存储
+//        message.writeTo(new FileOutputStream("F:/Program Files/TestMail/ImageMail.eml"));// 需要修改
+        // 返回生成的邮件
+        return message;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -29,20 +30,25 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     @Resource
     private CustomConfigProperties customConfigProperties;
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
+    }
+
     /**
      * 配置映射处理
      */
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        return new RequestMappingHandlerMapping();
-    }
+//    @Bean
+//    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+//        return new RequestMappingHandlerMapping();
+//    }
     /**
      * 配置适配器
      */
-    @Bean
-    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
-        return new RequestMappingHandlerAdapter();
-    }
+//    @Bean
+//    public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
+//        return new RequestMappingHandlerAdapter();
+//    }
     /**
      * 文件上传支持
      */
@@ -50,7 +56,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     public CommonsMultipartResolver commonsMultipartResolver() {
         HashMap<String, Object> custom = customConfigProperties.getCustom();
         CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-        commonsMultipartResolver.setMaxUploadSize((long)custom.get("maxUploadSize"));
+        commonsMultipartResolver.setMaxUploadSize((int)custom.get("maxUploadSize"));
         commonsMultipartResolver.setMaxInMemorySize((int)custom.get("maxInMemorySize"));
         commonsMultipartResolver.setDefaultEncoding((String) custom.get("defaultEncoding"));
         return commonsMultipartResolver;
@@ -65,9 +71,9 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     }
 
     /**
-     * 注册过滤器
+     * 注册过滤器 （springboot自动配置中已带，只需在yml中配置编码）
      */
-    @Bean
+    /*@Bean
     public FilterRegistrationBean characterEncodingFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
@@ -77,7 +83,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
         filterRegistrationBean.setOrder(1);
         filterRegistrationBean.setName("characterEncodingFilter");
         return filterRegistrationBean;
-    }
+    }*/
     /**
      * 欢迎页
      */

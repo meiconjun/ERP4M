@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,8 @@ import java.lang.reflect.Type;
  * @date 2020/4/518:05
         */
 public abstract class BaseController {
-    protected Logger logger = LoggerFactory.getLogger(BaseController.class);
+    protected Logger platformLogger = LogUtil.getPlatformLogger();
+    protected Logger errorLogger = LogUtil.getExceptionLogger();
 
     /**
      *
@@ -45,7 +47,7 @@ public abstract class BaseController {
 
         String reqJson = request.getParameter("message");
         // 打印请求报文
-        logger.info("请求报文:\n" + CommonUtil.formatJson(reqJson));
+        platformLogger.info("请求报文:\n" + CommonUtil.formatJson(reqJson));
         // 将json报文转为requestBean
 //        return (RequestBean) CommonUtil.jsonToObj(reqJson, RequestBean.class);
         return (RequestBean) CommonUtil.jsonToObj(reqJson, paramClass);
@@ -65,7 +67,7 @@ public abstract class BaseController {
      */
     protected String afterAction (ResponseBean responseBean) {
         String retStr = CommonUtil.objToJson(responseBean);
-        logger.info("返回报文:\n" + retStr);
+        platformLogger.info("返回报文:\n" + retStr);
         return retStr;
     }
 }

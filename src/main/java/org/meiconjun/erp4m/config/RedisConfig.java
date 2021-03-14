@@ -61,8 +61,8 @@ public class RedisConfig {
      *                                 RedisClusterConfiguration  集群
      */
     @Bean(name = "jedisConnectionFactory")
-    public JedisConnectionFactory jedisConnectionFactory() {
-        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration());
+    public JedisConnectionFactory jedisConnectionFactory(RedisStandaloneConfiguration redisStandaloneConfiguration) {
+        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(redisStandaloneConfiguration);
         return jedisConnectionFactory;
     }
     /**
@@ -85,13 +85,14 @@ public class RedisConfig {
      * 映射序列化的java对象到redis
      */
     @Bean(name = "redisTemplate")
-    public RedisTemplate redisTemplate() {
+    public RedisTemplate redisTemplate(JedisConnectionFactory jedisConnectionFactory, StringRedisSerializer stringRedisSerializer,
+                                       GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer) {
         RedisTemplate redisTemplate = new RedisTemplate();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-        redisTemplate.setKeySerializer(stringRedisSerializer());
-        redisTemplate.setValueSerializer(genericJackson2JsonRedisSerializer());
-        redisTemplate.setHashKeySerializer(stringRedisSerializer());
-        redisTemplate.setHashValueSerializer(stringRedisSerializer());
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        redisTemplate.setKeySerializer(stringRedisSerializer);
+        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
+        redisTemplate.setHashKeySerializer(stringRedisSerializer);
+        redisTemplate.setHashValueSerializer(stringRedisSerializer);
         return redisTemplate;
     }
 
@@ -99,9 +100,9 @@ public class RedisConfig {
      * 所有键与值都是 String 类型的 RedisTemplate
      */
     @Bean(name = "stringRedisTemplate")
-    public StringRedisTemplate stringRedisTemplate() {
+    public StringRedisTemplate stringRedisTemplate(JedisConnectionFactory jedisConnectionFactory) {
         StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
-        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory());
+        stringRedisTemplate.setConnectionFactory(jedisConnectionFactory);
         return stringRedisTemplate;
     }
 }

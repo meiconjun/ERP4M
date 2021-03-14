@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.common;
 
+import org.meiconjun.erp4m.job.WeiboCrawler;
+import org.meiconjun.erp4m.util.LogUtil;
 import org.meiconjun.erp4m.util.SchedulerUtil;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ public class SystemInit {
         logger.info("---------------------执行初始化操作----------------------");
         // do something
         initScheduler();
+//        new WeiboCrawler().execute();
     }
 
     /**
@@ -39,8 +42,10 @@ public class SystemInit {
         // 文档回收站清理 每天林晨2点执行
         schedulerUtil.addCronTrigger("文档回收站清理", "文档Job", "文档回收站清理Trigger",
                 "通用", org.meiconjun.erp4m.job.RecycleDocClean.class, "0 0 2 * * ? *");
-
-        //启动
+        // 无内鬼邮件发送定时服务
+        /*schedulerUtil.addCronTrigger("无内鬼每日推送", "爬虫Job", "无内鬼每日推送Trigger",
+                "通用", org.meiconjun.erp4m.job.WuneriguiDailyMail.class, "55 59 23 * * ? *");// 每日23时59分55秒触发一次
+*/        //启动
         schedulerUtil.startScheduler();
     }
 }

@@ -3,8 +3,13 @@ package org.meiconjun.erp4m.config;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.plugin.Interceptor;
+import org.meiconjun.erp4m.interceptor.SpringContextHolder;
+import org.meiconjun.erp4m.util.LogUtil;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -27,35 +32,38 @@ import java.util.Properties;
  */
 @Configuration
 public class ApplicationContextConfig {
-
-    @Resource
-    private DatabaseProperties databaseProperties;
-
+    private Logger logger = LogUtil.getPlatformLogger();
     /**
      * 数据库数据源配置
      * @return
      */
     @Bean(name = "dataSource", initMethod = "init", destroyMethod = "close")
-    public DruidDataSource druidDataSource () throws SQLException {
+    public DruidDataSource druidDataSource (@Value("${database-config.jdbc.driver}") String driver, @Value("${database-config.jdbc.url}") String url, @Value("${database-config.jdbc.username}") String username,
+                                            @Value("${database-config.jdbc.password}") String password, @Value("${database-config.jdbc.filters}") String filters, @Value("${database-config.jdbc.maxActive}") int maxActive,
+                                            @Value("${database-config.jdbc.initialSize}") int initialSize, @Value("${database-config.jdbc.maxWait}") int maxWait, @Value("${database-config.jdbc.minIdle}") int minIdle,
+                                            @Value("${database-config.jdbc.timeBetweenEvictionRunsMillis}") int timeBetweenEvictionRunsMillis, @Value("${database-config.jdbc.minEvictableIdleTimeMillis}") int minEvictableIdleTimeMillis,
+                                            @Value("${database-config.jdbc.validationQuery}") String validationQuery, @Value("${database-config.jdbc.testWhileIdle}") boolean testWhileIdle,
+                                            @Value("${database-config.jdbc.testOnBorrow}") boolean testOnBorrow, @Value("${database-config.jdbc.testOnReturn}") boolean testOnReturn,
+                                            @Value("${database-config.jdbc.poolPreparedStatements}") boolean poolPreparedStatements, @Value("${database-config.jdbc.maxPoolPreparedStatementPerConnectionSize}") int maxPoolPreparedStatementPerConnectionSize) throws SQLException {
         DruidDataSource druidDataSource = new DruidDataSource();
-        HashMap<String, Object> jdbc = databaseProperties.getJdbc();
-        druidDataSource.setDriverClassName((String)jdbc.get("driver"));
-        druidDataSource.setUrl((String)jdbc.get("url"));
-        druidDataSource.setUsername((String)jdbc.get("username"));
-        druidDataSource.setPassword((String)jdbc.get("password"));
-        druidDataSource.setFilters((String)jdbc.get("filters"));
-        druidDataSource.setMaxActive((int)jdbc.get("maxActive"));
-        druidDataSource.setInitialSize((int)jdbc.get("initialSize"));
-        druidDataSource.setMaxWait((int)jdbc.get("maxWait"));
-        druidDataSource.setMinIdle((int)jdbc.get("minIdle"));
-        druidDataSource.setTimeBetweenEvictionRunsMillis((int)jdbc.get("timeBetweenEvictionRunsMillis"));
-        druidDataSource.setMinEvictableIdleTimeMillis((int)jdbc.get("minEvictableIdleTimeMillis"));
-        druidDataSource.setValidationQuery((String)jdbc.get("validationQuery"));
-        druidDataSource.setTestWhileIdle((boolean)jdbc.get("testWhileIdle"));
-        druidDataSource.setTestOnBorrow((boolean)jdbc.get("testOnBorrow"));
-        druidDataSource.setTestOnReturn((boolean)jdbc.get("testOnReturn"));
-        druidDataSource.setPoolPreparedStatements((boolean)jdbc.get("poolPreparedStatements"));
-        druidDataSource.setMaxPoolPreparedStatementPerConnectionSize((int)jdbc.get("maxPoolPreparedStatementPerConnectionSize"));
+
+        druidDataSource.setDriverClassName(driver);
+        druidDataSource.setUrl(url);
+        druidDataSource.setUsername(username);
+        druidDataSource.setPassword(password);
+        druidDataSource.setFilters(filters);
+        druidDataSource.setMaxActive(maxActive);
+        druidDataSource.setInitialSize(initialSize);
+        druidDataSource.setMaxWait(maxWait);
+        druidDataSource.setMinIdle(minIdle);
+        druidDataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
+        druidDataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
+        druidDataSource.setValidationQuery(validationQuery);
+        druidDataSource.setTestWhileIdle(testWhileIdle);
+        druidDataSource.setTestOnBorrow(testOnBorrow);
+        druidDataSource.setTestOnReturn(testOnReturn);
+        druidDataSource.setPoolPreparedStatements(poolPreparedStatements);
+        druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
         return druidDataSource;
     }
 
@@ -64,9 +72,9 @@ public class ApplicationContextConfig {
      * @return
      */
     @Bean(name = "sqlSessionFactory")
-    public SqlSessionFactoryBean sqlSessionFactory() throws SQLException, IOException {
+    public SqlSessionFactoryBean sqlSessionFactory(DruidDataSource dataSource) throws SQLException, IOException {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(druidDataSource());
+        sqlSessionFactoryBean.setDataSource(dataSource);
         PageInterceptor pageInterceptor = new PageInterceptor();
         Properties properties = new Properties();
         properties.setProperty("helperDialect", "mysql");
@@ -101,9 +109,9 @@ public class ApplicationContextConfig {
      * 配置事务管理器
      */
     @Bean(name = "transactionManager")
-    public DataSourceTransactionManager dataSourceTransactionManager() throws SQLException {
+    public DataSourceTransactionManager dataSourceTransactionManager(DruidDataSource dataSource) throws SQLException {
         DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-        dataSourceTransactionManager.setDataSource(druidDataSource());
+        dataSourceTransactionManager.setDataSource(dataSource);
         return dataSourceTransactionManager;
     }
 

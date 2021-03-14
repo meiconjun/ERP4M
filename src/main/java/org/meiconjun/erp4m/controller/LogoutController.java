@@ -35,7 +35,7 @@ public class LogoutController extends BaseController {
     protected ResponseBean doAction(HttpServletRequest request, RequestBean requestBean) {
         Map<String, Object> paramMap = requestBean.getParamMap();
         String user_no = (String) paramMap.get("user_no");
-        logger.info("==============用户[" + user_no + "]登出================");
+        errorLogger.info("==============用户[" + user_no + "]登出================");
         ResponseBean responseBean = new ResponseBean();
         HttpSession session = request.getSession();
         session.removeAttribute("USER_SESSION");

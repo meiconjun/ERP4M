@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -61,6 +63,38 @@ public class CommonUtil {
      */
     private static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
 
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * 将Json字符串解析成对象
+     * @return
+     */
+    public static Object jsonToObjByJackson(String json, Class t) {
+//		return gson.fromJson(json, t);
+        Object retObj = new Object();
+        try {
+            retObj = objectMapper.readValue(json, t);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return retObj;
+    }
+
+    /**
+     * 将对象转为Json字符串
+     * @param obj
+     * @return
+     */
+    public static String objToJsonByJackson(Object obj) {
+//		return gson.toJson(obj);
+        String retJson = "";
+        try {
+            retJson = objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return retJson;
+    }
     /**
      * 将Json字符串解析成对象,注意传递数字要使用字符串形式，否则转换类型会异常
      * 使用示例： Map mm = (Map) CommonUtil.jsonToObj(retStr, new TypeToken<Map<String, String>>(){}.getType());
