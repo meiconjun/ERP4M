@@ -22,4 +22,8 @@ import java.util.HashMap;
 @ToString
 public class CustomConfigProperties {
     private HashMap<String, Object> custom;
+
+    public HashMap<String, Object> getCustom() {
+        return custom;
+    };
 }

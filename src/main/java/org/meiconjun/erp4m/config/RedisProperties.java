@@ -22,4 +22,8 @@ import java.util.HashMap;
 @ToString
 public class RedisProperties {
     private HashMap<String, Object> redis;
+
+    public HashMap<String, Object> getRedis() {
+        return redis;
+    };
 }
