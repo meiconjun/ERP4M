@@ -48,10 +48,10 @@ public class UserSessionInterceptor implements HandlerInterceptor {
             } else {
                 // 未登录
                 logger.info("请求未登录，拦截,uri:[" + uri + "]");
-                /*request.setAttribute("err_msg", "您未登录或登录已失效，请重新登录！");
-                request.getRequestDispatcher("/WEB-INF/static/html/login.html").forward(request, response);*/
+                request.setAttribute("err_msg", "您未登录或登录已失效，请重新登录！");
+                request.getRequestDispatcher("/login.html").forward(request, response);
 //                response.sendError(999);
-                response.setStatus(999);
+//                response.setStatus(999);
             }
         }
         return passFlag;

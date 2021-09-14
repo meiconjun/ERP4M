@@ -23,22 +23,9 @@ server:
 
 #==========mybatis配置==========
 mybatis:
-  configuration:
-    # 查询结果返回全量字段，解决有时null不返回的问题
-    call-setters-on-nulls: true
   mapper-locations: classpath:mapper/*.xml
   config-locations: classpath:/mybatis-config.xml
 
-#===========devtools热部署配置==========
-spring:
-  devtools:
-    restart:
-      #热部署是否生效
-      enabled: true
-      #设置重启的目录
-      #sadditional-paths: src/main/java
-      #classpath目录下的WEB-INF文件夹内容修改不重启
-      additional-exclude: WEB-INF/**
 #=============log4j2配置引入
 logging:
   config: classpath:log4j2.yml

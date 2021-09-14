@@ -3,9 +3,9 @@ package org.meiconjun.erp4m.controller;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.service.ProjectManageService;
 import org.meiconjun.erp4m.util.CommonUtil;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,9 @@ public class FileUploadController {
 
     @Resource(name = "projectManageService")
     private ProjectManageService projectManageService;
+
+    @Resource
+    private CustomConfigProperties customConfigProperties;
     /**
      * 上传用户头像
      * @param img
@@ -51,7 +54,7 @@ public class FileUploadController {
         if (CommonUtil.isStrBlank(user_no)) {
             user_no = "default";
         }
-        String imgPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String imgPath = customConfigProperties.getFileSavePath()  + File.separator;
         String orgName = img.getOriginalFilename();
         String reNameFile = "userHeaderFile" + File.separator + user_no + File.separator + user_no + "_" +  SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
 
@@ -74,7 +77,7 @@ public class FileUploadController {
     @ResponseBody
     @RequestMapping(value = "/projectDescFileUpload.do", method = RequestMethod.POST)
     public String fileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
-        String imgRootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String imgRootPath = customConfigProperties.getFileSavePath()  + File.separator;
         String filePath = "";
         String file_root_path = "";
         filePath += "project" + File.separator + CommonUtil.getCurrentDateStr() + File.separator;
@@ -121,7 +124,7 @@ public class FileUploadController {
         String orgName = img.getOriginalFilename();
 
 
-        String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String rootPath = customConfigProperties.getFileSavePath()  + File.separator;
         String filePath = file_root_path;
         String this_version = "1.0";
         if (!CommonUtil.isStrBlank(doc_version)) {
@@ -191,7 +194,7 @@ public class FileUploadController {
         String doc_version = request.getParameter("doc_version");
         String checkOut = request.getParameter("checkOut");
 
-        String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
+        String rootPath = customConfigProperties.getFileSavePath()  + File.separator;
         String orgName = img.getOriginalFilename();
         if (CommonUtil.isStrBlank(file_root_path) || "undefined".equals(file_root_path)) {
             file_root_path = "docFile" + File.separator + doc_type + File.separator + doc_no + File.separator;
@@ -237,24 +240,34 @@ public class FileUploadController {
     @ResponseBody
     @RequestMapping(value = "/bugListFileUpload.do", method = RequestMethod.POST)
     public String tinyMceFileUpload(@RequestParam(value = "file")MultipartFile img, HttpServletRequest request) throws IOException {
-        //TODO 目前文件服务器和应用服务器在一起，直接操作本地文件即可，但后续需改为FTP形式
-        String nginxFilePath = PropertiesUtil.getProperty("nginxFilePath");// nginx文件代理位置
-        String nginxServerIp = PropertiesUtil.getProperty("nginxServerIp");// nginx文件代理服务器IP
-        String nginxServerPort = PropertiesUtil.getProperty("nginxServerPort");// nginx文件代理服务器端口
-        String nginxServerRoot = PropertiesUtil.getProperty("nginxServerRoot");// nginx文件代理服务器监听路径
-
+        boolean enabledNginx = customConfigProperties.isEnabledNginx();
+        String location = "";
+        String saveFilePath = "";
         String filePath = "bugList" + File.separator + CommonUtil.getCurrentDateStr() + File.separator;
         String orgName = img.getOriginalFilename();
         filePath += SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
         logger.debug("文件存储位置[{}]", filePath);
-        File file = new File(nginxFilePath + File.separator + filePath);
+        if (enabledNginx) {
+            // 使用nginx服务器
+            String nginxFilePath = customConfigProperties.getNginxFilePath();// nginx文件代理位置
+            String nginxServerIp = customConfigProperties.getNginxServerIp();// nginx文件代理服务器IP
+            String nginxServerPort = customConfigProperties.getNginxServerPort();// nginx文件代理服务器端口
+            String nginxServerRoot = customConfigProperties.getNginxServerRoot();// nginx文件代理服务器监听路径
+            saveFilePath = nginxFilePath;
+            location = "http://" + nginxServerIp + ":" + nginxServerPort + "/" + nginxServerRoot + "/" + filePath;
+        } else {
+            String rootPath = customConfigProperties.getFileSavePath();
+            saveFilePath = rootPath;
+            location = "../../../getVideo/" + filePath.replace(File.separator, "/");
+        }
+        // TODO nginx服务器需要使用ftp协议将文件上传上去
+        File file = new File(saveFilePath + File.separator + filePath);
         if (!file.exists()) {
             file.mkdirs();
         }
         img.transferTo(file);
         HashMap<String, String> dataMap = new HashMap<String, String>();
-        dataMap.put("location",  "http://" + nginxServerIp + ":" + nginxServerPort + "/" + nginxServerRoot + "/" +
-                 filePath);
+        dataMap.put("location",  location);
         return CommonUtil.objToJson(dataMap);
     }
 }

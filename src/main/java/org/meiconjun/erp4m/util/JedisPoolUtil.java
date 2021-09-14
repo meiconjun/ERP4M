@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.util;
 
+import org.meiconjun.erp4m.config.RedisProperties;
+import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -20,8 +22,13 @@ public class JedisPoolUtil {
      * redis连接池
      */
     private static JedisPool jedisPool;
+    private static RedisProperties redisProperties;
 
     private static Logger logger = LoggerFactory.getLogger(JedisPoolUtil.class);
+
+    static {
+        redisProperties = SpringContextHolder.getBean("redisProperties");
+    }
     /**
      * 连接池初始化方法，spring启动完成后执行
      */
@@ -30,13 +37,13 @@ public class JedisPoolUtil {
         logger.info("-----------------初始化Redis连接池----------------");
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         // 设置最大空闲数
-        jedisPoolConfig.setMaxIdle(Integer.valueOf(PropertiesUtil.getProperty("redisPoolMaxIdle")));
+        jedisPoolConfig.setMaxIdle(redisProperties.getRedisPoolMaxIdle());
         // 设置最大连接数
-        jedisPoolConfig.setMaxTotal(Integer.valueOf(PropertiesUtil.getProperty("redisPoolMaxTotal")));
+        jedisPoolConfig.setMaxTotal(redisProperties.getRedisPoolMaxTotal());
         // 最大等待毫秒数
-        jedisPoolConfig.setMaxWaitMillis(Integer.valueOf(PropertiesUtil.getProperty("redisPoolMaxWaitMillis")));
+        jedisPoolConfig.setMaxWaitMillis(redisProperties.getRedisPoolMaxWaitMillis());
         // redis服务器ip
-        String redisIp = PropertiesUtil.getProperty("redisServerIp");
+        String redisIp = redisProperties.getRedisServerIp();
         logger.info("---------------获取Redis服务器IP[{}]--------------", redisIp);
         jedisPool = new JedisPool(jedisPoolConfig, redisIp);
     }

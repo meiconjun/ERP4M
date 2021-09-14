@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.meiconjun.erp4m.bean.*;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.CreateProjectDao;
 import org.meiconjun.erp4m.dao.ProjectDocDefindDao;
@@ -43,6 +44,8 @@ public class ProjectManageServiceImpl implements ProjectManageService {
     private ProjectDocDefindDao projectDocDefindDao;
     @Resource
     private CreateProjectDao createProjectDao;
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -92,7 +95,7 @@ public class ProjectManageServiceImpl implements ProjectManageService {
         projectManageDao.deleteProjectMainInfo(project_no);
         projectManageDao.deleteProjectStageInfo(project_no);
 
-        String filePath = PropertiesUtil.getProperty("fileSavePath") + file_root_path;
+        String filePath = customConfigProperties.getFileSavePath() + file_root_path;
         boolean flag = FileUtil.deleteFolder(filePath);
         if (!flag) {
             throw new RuntimeException("删除项目文档失败！");

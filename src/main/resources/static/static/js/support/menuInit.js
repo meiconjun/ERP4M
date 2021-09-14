@@ -15,7 +15,7 @@ function addTalMenu(url, menuName, menuId) {
 
         $.ajax({
             async : false,
-            url : rootObj.origin + "/" + url,
+            url : url,
             success : function (data) {
                 content = data;
             },

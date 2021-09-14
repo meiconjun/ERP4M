@@ -122,6 +122,13 @@
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
         </dependency>
+        <!--解决ValidationException-->
+        <!--https://blog.csdn.net/testcs_dn/article/details/64908771-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
         <!-- spring核心包 -->
         <!--<dependency>
             <groupId>org.springframework</groupId>

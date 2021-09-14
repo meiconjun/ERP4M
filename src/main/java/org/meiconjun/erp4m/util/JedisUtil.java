@@ -1,14 +1,13 @@
 package org.meiconjun.erp4m.util;
 
+import org.meiconjun.erp4m.config.RedisProperties;
 import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +25,11 @@ public class JedisUtil {
     private static Logger logger = LoggerFactory.getLogger(JedisUtil.class);
 
     private static RedisTemplate redisTemplate;
+    private static RedisProperties redisProperties;
 
     static {
         redisTemplate = SpringContextHolder.getBean("redisTemplate");
+        redisProperties = SpringContextHolder.getBean("redisProperties");
     }
 
     /**
@@ -36,7 +37,7 @@ public class JedisUtil {
      * @return
      */
     public static boolean isRedisEnable() {
-        String redisEnable = PropertiesUtil.getProperty("redisEnable");
+        String redisEnable = redisProperties.getRedisEnable();
         if ("on".equals(redisEnable)) {
             return true;
         } else {

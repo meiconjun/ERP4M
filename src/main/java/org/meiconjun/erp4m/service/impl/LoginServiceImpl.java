@@ -4,10 +4,10 @@ import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.LoginDao;
 import org.meiconjun.erp4m.service.LoginService;
 import org.meiconjun.erp4m.util.CommonUtil;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,8 @@ public class LoginServiceImpl implements LoginService {
     private Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
     @Resource
     private LoginDao loginDao;
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws IOException {
@@ -75,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
                 // 图片转Base64
                 if (!CommonUtil.isStrBlank((String) userMap.get("picture"))) {
                     try {
-                        String url = PropertiesUtil.getProperty("fileSavePath") + (String) userMap.get("picture");
+                        String url = customConfigProperties.getFileSavePath() + (String) userMap.get("picture");
                         File file = new File(url);
                         String imgBase64 = CommonUtil.fileToBase64(file);
                         user2.setPicture(imgBase64);
@@ -94,7 +96,7 @@ public class LoginServiceImpl implements LoginService {
                     responseBean.setRetMsg("该用户已被停用，请联系管理员！");
                 } else {
                     // 判断是否是初始密码
-                    String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
+                    String defaultPsw = customConfigProperties.getDefaultPassword();
                     if (defaultPsw.equals(user.getPass_word())) {
                         retMap.put("changePsw", true);
                     }

@@ -3,13 +3,14 @@ package org.meiconjun.erp4m.service.impl;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.service.InitService;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 
 /**
@@ -23,6 +24,8 @@ import java.util.HashMap;
 @Transactional
 public class InitServiceImpl implements InitService {
     private Logger logger = LoggerFactory.getLogger(InitServiceImpl.class);
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
     @Override
     public ResponseBean excute(RequestBean requestBean) throws Exception {
@@ -41,7 +44,7 @@ public class InitServiceImpl implements InitService {
      */
     private void initFilePath(RequestBean requestBean, ResponseBean responseBean) {
         HashMap<String, Object> retMap = new HashMap<String, Object>();
-        String filePath = PropertiesUtil.getProperty("fileSavePath");
+        String filePath = customConfigProperties.getFileSavePath();
 
         retMap.put("filePath", filePath);
         responseBean.setRetMap(retMap);

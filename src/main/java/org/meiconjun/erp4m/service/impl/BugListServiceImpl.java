@@ -6,14 +6,13 @@ import org.meiconjun.erp4m.bean.BugBean;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.BugListDao;
 import org.meiconjun.erp4m.service.BugListService;
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.meiconjun.erp4m.util.LogUtil;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.meiconjun.erp4m.util.SerialNumberGenerater;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +36,8 @@ public class BugListServiceImpl implements BugListService {
 
     @Resource
     private BugListDao bugListDao;
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
 
     @Override
@@ -138,7 +139,7 @@ public class BugListServiceImpl implements BugListService {
         ListIterator li = list.listIterator();
         while (li.hasNext()) {
             HashMap<String, String> map = (HashMap<String, String>)li.next();
-            String picture = PropertiesUtil.getProperty("fileSavePath") + map.get("picture");
+            String picture = customConfigProperties.getFileSavePath() + map.get("picture");
             File file = new File(picture);
             String imgBase64 = null;
             try {
@@ -207,7 +208,7 @@ public class BugListServiceImpl implements BugListService {
         // 将每个回复人的头像转为base64字符串
         while (li.hasNext()) {
             HashMap<String, String> map = (HashMap<String, String>)li.next();
-            String picture = PropertiesUtil.getProperty("fileSavePath") + map.get("picture");
+            String picture = customConfigProperties.getFileSavePath() + map.get("picture");
             File file = new File(picture);
             String imgBase64 = null;
             try {
@@ -231,7 +232,7 @@ public class BugListServiceImpl implements BugListService {
         String user_no = (String) paramMap.get("user_no");
 
         HashMap<String, String> userMap = bugListDao.selectUserInfoByNo(user_no);
-        String url = PropertiesUtil.getProperty("fileSavePath") + (String) userMap.get("picture");
+        String url = customConfigProperties.getFileSavePath() + userMap.get("picture");
         File file = new File(url);
         String imgBase64 = null;
         try {

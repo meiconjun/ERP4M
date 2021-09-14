@@ -23,22 +23,9 @@ server:
 
 #==========mybatis配置==========
 mybatis:
-  configuration:
-    # 查询结果返回全量字段，解决有时null不返回的问题
-    call-setters-on-nulls: true
   mapper-locations: classpath:mapper/*.xml
   config-locations: classpath:/mybatis-config.xml
 
-#===========devtools热部署配置==========
-spring:
-  devtools:
-    restart:
-      #热部署是否生效
-      enabled: true
-      #设置重启的目录
-      #sadditional-paths: src/main/java
-      #classpath目录下的WEB-INF文件夹内容修改不重启
-      additional-exclude: WEB-INF/**
 #=============log4j2配置引入
 logging:
   config: classpath:log4j2.yml
@@ -47,8 +34,8 @@ logging:
 database-config:
   jdbc:
     driver: com.mysql.jdbc.Driver
-    url: jdbc:mysql://cdb-6qtkxl4y.cd.tencentcdb.com:10149/erp4m?useSSL=true&characterEncoding=utf-8
-    username: erp4m
+    url: jdbc:mysql://cdb-6qtkxl4y.cd.tencentcdb.com:10149/erp4m2?useSSL=true&characterEncoding=utf-8
+    username: erp4m2
     password: 2465732jikuY
     #别名方式，扩展插件，监控统计用的filter:stat，日志用的filter:log4j，防御sql注入的filter:wall
     filters: stat
@@ -84,11 +71,11 @@ custom-config:
     enabledNginx: false
 
     #项目文件存放根路径
-    fileSavePath: G:\\erpFile\\
+    fileSavePath: /home/erpFile/
     #nginx代理文件存放根目录
-    nginxFilePath: G:\\erpFile\\mediaFile
+    nginxFilePath: /home/erpFile/mediaFile
     #nginx代理服务器IP
-    nginxServerIp: localhost
+    nginxServerIp: 106.53.197.29
     #nginx代理服务器PORT
     nginxServerPort: 80
     #nginx代理路径

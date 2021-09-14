@@ -54,11 +54,11 @@ public class SpringMvcConfig implements WebMvcConfigurer {
      */
     @Bean(name = "multipartResolver")
     public CommonsMultipartResolver commonsMultipartResolver() {
-        HashMap<String, Object> custom = customConfigProperties.getCustom();
+//        HashMap<String, Object> custom = customConfigProperties.getCustom();
         CommonsMultipartResolver commonsMultipartResolver = new CommonsMultipartResolver();
-        commonsMultipartResolver.setMaxUploadSize((int)custom.get("maxUploadSize"));
-        commonsMultipartResolver.setMaxInMemorySize((int)custom.get("maxInMemorySize"));
-        commonsMultipartResolver.setDefaultEncoding((String) custom.get("defaultEncoding"));
+        commonsMultipartResolver.setMaxUploadSize(customConfigProperties.getMaxUploadSize());
+        commonsMultipartResolver.setMaxInMemorySize(customConfigProperties.getMaxInMemorySize());
+        commonsMultipartResolver.setDefaultEncoding(customConfigProperties.getDefaultEncoding());
         return commonsMultipartResolver;
     }
     /**

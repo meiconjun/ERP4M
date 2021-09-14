@@ -6,10 +6,10 @@ import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.UserConfigDao;
 import org.meiconjun.erp4m.service.UserConfigService;
 import org.meiconjun.erp4m.util.CommonUtil;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,6 +36,8 @@ public class UserConfigServiceImpl implements UserConfigService {
 
     @Resource
     private UserConfigDao userConfigDao;
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
 
     @Override
@@ -99,7 +101,7 @@ public class UserConfigServiceImpl implements UserConfigService {
     private void getImgBase64(RequestBean requestBean, ResponseBean responseBean) throws IOException {
         Map<String, Object> paramMap = requestBean.getParamMap();
         String imgPath = (String) paramMap.get("imgUrl");
-        imgPath = PropertiesUtil.getProperty("fileSavePath") + imgPath;
+        imgPath = customConfigProperties.getFileSavePath() + imgPath;
 
         File file = new File(imgPath);
         String imgBase64 = CommonUtil.fileToBase64(file);
@@ -131,7 +133,7 @@ public class UserConfigServiceImpl implements UserConfigService {
             userConfigDao.inserUserRole(condMap);
         }
         if (!CommonUtil.isStrBlank(bean.getPicture())) {
-            String url = PropertiesUtil.getProperty("fileSavePath") + bean.getPicture();
+            String url = customConfigProperties.getFileSavePath() + bean.getPicture();
             File file = new File(url);
             String imgBase64 = CommonUtil.fileToBase64(file);
             Map<String, Object> retMap = new HashMap<String, Object>();
@@ -151,7 +153,7 @@ public class UserConfigServiceImpl implements UserConfigService {
         Map<String, Object> paramMap = (Map<String, Object>) requestBean.getParamMap();
         bean.setAuth_user(CommonUtil.getLoginUser().getUser_no());
 
-        String defaultPsw = PropertiesUtil.getProperty("defaultPassword");
+        String defaultPsw = customConfigProperties.getDefaultPassword();
         if (CommonUtil.isStrBlank(defaultPsw)) {
             defaultPsw = "123456";
         }

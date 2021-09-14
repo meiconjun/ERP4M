@@ -1,9 +1,9 @@
 package org.meiconjun.erp4m.job;
 
+import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.RecycleStationDao;
 import org.meiconjun.erp4m.util.CommonUtil;
 import org.meiconjun.erp4m.util.FileUtil;
-import org.meiconjun.erp4m.util.PropertiesUtil;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -27,6 +27,8 @@ public class RecycleDocClean implements Job {
 
     @Resource
     private RecycleStationDao recycleStationDao;
+    @Resource
+    private CustomConfigProperties customConfigProperties;
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -35,7 +37,7 @@ public class RecycleDocClean implements Job {
         long startTime = System.currentTimeMillis();
         logger.info("---------------------[job:文档回收站清理]执行开始------------------------");
         String curTime = CommonUtil.getCurrentTimeStr();// 当前时间
-        String root_path = PropertiesUtil.getProperty("fileSavePath");// 文件存储根路径
+        String root_path = customConfigProperties.getFileSavePath();// 文件存储根路径
         HashMap<String, Object> condMap = new HashMap<>();
         condMap.put("expire_time", curTime);
         List<HashMap<String, Object>> docList = recycleStationDao.selectPersonalRecycleDocInfo(condMap);

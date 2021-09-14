@@ -26,11 +26,6 @@ public class RedisConfig {
     @Resource
     private RedisProperties redisProperties;
 
-    private HashMap<String, Object> redis;
-    @PostConstruct
-    public void init() {
-        redis = redisProperties.getRedis();
-    }
     /**
      * jedis连接池配置
      * @return
@@ -38,9 +33,9 @@ public class RedisConfig {
     @Bean(name = "poolConfig")
     public JedisPoolConfig jedisPoolConfig() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxIdle((int)redis.get("redisPoolMaxIdle"));
-        jedisPoolConfig.setMaxTotal((int)redis.get("redisPoolMaxTotal"));
-        jedisPoolConfig.setMaxWaitMillis((int)redis.get("redisPoolMaxWaitMillis"));
+        jedisPoolConfig.setMaxIdle(redisProperties.getRedisPoolMaxIdle());
+        jedisPoolConfig.setMaxTotal(redisProperties.getRedisPoolMaxTotal());
+        jedisPoolConfig.setMaxWaitMillis(redisProperties.getRedisPoolMaxWaitMillis());
         return jedisPoolConfig;
     }
 
@@ -50,8 +45,8 @@ public class RedisConfig {
     @Bean(name = "redisStandaloneConfiguration")
     public RedisStandaloneConfiguration redisStandaloneConfiguration() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName((String)redis.get("redisServerIp"));
-        redisStandaloneConfiguration.setPort((int)redis.get("redisServerPort"));
+        redisStandaloneConfiguration.setHostName(redisProperties.getRedisServerIp());
+        redisStandaloneConfiguration.setPort(redisProperties.getRedisServerPort());
         return redisStandaloneConfiguration;
     }
     /**
