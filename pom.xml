@@ -368,7 +368,7 @@
 
     <build>
         <finalName>ERP4M</finalName>
-        <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+<!--        <pluginManagement>&lt;!&ndash; lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) &ndash;&gt;-->
             <plugins>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
@@ -412,6 +412,6 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                 </plugin>
             </plugins>
-        </pluginManagement>
+<!--        </pluginManagement>-->
     </build>
 </project>
