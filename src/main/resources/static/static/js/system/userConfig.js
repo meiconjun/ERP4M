@@ -252,7 +252,7 @@ function userConfig_modifyOperation(oldData, roleList) {
             commonPutNormalSelectOpts(FIELD_USER_STATUS, "userConfig_add_status", oldData.status, true);
 
             // 设置头像回显
-            let imgData = commonAjax("userConfig.do", JSON.stringify({
+            /*let imgData = commonAjax("userConfig.do", JSON.stringify({
                 "beanList": [],
                 "operType": "getImgBase64",
                 "paramMap": {
@@ -263,8 +263,8 @@ function userConfig_modifyOperation(oldData, roleList) {
                 layui.$('#userConfig_uploadHeaderPrev').prev().hide();
                 layui.$('#userConfig_uploadHeaderPrev').prev().prev().hide();
                 layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', "data:image/jpg;base64," + imgData.retMap.imgBase64);
-            }
-
+            }*/
+            layui.$('#userConfig_uploadHeaderPrev').removeClass('layui-hide').find('img').attr('src', oldData.picture);
 
             $("#userConfig_add_userNo").val(oldData.user_no).attr('disabled', 'disabled').addClass('layui-disabled');//禁用输入框并添加禁用的样式
             $("#userConfig_add_userName").val(oldData.user_name);

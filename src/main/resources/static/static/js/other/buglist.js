@@ -222,7 +222,7 @@ function buglist_showDetail(data) {
             let body = layui.layer.getChildFrame('body', index);// 获取iframe body dom 用于操作
 
             iframeWindowObj = $("#bugListDetailIframe").children()[0].contentWindow; //弹框Iframe层的window对象,将tinyEditor对象存到这里 方便进行引用
-            $(body).find("#bugMainPage_header").attr("src", "data:image/jpg;base64," + user_herder);// 作者头像
+            $(body).find("#bugMainPage_header").attr("src", "../../../" + user_herder);// 作者头像
             $(body).find("#bugMainPage_username").html(user_name);// 作者用户名
             $(body).find("#bugMainPage_lastModiTime").html("最后修改于 - " + commonFormatDate(data.last_modi_time));// 最后修改时间
             $(body).find("#bugMainPage_severity").html("严重级别 - " + commonFormatValue(FIELD_BUG_SEVERITY, data.severity, true) + " |");
@@ -230,7 +230,7 @@ function buglist_showDetail(data) {
             $(body).find("#bugMainPage_status").html(" 状态 - " + commonFormatValue(FIELD_BUG_STATUS, data.bug_status, true));
             $(body).find("#bugMainPage_editDiv").html(data.content);// content回显
             // 初始化评论编辑器操作在html内
-            $(body).find("#bugMainPage_userHeader").attr("src", "data:image/jpg;base64," + user_info.picture);// content回显
+            $(body).find("#bugMainPage_userHeader").attr("src", "../../../" + user_info.picture);// content回显
             if (data.create_user == user_info.user_no) {
                 //当前用户是发帖人，支持修改帖子内容
                 $(body).find("#bugMainPage_severity").after("<button class=\"layui-btn layui-btn-xs layui-btn-warm\" id='bugMainPageEdit' type=\"button\" style=\"float: right;\">编辑</button>" +
@@ -401,7 +401,7 @@ function getCommentUserHistory(serial_no) {
                     let allComment = "";
                     for (let i = 0; i < retList.length; i++) {
                         allComment += "<div class=\"box-comment\" id='" + retList[i].serial_no + "'>\n" +
-                            "                <img class=\"img-circle img-sm\" src=\"" + "data:image/jpg;base64," + retList[i].picture + "\" alt=\"用户头像\">\n" +
+                            "                <img class=\"img-circle img-sm\" src=\"" + "../../../" + retList[i].picture + "\" alt=\"用户头像\">\n" +
                             "\n" +
                             "                <div class=\"comment-text\">\n" +
                             "                      <span class=\"username\">\n" + retList[i].user_name +

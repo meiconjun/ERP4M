@@ -8,6 +8,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.commons.lang3.StringUtils;
 import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -29,49 +30,31 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Controller
 public class FileDownLoadController {
-	
-	private Logger logger = LoggerFactory.getLogger(FileDownLoadController.class);
+
+	private Logger platformLogger = LogUtil.getPlatformLogger();
+	private Logger errorLogger = LogUtil.getExceptionLogger();
 
 	@Resource
 	private CustomConfigProperties customConfigProperties;
 	
-	@RequestMapping(value = "/fileDownload.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/fileDownload.do", method = {RequestMethod.GET,RequestMethod.POST}, produces = "text/html;charset=UTF-8")
 	public void fileDownload(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		logger.info("----------------开始下载文件-------------------");
+		platformLogger.info("----------------开始下载文件-------------------");
 		String fileName = request.getParameter("fileName");//文件名
 		String filePath = request.getParameter("filePath");//文件全路径
 
 		String rootPath = customConfigProperties.getFileSavePath();
 		if (CommonUtil.isStrBlank(rootPath)) {
 			// TODO 推送错误给客户端
-			logger.error("未配置文件存储根路径");
+			errorLogger.error("未配置文件存储根路径");
 			return;
 		}
 		filePath = rootPath + filePath;
-		logger.info("文件名称：" + fileName + "，文件下载路径：" + filePath);
-		response.setCharacterEncoding("utf-8");
-	    response.setContentType("application/x-download;charset=utf-8");
-	    response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-		InputStream inputStream = null;
-		OutputStream os = null;
-		try {
-	    	// 打开本地文件流
-	    	inputStream = new FileInputStream(filePath);
-	    	// 激活下载操作
-	    	os = response.getOutputStream();
-	    	// 写入输出流
-	    	byte[] b = new byte[2048];
-	    	int length;
-	    	while ((length = inputStream.read(b)) > 0) {
-	    		os.write(b, 0, length);
-	    	}
-	    } catch (Exception e) {
-	    	throw e;
-	    } finally {
-	    	os.close();
-	    	inputStream.close();
-	    }
+		platformLogger.info("文件名称：" + fileName + "，文件下载路径：" + filePath);
+		outputFile(fileName, filePath, null, response);
 	}
+
+
 
 	/**
 	 * 获取媒体文件
@@ -83,18 +66,28 @@ public class FileDownLoadController {
 	 * @author xWang
 	 * @Date 2020-05-20
 	 */
-	@RequestMapping(value = "/getVideo/{module}/{date}/{fileName:.+}", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
+	@RequestMapping(value = "/getMedia/{module}/{date}/{fileName:.+}", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
 	public void getVideo(HttpServletRequest request,HttpServletResponse response, @PathVariable String module, @PathVariable String date, @PathVariable String fileName)
 	{
 		response.reset();
 		//获取从那个字节开始读取文件
 		String rangeString = request.getHeader("Range");
 		String fileSavePath = (String)customConfigProperties.getFileSavePath();
-		logger.info("===========fileSavePath: " + fileSavePath);
+		platformLogger.info("===========fileSavePath: " + fileSavePath);
 //		String rootPath = PropertiesUtil.getProperty("fileSavePath")  + File.separator;
 		String rootPath = fileSavePath  + File.separator;
 		String filePath = rootPath + module + File.separator + date + File.separator + fileName;
-		logger.info("============媒体文件下载路径[{}]=======================", filePath);
+		platformLogger.info("============媒体文件下载路径[{}]=======================", filePath);
+		outputFile(fileName, filePath, rangeString, response);
+	}
+
+	/**
+	 * 写入输出流
+	 * @param filePath
+	 * @param rangeString
+	 * @param response
+	 */
+	private void outputFile(String fileName, String filePath, String rangeString, HttpServletResponse response) {
 		try (OutputStream outputStream = response.getOutputStream();) {
 			//获取响应的输出流
 			File file = new File(filePath);
@@ -116,7 +109,7 @@ public class FileDownLoadController {
 					targetFile.seek(range);
 				} else {//其它文件
 					//设置响应头，把文件名字设置好
-					response.setHeader("Content-Disposition", "attachment; filename=" + fileName );
+					response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8") );
 					//设置文件长度
 					response.setHeader("Content-Length", String.valueOf(fileLength));
 					//解决编码问题
@@ -137,7 +130,7 @@ public class FileDownLoadController {
 		} catch (ClientAbortException ce) {
 
 		} catch (Exception e ) {
-			logger.error("获取媒体文件异常:" + e.getMessage(), e);
+			errorLogger.error("获取文件异常:" + e.getMessage(), e);
 		}
 	}
 }

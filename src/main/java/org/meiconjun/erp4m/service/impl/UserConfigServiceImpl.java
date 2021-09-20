@@ -133,11 +133,11 @@ public class UserConfigServiceImpl implements UserConfigService {
             userConfigDao.inserUserRole(condMap);
         }
         if (!CommonUtil.isStrBlank(bean.getPicture())) {
-            String url = customConfigProperties.getFileSavePath() + bean.getPicture();
-            File file = new File(url);
-            String imgBase64 = CommonUtil.fileToBase64(file);
+//            String url = customConfigProperties.getFileSavePath() + bean.getPicture();
+//            File file = new File(url);
+//            String imgBase64 = CommonUtil.fileToBase64(file);
             Map<String, Object> retMap = new HashMap<String, Object>();
-            retMap.put("base64", imgBase64);
+            retMap.put("base64", bean.getPicture());
             responseBean.setRetMap(retMap);
         }
         responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);

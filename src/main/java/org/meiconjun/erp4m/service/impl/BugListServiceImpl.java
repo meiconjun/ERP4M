@@ -139,15 +139,15 @@ public class BugListServiceImpl implements BugListService {
         ListIterator li = list.listIterator();
         while (li.hasNext()) {
             HashMap<String, String> map = (HashMap<String, String>)li.next();
-            String picture = customConfigProperties.getFileSavePath() + map.get("picture");
+            /*String picture = customConfigProperties.getFileSavePath() + map.get("picture");
             File file = new File(picture);
             String imgBase64 = null;
             try {
                 imgBase64 = CommonUtil.fileToBase64(file);
             } catch (IOException e) {
                 exceptionLogger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
-            }
-            map.put("picture", imgBase64);
+            }*/
+            map.put("picture", map.get("picture"));
             li.set(map);
         }
         Map retMap = new HashMap();
@@ -208,15 +208,15 @@ public class BugListServiceImpl implements BugListService {
         // 将每个回复人的头像转为base64字符串
         while (li.hasNext()) {
             HashMap<String, String> map = (HashMap<String, String>)li.next();
-            String picture = customConfigProperties.getFileSavePath() + map.get("picture");
+            /*String picture = customConfigProperties.getFileSavePath() + map.get("picture");
             File file = new File(picture);
             String imgBase64 = null;
             try {
                 imgBase64 = CommonUtil.fileToBase64(file);
             } catch (IOException e) {
                 exceptionLogger.error("加载回复人[" + map.get("user_no") + "]头像异常：", e);
-            }
-            map.put("picture", imgBase64);
+            }*/
+            map.put("picture", map.get("picture"));
             li.set(map);
         }
         Map<String, Object> retMap = new HashMap<String, Object>();
@@ -232,15 +232,15 @@ public class BugListServiceImpl implements BugListService {
         String user_no = (String) paramMap.get("user_no");
 
         HashMap<String, String> userMap = bugListDao.selectUserInfoByNo(user_no);
-        String url = customConfigProperties.getFileSavePath() + userMap.get("picture");
+        /*String url = customConfigProperties.getFileSavePath() + userMap.get("picture");
         File file = new File(url);
         String imgBase64 = null;
         try {
             imgBase64 = CommonUtil.fileToBase64(file);
         } catch (IOException e) {
             exceptionLogger.error("加载发帖人头像异常：" + e.getMessage(), e);
-        }
-        userMap.put("picture", imgBase64);
+        }*/
+        userMap.put("picture", userMap.get("picture"));
         Map retMap = new HashMap();
         retMap.put("userInfo", userMap);
         responseBean.setRetMap(retMap);

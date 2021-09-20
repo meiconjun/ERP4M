@@ -1,5 +1,6 @@
 package org.meiconjun.erp4m.controller;
 
+import cn.hutool.core.util.URLUtil;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.common.SystemContants;
@@ -18,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.Style;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -54,11 +54,11 @@ public class FileUploadController {
         if (CommonUtil.isStrBlank(user_no)) {
             user_no = "default";
         }
-        String imgPath = customConfigProperties.getFileSavePath()  + File.separator;
         String orgName = img.getOriginalFilename();
-        String reNameFile = "userHeaderFile" + File.separator + user_no + File.separator + user_no + "_" +  SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1);
-
-        File file = new File(imgPath, reNameFile);
+        String[] paths = {"userHeaderFile", user_no, user_no + "_" +  SerialNumberGenerater.getInstance().generaterNextNumber() + "." + orgName.substring(orgName.lastIndexOf(".") + 1)};
+        String savePath = getFilePathWithProtocol(paths);
+        String retPath = getFilePathWithController(paths, orgName);
+        File file = new File(savePath);
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -66,7 +66,7 @@ public class FileUploadController {
         //写入
         img.transferTo(file);
         HashMap<String, String> dataMap = new HashMap<String, String>();
-        dataMap.put("filePath", reNameFile);
+        dataMap.put("filePath", retPath);
         HashMap<String, Object> retMap = new HashMap<String, Object>();
         retMap.put("code", SystemContants.HANDLE_SUCCESS);
         retMap.put("msg", "上传成功");
@@ -258,7 +258,7 @@ public class FileUploadController {
         } else {
             String rootPath = customConfigProperties.getFileSavePath();
             saveFilePath = rootPath;
-            location = "../../../getVideo/" + filePath.replace(File.separator, "/");
+            location = "../../../getMedia/" + filePath.replace(File.separator, "/");
         }
         // TODO nginx服务器需要使用ftp协议将文件上传上去
         File file = new File(saveFilePath + File.separator + filePath);
@@ -269,5 +269,66 @@ public class FileUploadController {
         HashMap<String, String> dataMap = new HashMap<String, String>();
         dataMap.put("location",  location);
         return CommonUtil.objToJson(dataMap);
+    }
+
+    /**
+     * 获取文件存储路径（包含协议前缀）, 用于上传文件
+     * @param filePath 文件路径数组
+     * @return
+     */
+    private String getFilePathWithProtocol(String[] filePath) {
+        boolean enabledNginx = customConfigProperties.isEnabledNginx();
+        String separator = File.separator;
+        String preFix = "";
+        if (enabledNginx) {
+            // TODO 此处需要改为FTP形式的路径
+            separator = "/";
+//            String nginxFilePath = customConfigProperties.getNginxFilePath();// nginx文件代理位置
+            String nginxServerIp = customConfigProperties.getNginxServerIp();// nginx文件代理服务器IP
+            String nginxServerPort = customConfigProperties.getNginxServerPort();// nginx文件代理服务器端口
+            String nginxServerRoot = customConfigProperties.getNginxServerRoot();// nginx文件代理服务器监听路径
+            preFix = "http://" + nginxServerIp + ":" + nginxServerPort + separator + nginxServerRoot + separator;
+        } else {
+            preFix = customConfigProperties.getFileSavePath();;
+        }
+        for (int i = 0; i < filePath.length; i++) {
+            if (i > 0) {
+                preFix += separator;
+            }
+            preFix += filePath[i];
+        }
+        return preFix;
+    }
+
+    /**
+     * 获取文件存储路径（包含接口前缀），用于下载文件
+     * @param filePath 文件路径数组
+     * @return
+     */
+    private String getFilePathWithController(String[] filePath, String fileName) {
+        boolean enabledNginx = customConfigProperties.isEnabledNginx();
+        String separator = File.separator;
+        String preFix = "";
+        if (enabledNginx) {
+            separator = "/";
+            //            String nginxFilePath = customConfigProperties.getNginxFilePath();// nginx文件代理位置
+            String nginxServerIp = customConfigProperties.getNginxServerIp();// nginx文件代理服务器IP
+            String nginxServerPort = customConfigProperties.getNginxServerPort();// nginx文件代理服务器端口
+            String nginxServerRoot = customConfigProperties.getNginxServerRoot();// nginx文件代理服务器监听路径
+            preFix = "http://" + nginxServerIp + ":" + nginxServerPort + separator + nginxServerRoot + separator;
+        } else {
+            preFix = "fileDownload.do?filePath=";
+        }
+        String postFix = "";
+        for (int i = 0; i < filePath.length; i++) {
+            if (i > 0) {
+                postFix += separator;
+            }
+            postFix += filePath[i];
+        }
+        postFix += "&fileName=" + fileName;
+        postFix = URLUtil.encode(postFix);// url中出现反斜杠会报错(400)，需进行编码
+//        preFix = preFix.replace("\\", "\\\\");
+        return preFix + postFix;
     }
 }

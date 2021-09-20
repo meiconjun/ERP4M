@@ -42,7 +42,7 @@ Configuration:
             modulate: true
             interval: 1
         DefaultRolloverStrategy:     # 文件最多100个
-          max: 100
+          max: 30
       #   平台日志
       - name: PLATFORM_ROLLING_FILE
         ignoreExceptions: false
@@ -68,7 +68,7 @@ Configuration:
             modulate: true
             interval: 1
         DefaultRolloverStrategy:     # 文件最多100个
-          max: 100
+          max: 30
       #   错误日志
       - name: EXCEPTION_ROLLING_FILE
         ignoreExceptions: false
@@ -85,7 +85,7 @@ Configuration:
             modulate: true
             interval: 1
         DefaultRolloverStrategy:     # 文件最多100个
-          max: 100
+          max: 30
       #   DB 日志
       - name: DB_ROLLING_FILE
         ignoreExceptions: false
@@ -98,7 +98,7 @@ Configuration:
             modulate: true
             interval: 1
         DefaultRolloverStrategy:     # 文件最多100个
-          max: 100
+          max: 30
   Loggers:
     #打印debug级别以上日志，CONSOLE，ROLLING_FILE，EXCEPTION_ROLLING_FILE
     Root:
@@ -124,8 +124,28 @@ Configuration:
         additivity: false
         AppenderRef:
           - ref: EXCEPTION_ROLLING_FILE
-      - name: org.meiconjun.erp4m.dao
-        level: info
+      - name: org.apache.ibatis
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: DB_ROLLING_FILE
+      - name: org.springframework.jdbc
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: DB_ROLLING_FILE
+      - name: org.springframework.transaction
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: DB_ROLLING_FILE
+      - name: org.mybatis
+        level: debug
+        additivity: false
+        AppenderRef:
+          - ref: DB_ROLLING_FILE
+      - name: com.alibaba.druid
+        level: debug
         additivity: false
         AppenderRef:
           - ref: DB_ROLLING_FILE

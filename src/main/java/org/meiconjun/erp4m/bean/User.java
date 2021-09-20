@@ -1,10 +1,17 @@
 package org.meiconjun.erp4m.bean;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
 /**
- * 登录用户Bean
+ * 登录用户实体类
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable {
 
     private static final long serialVersionUID = -7157721651022408945L;
@@ -49,82 +56,4 @@ public class User implements Serializable {
      */
     private String status;
 
-    public String getUser_no() {
-        return user_no;
-    }
-
-    public void setUser_no(String user_no) {
-        this.user_no = user_no;
-    }
-
-    public String getUser_name() {
-        return user_name;
-    }
-
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
-    }
-
-    public String getPass_word() {
-        return pass_word;
-    }
-
-    public void setPass_word(String pass_word) {
-        this.pass_word = pass_word;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getLast_modi_time() {
-        return last_modi_time;
-    }
-
-    public void setLast_modi_time(String last_modi_time) {
-        this.last_modi_time = last_modi_time;
-    }
-
-    public String getAuth_user() {
-        return auth_user;
-    }
-
-    public void setAuth_user(String auth_user) {
-        this.auth_user = auth_user;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public String getRole_no() {
-        return role_no;
-    }
-
-    public void setRole_no(String role_no) {
-        this.role_no = role_no;
-    }
 }

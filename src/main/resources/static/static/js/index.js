@@ -18,9 +18,9 @@ $(document).ready(function () {
             sessionStorage.setItem("user_no", user_info.user_no);
             // 头像回显
             if (!commonBlank(user_info.picture)) {
-                $("#user_picture_min").attr("src", "data:image/jpg;base64," + user_info.picture);
-                $("#user_picture_main").attr("src", "data:image/jpg;base64," + user_info.picture);
-                $("#user_picture_sidebar").attr("src", "data:image/jpg;base64," + user_info.picture);
+                $("#user_picture_min").attr("src", user_info.picture);
+                $("#user_picture_main").attr("src", user_info.picture);
+                $("#user_picture_sidebar").attr("src", user_info.picture);
             }
             if (sessionStorage.getItem("changePsw") == "true") {
                 console.log("111111111");
@@ -307,9 +307,9 @@ function userFileChange() {
                         // 更新回显头像
                         let user_info = JSON.parse(sessionStorage.getItem("user_info"));
                         user_info.picture = retData.retMap.base64;
-                        $("#user_picture_min").attr("src", "data:image/jpg;base64," + user_info.picture);
-                        $("#user_picture_main").attr("src", "data:image/jpg;base64," + user_info.picture);
-                        $("#user_picture_sidebar").attr("src", "data:image/jpg;base64," + user_info.picture);
+                        $("#user_picture_min").attr("src", user_info.picture);
+                        $("#user_picture_main").attr("src", user_info.picture);
+                        $("#user_picture_sidebar").attr("src", user_info.picture);
                         sessionStorage.setItem("user_info", JSON.stringify(user_info));
                     }
                     commonOk("修改成功");

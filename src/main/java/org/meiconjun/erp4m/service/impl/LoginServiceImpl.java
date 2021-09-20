@@ -76,14 +76,14 @@ public class LoginServiceImpl implements LoginService {
 //                user2.setPass_word((String) userMap.get("pass_word"));
                 // 图片转Base64
                 if (!CommonUtil.isStrBlank((String) userMap.get("picture"))) {
-                    try {
-                        String url = customConfigProperties.getFileSavePath() + (String) userMap.get("picture");
-                        File file = new File(url);
-                        String imgBase64 = CommonUtil.fileToBase64(file);
-                        user2.setPicture(imgBase64);
-                    } catch (IOException e) {
-                        logger.error("载入头像异常," + e.getMessage(), e);
-                    }
+//                    try {
+//                        String url = customConfigProperties.getFileSavePath() + (String) userMap.get("picture");
+//                        File file = new File(url);
+//                        String imgBase64 = CommonUtil.fileToBase64(file);
+                        user2.setPicture((String) userMap.get("picture"));
+//                    } catch (IOException e) {
+//                        logger.error("载入头像异常," + e.getMessage(), e);
+//                    }
 
                 }
 

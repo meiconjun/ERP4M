@@ -56,4 +56,8 @@ public interface UserConfigDao {
      * 根据角色号查询用户
      */
     List<String> selectUsersByRole(@Param("role_no") String role_no);
+    /**
+     * 根据用户号查询用户
+     */
+    User selectUserByNo(String user_no);
 }

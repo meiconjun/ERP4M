@@ -20,12 +20,12 @@ import javax.annotation.PostConstruct;
 @Component
 public class SystemInit {
 
-    private Logger logger = LoggerFactory.getLogger(SystemInit.class);
+    private Logger platformLogger = LogUtil.getPlatformLogger();
 
     // PostConstruct注解的方法会在Spring启动后自动执行
     @PostConstruct
     public void execute() throws Exception {
-        logger.info("---------------------执行初始化操作----------------------");
+        platformLogger.info("---------------------执行初始化操作----------------------");
         // do something
         initScheduler();
 //        new WeiboCrawler().execute();

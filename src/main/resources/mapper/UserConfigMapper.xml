@@ -70,4 +70,9 @@
         select user_no from sys_user_role_tb
         where role_no = #{role_no}
     </select>
+
+    <select id="selectUserByNo" parameterType="java.lang.String" resultType="org.meiconjun.erp4m.bean.User">
+        select * from sys_user_tb
+        where user_no = #{user_no}
+    </select>
 </mapper>
