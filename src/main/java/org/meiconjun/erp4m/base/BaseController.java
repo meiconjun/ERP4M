@@ -1,6 +1,7 @@
 package org.meiconjun.erp4m.base;
 
 import com.google.gson.reflect.TypeToken;
+import org.meiconjun.erp4m.annotation.UserLoginToken;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
 import org.meiconjun.erp4m.util.CommonUtil;
@@ -18,6 +19,7 @@ import java.lang.reflect.Type;
  * @Description: controller超类, 定义前置后置操作
  * @date 2020/4/518:05
         */
+@UserLoginToken
 public abstract class BaseController {
     protected Logger platformLogger = LogUtil.getPlatformLogger();
     protected Logger errorLogger = LogUtil.getExceptionLogger();
@@ -43,7 +45,7 @@ public abstract class BaseController {
      * @param request
      * @param paramClass
      */
-    protected  RequestBean beforeAction (HttpServletRequest request, Type paramClass) {
+    protected RequestBean beforeAction (HttpServletRequest request, Type paramClass) {
 
         String reqJson = request.getParameter("message");
         // 打印请求报文

@@ -11,8 +11,8 @@ function initUnReadMsg() {
         "beanList": [],
         "operType": "initUnReadMessage",
         "paramMap": {
-            "user_no": sessionStorage.getItem("user_no"),
-            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+            "user_no": localStorage.getItem("user_no"),
+            "role_no": JSON.parse(localStorage.getItem("user_info")).role_no
         }
     }));
     if (unReadMsgData.retCode == HANDLE_SUCCESS) {
@@ -51,8 +51,8 @@ function initReadMsg() {
         "beanList": [],
         "operType": "initReadMessage",
         "paramMap": {
-            "user_no": sessionStorage.getItem("user_no"),
-            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+            "user_no": localStorage.getItem("user_no"),
+            "role_no": JSON.parse(localStorage.getItem("user_info")).role_no
         }
     }));
     if (readMsgData.retCode == HANDLE_SUCCESS) {
@@ -93,8 +93,8 @@ function initTodoTask() {
         "beanList": [],
         "operType": "initTodoTask",
         "paramMap": {
-            "user_no": sessionStorage.getItem("user_no"),
-            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+            "user_no": localStorage.getItem("user_no"),
+            "role_no": JSON.parse(localStorage.getItem("user_info")).role_no
         }
     }));
     if (todoTaskData.retCode == HANDLE_SUCCESS) {
@@ -135,8 +135,8 @@ function initDoneTask() {
         "beanList": [],
         "operType": "initDoneTask",
         "paramMap": {
-            "user_no": sessionStorage.getItem("user_no"),
-            "role_no": JSON.parse(sessionStorage.getItem("user_info")).role_no
+            "user_no": localStorage.getItem("user_no"),
+            "role_no": JSON.parse(localStorage.getItem("user_info")).role_no
         }
     }));
     if (doneTaskData.retCode == HANDLE_SUCCESS) {

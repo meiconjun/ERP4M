@@ -19,26 +19,18 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-/*import info.monitorenter.cpdetector.io.ASCIIDetector;
-import info.monitorenter.cpdetector.io.ByteOrderMarkDetector;
-import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
-import info.monitorenter.cpdetector.io.JChardetFacade;
-import info.monitorenter.cpdetector.io.ParsingDetector;
-import info.monitorenter.cpdetector.io.UnicodeDetector;*/
 import org.meiconjun.erp4m.bean.FieldBean;
 import org.meiconjun.erp4m.bean.MessageBean;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.dao.CommonDao;
 import org.meiconjun.erp4m.dao.MessageDao;
 import org.meiconjun.erp4m.dao.TaskDao;
-import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.meiconjun.erp4m.interceptor.SpringContextHolder;
+import org.meiconjun.erp4m.interceptor.UserTokenInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 /**
  * 公共工具类
@@ -238,13 +230,13 @@ public class CommonUtil {
      * @return
      */
     public static User getLoginUser() {
-        HttpServletRequest request = RequestHolder.getHttpServletRequest();
+        /*HttpServletRequest request = RequestHolder.getHttpServletRequest();
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("USER_SESSION");
         if (user == null) {
             logger.error("===================获取登录用户为空====================");
-        }
-        return user;
+        }*/
+        return UserTokenInterceptor.getUser();
     }
 
     /**

@@ -60,7 +60,8 @@ public class Test {
 //        File file = new File("D:\\20210228");
 //        ZipUtil.fileFolderToZip(file, "D:\\20210228.zip", 47185920);
 //        mailTest();
-        System.out.println(DateUtil.format(DateUtil.yesterday(), "yyyyMMdd"));
+//        System.out.println(DateUtil.format(DateUtil.yesterday(), "yyyyMMdd"));
+        System.out.println(DateUtil.offsetMillisecond(new Date(), 600000));
     }
 
 

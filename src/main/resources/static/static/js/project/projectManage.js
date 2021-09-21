@@ -13,6 +13,10 @@ $(document).ready(function () {
             elem: '#projectManage_table',
             height: 'full-450',
             url: 'projectManage.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where: {
                 message: JSON.stringify({
                     "beanList": [{
@@ -202,7 +206,7 @@ function projectManage_detailOperation(data) {
         yes: function (index, layero) {
             let curPrincipal = data.principal;
             // 项目负责人可以确认项目进入下一阶段
-            if (sessionStorage.getItem("user_no") != curPrincipal) {
+            if (localStorage.getItem("user_no") != curPrincipal) {
                 commonInfo("只有项目负责人可以进行此操作！");
                 return false;
             }
@@ -344,6 +348,10 @@ function projectManage_docDetail(project_no, stage_num, unupload_doc, project_me
                 elem: '#projectManage_docDetail_table',
                 height: 430,
                 url: 'projectManage.do',
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 where: {
                     message: JSON.stringify({
                         "beanList": [{
@@ -433,7 +441,7 @@ function projectManage_docDetail(project_no, stage_num, unupload_doc, project_me
                             if (projectManage_buttonStr.indexOf("projectManage_docDetail_dialog") != -1) {
                                 html += "<a class=\"layui-btn layui-btn-xs\" onclick=\"projectManage_versionDetail('" + project_no + "','" + stage_num + "','" + data.doc_no + "')\">文档详情</a>";
                             }
-                            if (userStr.indexOf(sessionStorage.getItem("user_no")) != -1 && !commonBlank(data.serial_no)) {/*必须要已经上传了第一版文档(待办任务处上传的)*/
+                            if (userStr.indexOf(localStorage.getItem("user_no")) != -1 && !commonBlank(data.serial_no)) {/*必须要已经上传了第一版文档(待办任务处上传的)*/
                                 html += "<a class=\"layui-btn layui-btn-xs\" id='projectManage_uploadFile_dialog" + data.doc_no + "'>更新</a>";
                             }
                             return html;
@@ -467,6 +475,10 @@ function projectManage_versionDetail(project_no, stage_num, doc_no) {
                 elem: '#projectManage_docDetail_table2',
                 height: 430,
                 url: 'projectManage.do',
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 where: {
                     message: JSON.stringify({
                         "beanList": [{
@@ -596,6 +608,10 @@ function projectManage_uploadStageDoc(objId, project_no, stage_num, data) {
         let fileUploadInst = layui.upload.render({
             elem: "#" + objId,
             url: 'projectStageDocUpload.do',//改成您自己的上传接口
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             data: {
                 "project_no": project_no,
                 "stage_num": stage_num,

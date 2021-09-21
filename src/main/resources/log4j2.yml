@@ -118,11 +118,13 @@ Configuration:
         level: debug
         additivity: false
         AppenderRef:
+          - ref: CONSOLE
           - ref: BUSSINESS_ROLLING_FILE
       - name: exception
         level: error
         additivity: false
         AppenderRef:
+          - ref: CONSOLE
           - ref: EXCEPTION_ROLLING_FILE
       - name: org.apache.ibatis
         level: debug

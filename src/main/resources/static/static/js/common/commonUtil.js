@@ -58,7 +58,7 @@ function commonError(msg, f) {
  * (似乎异步请求无法统一封装,因为不会立即返回结果)
  * @param url 请求action地址
  * @param data 请求的json报文
- * @param is_async true-同步，false-异步，不传则默认false
+ * @param is_async true-异步，false-同步，不传则默认false
  */
 function commonAjax(url, data, is_async) {
     // console.log("发送请求......");
@@ -75,6 +75,10 @@ function commonAjax(url, data, is_async) {
         dataType : 'json',
         timeout : 6000,//请求超时时间
         contentType : "application/x-www-form-urlencoded; charset=utf-8",
+        headers: {
+            'authorization': localStorage.getItem("authorization"),
+            // 'user': localStorage.getItem("user_info")
+        },
         data : {
             message : data
         },

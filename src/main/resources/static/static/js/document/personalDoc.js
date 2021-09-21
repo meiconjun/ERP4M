@@ -16,12 +16,16 @@ $(document).ready(function () {
             elem: '#personalDoc_table',
             height: 'full-450',
             url: 'personalDoc.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where : {
                 message : JSON.stringify({
                     "beanList" : [{
                         "doc_no" : "",
                         "doc_name" : "",
-                        "last_modi_user" : sessionStorage.getItem("user_no"),
+                        "last_modi_user" : localStorage.getItem("user_no"),
                         "doc_type" : ""
                     }],
                     "operType" : "query",
@@ -198,7 +202,7 @@ $(document).ready(function () {
 function personalDoc_queryOperation(curPage, limit) {
     let doc_no = $("#personalDoc_docNo").val();
     let doc_name = $("#personalDoc_docName").val();
-    let last_modi_user = sessionStorage.getItem("user_no");
+    let last_modi_user = localStorage.getItem("user_no");
     let doc_type = $("#personalDoc_docType").val();
 
     personalDoc_curr = curPage;
@@ -374,6 +378,10 @@ function personalDoc_versionHis(data) {
                 elem: '#personalDoc_docDetail_table',
                 height: 430,
                 url: 'personalDoc.do',
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 where: {
                     message: JSON.stringify({
                         "beanList": [{
@@ -537,8 +545,12 @@ function personalDoc_initUploadInst(data, operType, digIndex) {
         personalDoc_fileUploadInst = layui.upload.render({
             elem: '#personalDoc_selectFile',
             url: 'docUpload.do',//改成您自己的上传接口
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             data: {
-                "user_no": sessionStorage.getItem("user_no"),
+                "user_no": localStorage.getItem("user_no"),
                 "doc_type": function () {
                     return $("#personalDoc_docType_addTxt").val();
                 },
@@ -601,7 +613,7 @@ function personalDoc_initUploadInst(data, operType, digIndex) {
     } else {
         personalDoc_fileUploadInst.reload({
             data: {
-                "user_no": sessionStorage.getItem("user_no"),
+                "user_no": localStorage.getItem("user_no"),
                 "doc_type": function () {
                     return $("#personalDoc_docType_addTxt").val();
                 },

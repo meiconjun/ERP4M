@@ -6,15 +6,16 @@ import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.common.SystemContants;
 import org.meiconjun.erp4m.config.CustomConfigProperties;
 import org.meiconjun.erp4m.dao.LoginDao;
+import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.meiconjun.erp4m.service.LoginService;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -97,10 +98,12 @@ public class LoginServiceImpl implements LoginService {
                 } else {
                     // 判断是否是初始密码
                     String defaultPsw = customConfigProperties.getDefaultPassword();
+                    String token = TokenUtil.getToken(user2, 3*600000);// 有效时间30分钟
                     if (defaultPsw.equals(user.getPass_word())) {
                         retMap.put("changePsw", true);
                     }
                     retMap.put("user", user2);
+                    retMap.put("token", token);
                     responseBean.setRetMap(retMap);
                     responseBean.setRetCode(SystemContants.HANDLE_SUCCESS);
                     responseBean.setRetMsg("登录成功！");

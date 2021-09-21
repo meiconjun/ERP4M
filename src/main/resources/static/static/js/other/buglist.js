@@ -12,6 +12,10 @@ $(document).ready(function () {
             elem : '#buglist_table',
             height : 'full-450',
             url: 'buglist.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where : {
                 message : JSON.stringify({
                     "beanList": [{

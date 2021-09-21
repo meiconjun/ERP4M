@@ -1,6 +1,7 @@
 package org.meiconjun.erp4m.controller;
 
 import com.google.gson.reflect.TypeToken;
+import org.meiconjun.erp4m.annotation.PassToken;
 import org.meiconjun.erp4m.base.BaseController;
 import org.meiconjun.erp4m.bean.RequestBean;
 import org.meiconjun.erp4m.bean.ResponseBean;
@@ -32,6 +33,7 @@ public class LoginController extends BaseController {
 
     @RequestMapping(value = "/login.do", method = RequestMethod.POST, produces = "text/html;charset=UTF-8")
     @ResponseBody
+    @PassToken
     public String excute(HttpServletRequest request, HttpServletResponse response) {
         return super.excuteRequest(request, new TypeToken<RequestBean<User>>(){}.getType());
     }

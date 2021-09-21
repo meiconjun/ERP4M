@@ -90,14 +90,14 @@ function taskHandler_docJudge(taskBean) {
                     "operType": "judgePass",
                     "paramMap": {
                         "doc_serial_no": docBean.doc_serial_no,
-                        "judge_user": sessionStorage.getItem("user_no"),
+                        "judge_user": localStorage.getItem("user_no"),
                         "remarks": docBean.remarks
                     }
                 }));
                 if (retData.retCode == HANDLE_SUCCESS) {
                     commonOk("提交成功!文档已发行进入公共文档库");
                     // 更新任务信息，关闭弹框，刷新任务列表
-                    commonUpdateTaskState(taskBean.task_no, sessionStorage.getItem("user_no"));
+                    commonUpdateTaskState(taskBean.task_no, localStorage.getItem("user_no"));
                     // 刷新任务列表
                     initTodoTask();
                     layui.layer.closeAll();
@@ -127,7 +127,7 @@ function taskHandler_docJudge(taskBean) {
                                 "operType": "judgeDenied",
                                 "paramMap": {
                                     "doc_serial_no": docBean.doc_serial_no,
-                                    "judge_user": sessionStorage.getItem("user_no"),
+                                    "judge_user": localStorage.getItem("user_no"),
                                     "opinion": $("#docJudge_opinion").val(),
                                     "doc_no": docBean.doc_no,
                                     "upload_user": docBean.upload_user
@@ -136,7 +136,7 @@ function taskHandler_docJudge(taskBean) {
                             if (retData.retCode == HANDLE_SUCCESS) {
                                 commonOk("提交成功!");
                                 // 更新任务信息，关闭弹框，刷新任务列表
-                                commonUpdateTaskState(taskBean.task_no, sessionStorage.getItem("user_no"));
+                                commonUpdateTaskState(taskBean.task_no, localStorage.getItem("user_no"));
                                 // 刷新任务列表
                                 initTodoTask();
                                 layui.layer.closeAll();
@@ -322,7 +322,7 @@ function taskHandler_docReview(taskBean) {
                         "operType": "userReview",
                         "paramMap": {
                             "doc_serial_no": docBean.doc_serial_no,
-                            "review_user": sessionStorage.getItem("user_no"),
+                            "review_user": localStorage.getItem("user_no"),
                             "task_no": taskBean.task_no,
                             "docBean": docBean
                         }
@@ -357,7 +357,7 @@ function taskHandler_docReview(taskBean) {
                                     "operType": "userReviewDenied",
                                     "paramMap": {
                                         "doc_serial_no": docBean.doc_serial_no,
-                                        "judge_user": sessionStorage.getItem("user_no"),
+                                        "judge_user": localStorage.getItem("user_no"),
                                         "opinion": $("#docReview_opinion").val(),
                                         "task_no": taskBean.task_no,
                                         "doc_no": docBean.doc_no,
@@ -454,6 +454,10 @@ function taskHandler_stageDocUpload(taskBean) {
             curUploadInst = layui.upload.render({
                 elem: '#stageDocUpload_selectFile',
                 url: 'projectStageDocUpload.do',//改成您自己的上传接口
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 data: {
                     "project_no": taskParam.project_no,
                     "doc_serial": taskParam.doc_serial,
@@ -476,7 +480,7 @@ function taskHandler_stageDocUpload(taskBean) {
                 done: function(res, index, upload){
                     if (res.code == '0') {
                         // 更新任务信息，关闭弹框，刷新任务列表
-                        let updateState = commonUpdateTaskState(taskBean.task_no, sessionStorage.getItem("user_no"));
+                        let updateState = commonUpdateTaskState(taskBean.task_no, localStorage.getItem("user_no"));
                         if (updateState.retCode != HANDLE_SUCCESS) {
                             commonError(updateState.retMsg);
                             return;

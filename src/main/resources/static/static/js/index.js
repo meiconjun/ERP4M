@@ -13,9 +13,9 @@ $(document).ready(function () {
             disconnectWebSocket();
         }
         //获取登录用户信息
-        if (!commonBlank(sessionStorage.getItem("user_info"))) {
-            user_info = JSON.parse(sessionStorage.getItem("user_info"));
-            sessionStorage.setItem("user_no", user_info.user_no);
+        if (!commonBlank(localStorage.getItem("user_info"))) {
+            user_info = JSON.parse(localStorage.getItem("user_info"));
+            localStorage.setItem("user_no", user_info.user_no);
             // 头像回显
             if (!commonBlank(user_info.picture)) {
                 $("#user_picture_min").attr("src", user_info.picture);
@@ -305,12 +305,12 @@ function userFileChange() {
                 if (retData.retCode == HANDLE_SUCCESS) {
                     if (!commonBlank(retData.retMap)) {
                         // 更新回显头像
-                        let user_info = JSON.parse(sessionStorage.getItem("user_info"));
+                        let user_info = JSON.parse(localStorage.getItem("user_info"));
                         user_info.picture = retData.retMap.base64;
                         $("#user_picture_min").attr("src", user_info.picture);
                         $("#user_picture_main").attr("src", user_info.picture);
                         $("#user_picture_sidebar").attr("src", user_info.picture);
-                        sessionStorage.setItem("user_info", JSON.stringify(user_info));
+                        localStorage.setItem("user_info", JSON.stringify(user_info));
                     }
                     commonOk("修改成功");
                     layui.layer.close(index1);
@@ -321,7 +321,7 @@ function userFileChange() {
             return false;
         },
         success: function (layero, index) {
-            let user_info = JSON.parse(sessionStorage.getItem("user_info"));
+            let user_info = JSON.parse(localStorage.getItem("user_info"));
             $("#userFile_modify_uploadHeaderPrev").find('img').attr('src', $("#user_picture_min").attr("src"));
             $("#userFile_modify_userNo").val(user_info.user_no);
             $("#userFile_modify_userName").val(user_info.user_name);
@@ -336,6 +336,10 @@ function userFileChange() {
             layui.upload.render({
                 elem: '#userFile_modify_uploadHeader',
                 url: 'uploadHeaderImg.do',//改成您自己的上传接口
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 data: {
                     "user_no": function () {
                         return user_info.user_no;
@@ -374,7 +378,7 @@ function logout() {
         "beanList": [],
         "operType": "",
         "paramMap": {
-            "user_no": sessionStorage.getItem("user_no")
+            "user_no": localStorage.getItem("user_no")
         }
     }));
     // 移除前台session

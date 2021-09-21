@@ -12,6 +12,10 @@ $(document).ready(function () {
             elem: '#publicDoc_table',
             height: 'full-450',
             url: 'publicDoc.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where : {
                 message : JSON.stringify({
                     "beanList" : [{
@@ -252,6 +256,10 @@ function publicDoc_versionHis(data) {
                 elem: '#publicDoc_docDetail_table',
                 height: 430,
                 url: 'publicDoc.do',
+                headers: {
+                    'authorization': localStorage.getItem("authorization"),
+                    // 'user': localStorage.getItem("user_info")
+                },
                 where: {
                     message: JSON.stringify({
                         "beanList": [{

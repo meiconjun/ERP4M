@@ -2,6 +2,7 @@ package org.meiconjun.erp4m.config;
 
 import org.meiconjun.erp4m.interceptor.RequestHolder;
 import org.meiconjun.erp4m.interceptor.UserSessionInterceptor;
+import org.meiconjun.erp4m.interceptor.UserTokenInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -66,10 +67,16 @@ public class SpringMvcConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new UserSessionInterceptor()).addPathPatterns("/**");
-        registry.addInterceptor(new RequestHolder()).addPathPatterns("/**");
+//        registry.addInterceptor(new UserSessionInterceptor()).addPathPatterns("/**");
+//        registry.addInterceptor(new RequestHolder()).addPathPatterns("/**");
+        registry.addInterceptor(userTokenInterceptor()).addPathPatterns("/**");
+//        registry.addInterceptor(new RequestHolder()).addPathPatterns("/**");
     }
 
+    @Bean
+    public UserTokenInterceptor userTokenInterceptor() {
+        return new UserTokenInterceptor();
+    }
     /**
      * 注册过滤器 （springboot自动配置中已带，只需在yml中配置编码）
      */
@@ -87,8 +94,8 @@ public class SpringMvcConfig implements WebMvcConfigurer {
     /**
      * 欢迎页
      */
-    @Override
+    /*@Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:login.html");
-    }
+    }*/
 }

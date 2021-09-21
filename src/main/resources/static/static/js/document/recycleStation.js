@@ -11,6 +11,10 @@ $(document).ready(function () {
             elem: '#recycleStation_table',
             height: 'full-450',
             url: 'recycleStation.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where : {
                 message : JSON.stringify({
                     "beanList" : [{
@@ -175,7 +179,7 @@ $(document).ready(function () {
 function recycleStation_queryOperation(curPage, limit) {
     let doc_no = $("#recycleStation_docNo").val();
     let doc_name = $("#recycleStation_docName").val();
-    let last_modi_user = sessionStorage.getItem("user_no");
+    let last_modi_user = localStorage.getItem("user_no");
     let doc_type = $("#recycleStation_docType").val();
 
     recycleStation_curr = curPage;

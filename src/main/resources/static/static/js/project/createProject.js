@@ -52,6 +52,10 @@ $(document).ready(function () {
         createProject_fileUploadInst = layui.upload.render({
             elem: '#createProject_productDoc',
             url: 'projectDescFileUpload.do',//改成您自己的上传接口
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             data: {
                 "projectName": function () {
                     return $("#createProject_name").val();
