@@ -11,6 +11,7 @@ import org.meiconjun.erp4m.annotation.UserLoginToken;
 import org.meiconjun.erp4m.bean.User;
 import org.meiconjun.erp4m.dao.UserConfigDao;
 import org.meiconjun.erp4m.util.CommonUtil;
+import org.meiconjun.erp4m.util.JedisUtil;
 import org.meiconjun.erp4m.util.LogUtil;
 import org.meiconjun.erp4m.util.TokenUtil;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import java.util.List;
  */
 public class UserTokenInterceptor implements HandlerInterceptor {
     private static ThreadLocal<User> userHolder = new ThreadLocal<User>();
+    private static ThreadLocal<String> userNoHolder = new ThreadLocal<String>();
     private Logger platformLogger = LogUtil.getPlatformLogger();
     @Resource
     private UserConfigDao userConfigDao;
@@ -127,7 +129,12 @@ public class UserTokenInterceptor implements HandlerInterceptor {
                             throw new RuntimeException("登录信息失效，请重新登陆");
                         }
                         User user = (User) CommonUtil.jsonToObj(usrStr, User.class);*/
-                        userHolder.set(user);
+                        userNoHolder.set(user.getUser_no());
+                        if (JedisUtil.isRedisEnable()) {
+
+                        } else {
+                            userHolder.set(user);
+                        }
                         // token延时
                         String token_new = TokenUtil.getToken(user, 3*600000);
                         response.setHeader("authorization", token_new);
@@ -141,7 +148,10 @@ public class UserTokenInterceptor implements HandlerInterceptor {
     }
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        userHolder.remove();
+        userNoHolder.remove();
+        if (!JedisUtil.isRedisEnable()) {
+            userHolder.remove();
+        }
     }
     public static User getUser() {
         return userHolder.get();

@@ -75,4 +75,25 @@
         select * from sys_user_tb
         where user_no = #{user_no}
     </select>
+
+    <insert id="mergeUser" parameterType="org.meiconjun.erp4m.bean.User">
+        insert into sys_user_tb (user_no, user_name, pass_word, picture, email, phone, last_modi_time, auth_user, status)
+        values(#{bean.user_no}, #{bean.user_name}, #{bean.pass_word}, #{bean.picture}, #{bean.email}, #{bean.phone},
+        #{bean.last_modi_time}, #{bean.auth_user}, #{bean.status})
+        on duplicate key update
+        user_name = #{user_name},
+        email = #{email}, phone = #{phone}, last_modi_time = #{last_modi_time}
+        <if test="status != null and status != ''">
+            , status = #{status}
+        </if>
+        <if test="pass_word != null and pass_word != ''">
+            , pass_word = #{pass_word}
+        </if>
+        <if test="picture != null and picture != ''">
+            , picture = #{picture}
+        </if>
+        <if test="auth_user != null and auth_user != ''">
+            , auth_user = #{auth_user}
+        </if>
+    </insert>
 </mapper>

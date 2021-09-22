@@ -60,4 +60,11 @@ public interface UserConfigDao {
      * 根据用户号查询用户
      */
     User selectUserByNo(String user_no);
+
+    /**
+     *
+     * @param user
+     * @return
+     */
+    int mergeUser(User user);
 }

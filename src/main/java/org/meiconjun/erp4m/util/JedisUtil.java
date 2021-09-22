@@ -4,10 +4,12 @@ import org.meiconjun.erp4m.config.RedisProperties;
 import org.meiconjun.erp4m.interceptor.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +46,40 @@ public class JedisUtil {
             return false;
         }
     }
+
+    /**
+     * 开启事务
+     */
+    public static void multi() {
+        redisTemplate.multi();
+    }
+
+    /**
+     * 放弃事务
+     */
+    public static void discard() {
+        redisTemplate.discard();
+    }
+    /**
+     * 提交事务
+     */
+    public static void exec() {
+        redisTemplate.exec();
+    }
+
+    /**
+     * 监控事务操作的key，在事务中key被其他线程改变，则事务被放弃
+     */
+    public static void watch(Object key) {
+        redisTemplate.watch(key);
+    }
+
+    /**
+     * 放弃所有监控
+     */
+    public static void unWatch() {
+        redisTemplate.unwatch();
+    }
     /**
      * 是否存在key对应的缓存
      * @param key
@@ -72,9 +108,7 @@ public class JedisUtil {
         try {
             ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
             valueOperations.set(key, value);
-            if (time > 0) {
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
-            }
+            setExpire(key, time);
             return true;
         } catch (Exception e) {
             logger.error("-------------redis存储key[{}]失败，value[{}]，" + e.getMessage(), e, key, value);
@@ -127,14 +161,101 @@ public class JedisUtil {
         try {
             ListOperations listOperations = redisTemplate.opsForList();
             listOperations.rightPushAll(key, valueList);
-            if (time > 0) {
-                redisTemplate.expire(key, time, TimeUnit.SECONDS);
-            }
+            setExpire(key, time);
             return true;
         } catch (Exception e) {
-            logger.error("-------------redis存储key[{}]失败，value[{}]，" + e.getMessage(), e, key, valueList);
+            logger.error("-------------redis存储key[{}]失败" + e.getMessage(), e, key);
         }
         return false;
+    }
+
+    /**
+     * 存储Map型数据
+     * @param key 代表整个Map的key
+     * @param map map对象
+     * @return
+     */
+    public static boolean setMapValue(String key, HashMap map) {
+        return setMapValue(key, map, 0);
+    }
+    /**
+     * 存储Map型数据
+     * @param key 代表整个Map的key
+     * @param map map对象
+     * @param time 超时时间
+     * @return
+     */
+    public static boolean setMapValue(String key, HashMap map, long time) {
+        try {
+            HashOperations hashOperations = redisTemplate.opsForHash();
+            hashOperations.putAll(key, map);
+            setExpire(key, time);
+            return true;
+        } catch (Exception e) {
+            logger.error("-------------redis存储key[{}]失败" + e.getMessage(), e, key);
+        }
+        return false;
+    }
+
+    /**
+     * 缓存指定Map中的某个值
+     * @param mapKey
+     * @param key
+     * @param value
+     * @return
+     */
+    public static boolean setSpecificValueOfMap(String mapKey, String key, Object value) {
+        try {
+            HashOperations hashOperations = redisTemplate.opsForHash();
+            hashOperations.put(mapKey, key, value);
+            return true;
+        } catch (Exception e) {
+            logger.error("-------------redis存储key[{}]失败" + e.getMessage(), e, key);
+        }
+        return false;
+    }
+
+    /**
+     * 获取整个Map
+     * @param key
+     * @return
+     */
+    public static HashMap getMapValue (String key) {
+        try {
+            HashOperations hashOperations = redisTemplate.opsForHash();
+            return (HashMap) hashOperations.entries(key);
+        } catch (Exception e) {
+            logger.error("-------------获取redis缓存[{}]失败，" + e.getMessage(), e, key);
+        }
+        return null;
+    }
+
+    /**
+     * 获取指定map中的指定值
+     * @param mapKey 缓存Map的key
+     * @param valueKey Map中值的key
+     * @return
+     */
+    public static Object getSpecificValueOfMap(String mapKey, String valueKey) {
+        try {
+            HashOperations hashOperations = redisTemplate.opsForHash();
+            return hashOperations.get(mapKey, valueKey);
+        } catch (Exception e) {
+            logger.error("-------------获取redis缓存[{}]失败，" + e.getMessage(), e, mapKey);
+        }
+        return null;
+    }
+
+
+    /**
+     * 设置缓存超时时间
+     * @param key
+     * @param time
+     */
+    private static void setExpire(String key, long time) {
+        if (time > 0) {
+            redisTemplate.expire(key, time, TimeUnit.SECONDS);
+        }
     }
     /**
      * 移除键对应的值

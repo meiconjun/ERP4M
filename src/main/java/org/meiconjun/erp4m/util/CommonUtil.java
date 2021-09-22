@@ -236,6 +236,10 @@ public class CommonUtil {
         if (user == null) {
             logger.error("===================获取登录用户为空====================");
         }*/
+        // TODO 先从redis缓存中获取
+        // TODO 采用读写穿透的缓存策略，以保证数据一致性
+
+
         return UserTokenInterceptor.getUser();
     }
 
