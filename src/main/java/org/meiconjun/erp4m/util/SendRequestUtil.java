@@ -1,5 +1,7 @@
 package org.meiconjun.erp4m.util;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -28,6 +30,8 @@ import java.util.Map;
  * @author meiconjun
  * @time 2019年4月6日下午5:05:25
  */
+@Getter
+@Setter
 public class SendRequestUtil {
 	/** 日志对象 **/
 	private static Logger logger = LoggerFactory.getLogger(SendRequestUtil.class);
@@ -140,7 +144,7 @@ public class SendRequestUtil {
 		}
 		return retObj;
 	}
-	
+
 	/**
 	 * 执行post请求
 	 * @author meiconjun
@@ -148,7 +152,7 @@ public class SendRequestUtil {
 	 * @param url 请求地址
 	 * @param headers 请求头信息列表
 	 * @param paramMap 表单参数
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	@SuppressWarnings({  "rawtypes", "unchecked" })
 	public static RetObj doPost(String url, Map<String, String> headers, Map<String, String> paramMap, int sleepMillis) throws IOException, InterruptedException {
@@ -338,42 +342,4 @@ public class SendRequestUtil {
 		return null;
 	}
 
-	/**
-	 * @param charset the charset to set
-	 */
-	public static void setCharset(String charset) {
-		SendRequestUtil.charSet = charset;
-	}
-
-	public static String getCharSet() {
-		return charSet;
-	}
-
-	public static void setCharSet(String charSet) {
-		SendRequestUtil.charSet = charSet;
-	}
-
-	public static int getRequestTimeout() {
-		return requestTimeout;
-	}
-
-	public static void setRequestTimeout(int requestTimeout) {
-		SendRequestUtil.requestTimeout = requestTimeout;
-	}
-
-	public static int getConnectTimeout() {
-		return connectTimeout;
-	}
-
-	public static void setConnectTimeout(int connectTimeout) {
-		SendRequestUtil.connectTimeout = connectTimeout;
-	}
-
-	public static int getSocketTimeout() {
-		return socketTimeout;
-	}
-
-	public static void setSocketTimeout(int socketTimeout) {
-		SendRequestUtil.socketTimeout = socketTimeout;
-	}
 }
