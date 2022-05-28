@@ -45,10 +45,13 @@ public class CommonUtil {
     private static MessageDao messageDao;
     private static CommonDao commonDao;
     private static TaskDao taskDao;
+    private static CacheUtil cacheUtil;
+
     static {
         messageDao = SpringContextHolder.getBean("messageDao");
         commonDao = SpringContextHolder.getBean("commonDao");
         taskDao = SpringContextHolder.getBean("taskDao");
+        cacheUtil = SpringContextHolder.getBean("cacheUtil");
     }
     /**
      * Json解析器
@@ -236,11 +239,14 @@ public class CommonUtil {
         if (user == null) {
             logger.error("===================获取登录用户为空====================");
         }*/
-        // TODO 先从redis缓存中获取
-        // TODO 采用读写穿透的缓存策略，以保证数据一致性
-
-
-        return UserTokenInterceptor.getUser();
+        // 先从redis缓存中获取
+        // 采用读写穿透的缓存策略，以保证数据一致性
+        if (JedisUtil.isRedisEnable()) {
+            logger.info("使用Redis缓存");
+            return cacheUtil.getSingleUserCache(UserTokenInterceptor.getUserNo());
+        } else {
+            return UserTokenInterceptor.getUser();
+        }
     }
 
     /**

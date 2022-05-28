@@ -157,4 +157,8 @@ public class UserTokenInterceptor implements HandlerInterceptor {
         return userHolder.get();
     }
 
+    public static String getUserNo() {
+        return userNoHolder.get();
+    }
+
 }

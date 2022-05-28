@@ -42,6 +42,8 @@ public class SystemInit {
         // 文档回收站清理 每天林晨2点执行
         schedulerUtil.addCronTrigger("文档回收站清理", "文档Job", "文档回收站清理Trigger",
                 "通用", org.meiconjun.erp4m.job.RecycleDocClean.class, "0 0 2 * * ? *");
+//        schedulerUtil.addCronTrigger("测试", "测试", "测试Trigger",
+//                "通用", org.meiconjun.erp4m.job.TestJob.class, "0/5 * * * * ? ");
         // 无内鬼邮件发送定时服务
         /*schedulerUtil.addCronTrigger("无内鬼每日推送", "爬虫Job", "无内鬼每日推送Trigger",
                 "通用", org.meiconjun.erp4m.job.WuneriguiDailyMail.class, "55 59 23 * * ? *");// 每日23时59分55秒触发一次

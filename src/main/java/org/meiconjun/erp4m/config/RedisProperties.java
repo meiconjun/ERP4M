@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class RedisProperties {
     // 是否启用redis on-是 其它-否
-    private String redisEnable;
+    private boolean redisEnable;
     // 最大空闲数
     private int redisPoolMaxIdle;
     // 最大连接数

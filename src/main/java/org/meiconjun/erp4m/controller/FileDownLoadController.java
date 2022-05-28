@@ -40,8 +40,10 @@ public class FileDownLoadController {
 	@RequestMapping(value = "/fileDownload.do", method = {RequestMethod.GET,RequestMethod.POST}, produces = "text/html;charset=UTF-8")
 	public void fileDownload(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		platformLogger.info("----------------开始下载文件-------------------");
-		String fileName = request.getParameter("fileName");//文件名
-		String filePath = request.getParameter("filePath");//文件全路径
+		//文件名
+		String fileName = request.getParameter("fileName");
+		//文件全路径
+		String filePath = request.getParameter("filePath");
 
 		String rootPath = customConfigProperties.getFileSavePath();
 		if (CommonUtil.isStrBlank(rootPath)) {

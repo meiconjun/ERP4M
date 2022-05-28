@@ -13,6 +13,10 @@ $(document).ready(function () {
             elem: '#userConfig_table',
             height: 'full-450',
             url: 'userConfig.do',
+            headers: {
+                'authorization': localStorage.getItem("authorization"),
+                // 'user': localStorage.getItem("user_info")
+            },
             where : {
                 message : JSON.stringify({
                     "beanList" : [{
@@ -283,6 +287,10 @@ function userConfig_initFileUpload() {
     layui.upload.render({
         elem: '#userConfig_uploadHeader',
         url: 'uploadHeaderImg.do',//改成您自己的上传接口
+        headers: {
+            'authorization': localStorage.getItem("authorization"),
+            // 'user': localStorage.getItem("user_info")
+        },
         data: {
             "user_no": function () {
                 return $("#userConfig_add_userNo").val();

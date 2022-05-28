@@ -39,12 +39,7 @@ public class JedisUtil {
      * @return
      */
     public static boolean isRedisEnable() {
-        String redisEnable = redisProperties.getRedisEnable();
-        if ("on".equals(redisEnable)) {
-            return true;
-        } else {
-            return false;
-        }
+        return redisProperties.isRedisEnable();
     }
 
     /**
@@ -239,7 +234,9 @@ public class JedisUtil {
     public static Object getSpecificValueOfMap(String mapKey, String valueKey) {
         try {
             HashOperations hashOperations = redisTemplate.opsForHash();
-            return hashOperations.get(mapKey, valueKey);
+            Object object = hashOperations.get(mapKey, valueKey);
+            logger.info("获取缓存成功");
+            return object;
         } catch (Exception e) {
             logger.error("-------------获取redis缓存[{}]失败，" + e.getMessage(), e, mapKey);
         }

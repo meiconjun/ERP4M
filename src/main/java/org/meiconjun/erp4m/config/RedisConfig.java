@@ -1,12 +1,19 @@
 package org.meiconjun.erp4m.config;
 
+import org.meiconjun.erp4m.listener.RedisTestListener;
+import org.meiconjun.erp4m.listener.TestConsumer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -87,7 +94,7 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(stringRedisSerializer);
         redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
         redisTemplate.setHashKeySerializer(stringRedisSerializer);
-        redisTemplate.setHashValueSerializer(stringRedisSerializer);
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
         return redisTemplate;
     }
 
@@ -99,5 +106,26 @@ public class RedisConfig {
         StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
         stringRedisTemplate.setConnectionFactory(jedisConnectionFactory);
         return stringRedisTemplate;
+    }
+/*    @Bean(name = "redisTestListener")
+    public RedisTestListener redisTestListener() {
+        return new RedisTestListener();
+    }*/
+
+    @Bean(name= "messageListenerAdapter")
+    public MessageListenerAdapter messageListenerAdapter(RedisSerializer<Object> redisSerializer, TestConsumer testConsumer) {
+        MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(testConsumer, "consume");
+        messageListenerAdapter.setSerializer(redisSerializer);
+        return messageListenerAdapter;
+    }
+
+
+    @Bean(name = "redisMessageListenerContainer")
+    public RedisMessageListenerContainer redisMessageListenerContainer(MessageListenerAdapter messageListenerAdapter, StringRedisSerializer stringRedisSerializer, JedisConnectionFactory jedisConnectionFactory) {
+        RedisMessageListenerContainer redisMessageListenerContainer = new RedisMessageListenerContainer();
+        redisMessageListenerContainer.setConnectionFactory(jedisConnectionFactory);
+        redisMessageListenerContainer.setTopicSerializer(stringRedisSerializer);
+        redisMessageListenerContainer.addMessageListener(messageListenerAdapter, new PatternTopic("redis/**"));
+        return redisMessageListenerContainer;
     }
 }
